@@ -11,7 +11,6 @@ class Worker implements HttpGetActionInterface
 {
     public function __construct(
         protected readonly ResultFactory   $resultFactory,
-        protected readonly UrlInterface    $url,
         protected readonly AssetRepository $assetRepository,
     ) {
     }
@@ -20,12 +19,9 @@ class Worker implements HttpGetActionInterface
     {
         $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
         return $resultJson->setData([
-            'baseJsUrl' => $this->url->getBaseUrl(['_type' => UrlInterface::URL_TYPE_STATIC]),
             'assetUrl' => [
-                'require' => $this->assetRepository->createAsset('requirejs/require.js')->getUrl(),
-                'require_mixin' => $this->assetRepository->createAsset('mage/requirejs/mixin.js')->getUrl(),
-                'require_config' => $this->assetRepository->createAsset('requirejs-config.js')->getUrl(),
-            ]
+                'dexie' => $this->assetRepository->getUrl('VMPL_BugReplay/js/lib/dexie.js'),
+            ],
         ]);
     }
 }
