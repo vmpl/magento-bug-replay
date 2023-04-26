@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "dexie": "^3.2.3"
+    "dexie": "^3.2.3",
+    "rrweb": "^2.0.0-alpha.4",
+    "rrweb-player": "^1.0.0-alpha.4"
   }
 }
