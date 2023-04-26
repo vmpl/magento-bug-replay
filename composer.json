@@ -1,0 +1,36 @@
+{
+    "name": "vmpl/module-bug-replay",
+    "description": "N/A",
+    "type": "magento2-module",
+    "version": "1.0.0-dev",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Kamil Wiśniowski",
+            "email": "kamil.wisniowski@vm.pl",
+            "homepage": "https://vm.pl",
+            "role": "Developer"
+        }
+    ],
+    "dist": {
+        "url": "https://github.com/vmpl/magento-bug-replay/archive/refs/tags/1.0.0-dev.zip",
+        "type": "zip"
+    },
+    "source": {
+        "url":  "https://github.com/vmpl/magento-bug-replay.git",
+        "type": "git",
+        "reference": "master"
+    },
+    "require": {
+        "php": "~8.1.0",
+        "magento/framework": "^103.0.5"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "VMPL\\BugReplay\\": ""
+        }
+    }
+}
