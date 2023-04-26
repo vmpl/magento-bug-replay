@@ -20,7 +20,7 @@ class Worker implements HttpGetActionInterface
         $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
         return $resultJson->setData([
             'assetUrl' => [
-                'dexie' => $this->assetRepository->getUrl('VMPL_BugReplay/js/lib/dexie.js'),
+                'dexie' => $this->assetRepository->getUrl('VMPL_BugReplay/js/lib/dexie/dexie.js'),
             ],
         ]);
     }

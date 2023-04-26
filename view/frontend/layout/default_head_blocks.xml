@@ -2,6 +2,10 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
   <head>
+    <css rel="stylesheet" src="VMPL_BugReplay::js/lib/rrweb/rrweb-all.css"/>
+    <css rel="stylesheet" src="VMPL_BugReplay::js/lib/rrweb-player/style.css"/>
     <script src="VMPL_BugReplay::js/main.js"/>
+    <script src="VMPL_BugReplay::js/lib/rrweb/rrweb-all.js"/>
+    <script src="VMPL_BugReplay::js/lib/rrweb-player/index.js"/>
   </head>
 </page>

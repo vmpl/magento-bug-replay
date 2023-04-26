@@ -5,9 +5,9 @@ const db = (() => {
             importScripts(...Object.values(response.assetUrl))
         })
         .then(() => {
-            const db = new Dexie("WorkerDatabase");
+            const db = new Dexie("VM.PL-RecorderData");
             db.version(1).stores({
-                events: "name"
+                events: "timestamp,type,data"
             });
 
             return db;
@@ -17,23 +17,22 @@ const db = (() => {
 
 onmessage = (event) => {
     switch (event.data.type) {
-        case 'post':
+        case 'add':
+            const recordEvent = event.data.event;
             db.then(it => {
-                it.events.bulkPut(event.data.events)
-                    .then(() => {
-                        postMessage({type: 'post', events: event.events});
-                    })
+                it.events.add(recordEvent);
             })
             break;
-        case 'read':
+        case 'all':
             db.then(it => {
                 it.events.toArray()
                     .then(events => {
-                        postMessage({type: 'read', events: events});
+                        postMessage({type: 'all', events})
                     })
-            })
+            });
             break;
         default:
-            console.log('default type worker message');
+            console.log('default type worker message', event.data);
+            break;
     }
 }
