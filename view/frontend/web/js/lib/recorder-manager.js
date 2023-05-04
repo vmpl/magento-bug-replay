@@ -1,15 +1,25 @@
 /*eslint-disable */
 /* jscs:disable */
-define([], function () {
+define(["threads"], function (_threads) {
   var RecorderManager = /*#__PURE__*/function () {
     "use strict";
 
-    function RecorderManager(message) {
-      this.message = message;
+    function RecorderManager(sessionWorker) {
+      this.sessionWorker = sessionWorker;
     }
     var _proto = RecorderManager.prototype;
-    _proto.logMessage = function logMessage() {
-      console.log(this.message);
+    _proto.sayHello = function sayHello() {
+      this.sessionWorker.sayHello();
+    };
+    RecorderManager.init = function init(instance) {
+      if (instance === void 0) {
+        instance = 'BugReplay';
+      }
+      return (0, _threads.spawn)(new Worker('./session-worker')).then(function (sessionWorker) {
+        return sessionWorker.initInstance(instance).then(function () {
+          return new RecorderManager(sessionWorker);
+        });
+      });
     };
     return RecorderManager;
   }();

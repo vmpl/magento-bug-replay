@@ -1,3 +1,3 @@
 require(['VMPL_BugReplay/js/runner'], function (runner) {
-    runner.execute()
+    runner.then(it => it.execute())
 })

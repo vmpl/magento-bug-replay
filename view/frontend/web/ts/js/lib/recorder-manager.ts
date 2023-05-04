@@ -1,8 +1,19 @@
+import {spawn} from "threads";
+import SessionWorker from "VMPL_BugReplay/js/lib/session-worker";
+
 export default class RecorderManager {
-    constructor(private message: string) {
+    protected constructor(protected readonly sessionWorker: SessionWorker) {
     }
 
-    logMessage(): void  {
-        console.log(this.message);
+    sayHello() {
+        this.sessionWorker.sayHello();
+    }
+
+    static init(instance: string = 'BugReplay'): Promise<RecorderManager> {
+        return spawn(new Worker('./session-worker'))
+            .then((sessionWorker: SessionWorker) => {
+                return sessionWorker.initInstance(instance)
+                    .then(() => new RecorderManager((sessionWorker)))
+            })
     }
 }

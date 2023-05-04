@@ -15,7 +15,7 @@ module.exports = {
             {
                 loose: true,
                 targets: {
-                    browsers: ['last 2 versions', 'ie >= 11']
+                    browsers: ['last 2 versions']
                 },
                 modules: 'amd'
             }

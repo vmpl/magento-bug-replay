@@ -5,8 +5,9 @@ class Runner {
     }
 
     execute(): void {
-        this.manager.logMessage();
+        this.manager.sayHello();
     }
 }
-const runner = new Runner(new RecorderManager('Hello World!'));
+const runner = RecorderManager.init()
+    .then(manager => new Runner(manager));
 export default runner;
