@@ -4,8 +4,8 @@
   <head>
     <css rel="stylesheet" src="VMPL_BugReplay::js/lib/rrweb/rrweb-all.css"/>
     <css rel="stylesheet" src="VMPL_BugReplay::js/lib/rrweb-player/style.css"/>
-    <script src="VMPL_BugReplay::js/main.js"/>
     <script src="VMPL_BugReplay::js/lib/rrweb/rrweb-all.js"/>
     <script src="VMPL_BugReplay::js/lib/rrweb-player/index.js"/>
+    <script src="VMPL_BugReplay::js/main.js"/>
   </head>
 </page>

@@ -1,0 +1,38 @@
+{
+    "extends": "./tsconfig.ce.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "strictNullChecks": false,
+        "module": "esnext",
+        "target": "es2015",
+        "allowJs": true,
+        "noImplicitAny": true,
+        "pretty": true,
+        "allowSyntheticDefaultImports": true,
+        "lib": [
+            "es2015",
+            "es2015.iterable",
+            "es2015.promise",
+            "dom",
+            "es7"
+        ],
+        "types": [
+            "jquery",
+            "jqueryui",
+            "knockout",
+            "magento2",
+            "object-path",
+            "requirejs",
+            "slick-carousel",
+            "tinycolor",
+            "tinymce",
+            "underscore"
+        ]
+    },
+    "exclude": [
+        "page-builder-types",
+        "node_modules",
+        "**/*.spec.ts",
+        "**/*.types.ts"
+    ]
+}
