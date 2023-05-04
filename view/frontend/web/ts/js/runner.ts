@@ -1,7 +1,7 @@
 import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
 
 class Runner {
-    constructor(private manager: RecorderManager) {
+    constructor(protected readonly manager: RecorderManager) {
     }
 
     execute(): void {

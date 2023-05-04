@@ -1,27 +1,23 @@
-const ThreadsPlugin = require('threads-plugin')
 const path = require('path');
-const glob = require('glob');
 
 module.exports = {
     mode: process.env.NODE_ENV ?? 'production',
-    entry: glob.sync('view/frontend/web/ts/js/**').map(it => `./${it}`),
+    entry: {
+        threads: './node_modules/threads/index.mjs',
+        'threads/worker': './node_modules/threads/worker.mjs',
+        dexie: './node_modules/dexie/import-wrapper.mjs',
+    },
     output: {
         filename: './[name].js',
-        path: path.resolve('./view/frontend/web/js/')
+        path: path.resolve('./view/frontend/web/js/lib'),
+        libraryTarget: "umd"
     },
     module: {
         rules: [
             {
                 test: /\.(js|jsx|tsx|ts)$/,
-                exclude: '/node_modules/',
                 loader: 'babel-loader'
             }
         ]
     },
-    plugins: [
-        new ThreadsPlugin()
-    ],
-    externals: {
-        "tiny-worker": "tiny-worker"
-    }
 }

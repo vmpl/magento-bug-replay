@@ -15,7 +15,11 @@ define(["threads"], function (_threads) {
       if (instance === void 0) {
         instance = 'BugReplay';
       }
-      return (0, _threads.spawn)(new Worker('./session-worker')).then(function (sessionWorker) {
+      return fetch('/vmpl-bug-report/config/worker').then(function (response) {
+        return response.json();
+      }).then(function (content) {
+        return (0, _threads.spawn)(new Worker(content.assetUrl.sessionLoader));
+      }).then(function (sessionWorker) {
         return sessionWorker.initInstance(instance).then(function () {
           return new RecorderManager(sessionWorker);
         });
