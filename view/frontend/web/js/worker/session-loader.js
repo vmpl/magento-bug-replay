@@ -6,8 +6,8 @@
     }
     importScripts(
         content.assetUrl.requirejs,
-        content.assetUrl.requireMixins,
         content.assetUrl.requireWorker,
+        content.assetUrl.requireMixins,
         content.assetUrl.requireConfig,
     )
 
