@@ -1,13 +1,24 @@
 import {spawn} from "threads";
-import {SessionWorker} from "VMPL_BugReplay/js/api/session";
+import {RecordEvent, SessionWorker} from "VMPL_BugReplay/js/api/session";
 import {ConfigWorkerContent} from "VMPL_BugReplay/js/api/response";
+import {record} from "rrweb";
 
 export default class RecorderManager {
-    protected constructor(protected readonly sessionWorker: SessionWorker) {
+    stopRecord: Function;
+
+    protected constructor(
+        protected readonly sessionWorker: SessionWorker,
+    ) {
     }
 
-    sayHello() {
-        this.sessionWorker.sayHello();
+    startRecord() {
+        ((self) => {
+            self.stopRecord = record({
+                emit(event: RecordEvent) {
+                    self.sessionWorker.post(event);
+                }
+            })
+        })(this);
     }
 
     static init(instance: string = 'BugReplay'): Promise<RecorderManager> {

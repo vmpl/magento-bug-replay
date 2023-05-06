@@ -5,7 +5,7 @@ class Runner {
     }
 
     execute(): void {
-        this.manager.sayHello();
+        this.manager.startRecord();
     }
 }
 const runner = RecorderManager.init()

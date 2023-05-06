@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["threads"], function (_threads) {
+define(["threads", "rrweb"], function (_threads, _rrweb) {
   var RecorderManager = /*#__PURE__*/function () {
     "use strict";
 
@@ -8,8 +8,14 @@ define(["threads"], function (_threads) {
       this.sessionWorker = sessionWorker;
     }
     var _proto = RecorderManager.prototype;
-    _proto.sayHello = function sayHello() {
-      this.sessionWorker.sayHello();
+    _proto.startRecord = function startRecord() {
+      (function (self) {
+        self.stopRecord = (0, _rrweb.record)({
+          emit: function emit(event) {
+            self.sessionWorker.post(event);
+          }
+        });
+      })(this);
     };
     RecorderManager.init = function init(instance) {
       if (instance === void 0) {

@@ -9,7 +9,7 @@ define(["VMPL_BugReplay/js/lib/recorder-manager"], function (_recorderManager) {
     }
     var _proto = Runner.prototype;
     _proto.execute = function execute() {
-      this.manager.sayHello();
+      this.manager.startRecord();
     };
     return Runner;
   }();
