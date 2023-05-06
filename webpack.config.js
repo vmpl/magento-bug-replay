@@ -17,7 +17,13 @@ module.exports = {
         rules: [
             {
                 test: /\.(js|jsx|tsx|ts)$/,
-                loader: 'babel-loader'
+                loader: 'babel-loader',
+                options: {
+                    presets: [
+                        "@babel/preset-env",
+                        "@babel/preset-typescript"
+                    ]
+                }
             }
         ]
     },

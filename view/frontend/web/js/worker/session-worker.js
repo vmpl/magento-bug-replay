@@ -16,27 +16,28 @@ define(["threads/worker", "dexie"], function (_worker, _dexie) {
       return _this;
     }
     var _proto = SessionDatabase.prototype;
-    _proto.post = function post(record) {
-      return this.events.put(record);
+    _proto.postRecord = function postRecord(record) {
+      return this.events.add(record);
     };
     return SessionDatabase;
   }(_dexie.Dexie);
   var SessionWorker = /*#__PURE__*/function () {
     function SessionWorker() {}
     var _proto2 = SessionWorker.prototype;
+    _proto2.exportToObject = function exportToObject() {
+      return {
+        initInstance: this.initInstance.bind(this),
+        post: this.post.bind(this)
+      };
+    };
     _proto2.initInstance = function initInstance(instance) {
       this.database = new SessionDatabase(instance);
       return Promise.resolve();
     };
-    _proto2.sayHello = function sayHello() {
-      console.log('Hello World!');
-      return Promise.resolve();
-    };
-    _proto2.exportToObject = function exportToObject() {
-      return {
-        initInstance: this.initInstance.bind(this),
-        sayHello: this.sayHello.bind(this)
-      };
+    _proto2.post = function post(event) {
+      return this.database.postRecord(event).then(function () {
+        return true;
+      });
     };
     return SessionWorker;
   }();

@@ -12,27 +12,28 @@ class SessionDatabase extends Dexie {
         });
     }
 
-    post(record: RecordEvent): Promise<RecordEvent> {
-        return this.events.put(record);
+    postRecord(record: RecordEvent): Promise<RecordEvent> {
+        return this.events.add(record);
     }
 }
 
 class SessionWorker implements SessionWorkerInterface {
-    protected database: Dexie;
-    initInstance(instance: string): Promise<any> {
-        this.database = new SessionDatabase(instance);
-        return Promise.resolve();
-    }
-    sayHello(): Promise<any> {
-        console.log('Hello World!');
-        return Promise.resolve();
-    }
+    protected database: SessionDatabase;
 
     exportToObject(): Object {
         return {
             initInstance: this.initInstance.bind(this),
-            sayHello: this.sayHello.bind(this),
+            post: this.post.bind(this),
         }
+    }
+    initInstance(instance: string): Promise<any> {
+        this.database = new SessionDatabase(instance);
+        return Promise.resolve();
+    }
+
+    post(event: RecordEvent): Promise<boolean> {
+        return this.database.postRecord(event)
+            .then(() => true);
     }
 }
 const sessionWorker = new SessionWorker();

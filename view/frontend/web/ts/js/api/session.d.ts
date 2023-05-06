@@ -6,5 +6,5 @@ export interface RecordEvent {
 }
 export class SessionWorker {
     initInstance(instance: string): Promise<any>;
-    sayHello(): Promise<any>;
+    post(event: RecordEvent): Promise<boolean>;
 }
