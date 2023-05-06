@@ -1,1 +1,3 @@
 node_modules
+page-builder-types
+*node_modules*.js*

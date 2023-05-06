@@ -1,12 +1,13 @@
 import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
 
 class Runner {
-    constructor(private manager: RecorderManager) {
+    constructor(protected readonly manager: RecorderManager) {
     }
 
     execute(): void {
-        this.manager.logMessage();
+        this.manager.sayHello();
     }
 }
-const runner = new Runner(new RecorderManager('Hello World!'));
+const runner = RecorderManager.init()
+    .then(manager => new Runner(manager));
 export default runner;

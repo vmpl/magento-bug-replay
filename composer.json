@@ -23,7 +23,8 @@
     },
     "require": {
         "php": "~8.1.0",
-        "magento/framework": "^103.0.5"
+        "magento/framework": "^103.0.5",
+        "magento/module-theme": "^101.1.5"
     },
     "autoload": {
         "files": [

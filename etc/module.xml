@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
   <module name="VMPL_BugReplay">
     <sequence>
-
+      <module name="Magento_Store"/>
     </sequence>
   </module>
 </config>
