@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["threads", "rrweb"], function (_threads, _rrweb) {
+define(["threads"], function (_threads) {
   var RecorderManager = /*#__PURE__*/function () {
     "use strict";
 
@@ -10,7 +10,7 @@ define(["threads", "rrweb"], function (_threads, _rrweb) {
     var _proto = RecorderManager.prototype;
     _proto.startRecord = function startRecord() {
       (function (self) {
-        self.stopRecord = (0, _rrweb.record)({
+        self.stopRecord = rrweb.record({
           emit: function emit(event) {
             self.sessionWorker.post(event);
           }

@@ -1,13 +1,13 @@
 {
-    "compilerOptions": {
-        "paths": {
-            "VMPL_BugReplay/*": [
-                "view/frontend/web/ts/*"
-            ]
-        }
-    },
-    "include": [
-        "./**/*.d.ts",
-        "./**/*.ts"
-    ]
+  "compilerOptions": {
+    "paths": {
+      "VMPL_BugReplay/*": [
+        "view/frontend/web/ts/*"
+      ],
+    }
+  },
+  "include": [
+    "./**/*.d.ts",
+    "./**/*.ts"
+  ]
 }

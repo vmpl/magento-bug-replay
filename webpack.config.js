@@ -7,7 +7,6 @@ module.exports = {
         threads: './node_modules/threads/index.mjs',
         'threads/worker': './node_modules/threads/worker.mjs',
         dexie: './node_modules/dexie/import-wrapper.mjs',
-        rrweb: './node_modules/rrweb/dist/rrweb-all.js',
     },
     output: {
         filename: './[name].js',
@@ -18,7 +17,13 @@ module.exports = {
         rules: [
             {
                 test: /\.(js|jsx|tsx|ts)$/,
-                loader: 'babel-loader'
+                loader: 'babel-loader',
+                options: {
+                    presets: [
+                        "@babel/preset-env",
+                        "@babel/preset-typescript"
+                    ]
+                }
             }
         ]
     },

@@ -1,7 +1,6 @@
 import {spawn} from "threads";
 import {RecordEvent, SessionWorker} from "VMPL_BugReplay/js/api/session";
 import {ConfigWorkerContent} from "VMPL_BugReplay/js/api/response";
-import {record} from "rrweb";
 
 export default class RecorderManager {
     stopRecord: Function;
@@ -13,7 +12,7 @@ export default class RecorderManager {
 
     startRecord() {
         ((self) => {
-            self.stopRecord = record({
+            self.stopRecord = rrweb.record({
                 emit(event: RecordEvent) {
                     self.sessionWorker.post(event);
                 }
