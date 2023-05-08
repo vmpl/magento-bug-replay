@@ -1,0 +1,1 @@
+{"version":3,"file":"response.js","names":[],"sources":["../../ts/js/api/response.ts"],"sourcesContent":["export declare type ConfigWorkerContent = {\n    baseUrl: string,\n    assetUrl: {\n        sessionLoader: string,\n        requireWorker: string,\n        requirejs: string,\n        requireMixins: string,\n        requireConfig: string,\n    }\n}\n"],"mappings":""}

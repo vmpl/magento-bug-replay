@@ -1,0 +1,1 @@
+{"version":3,"file":"rrweb.js","names":[],"sources":["../../ts/js/api/rrweb.ts"],"sourcesContent":["declare const rrweb: {record: Function};\n"],"mappings":""}

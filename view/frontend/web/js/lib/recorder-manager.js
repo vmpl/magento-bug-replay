@@ -1,11 +1,12 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["threads"], function (_threads) {
+define(["threads", "VMPL_BugReplay/js/lib/session-paginator"], function (_threads, _sessionPaginator) {
   var RecorderManager = /*#__PURE__*/function () {
     "use strict";
 
     function RecorderManager(sessionWorker) {
       this.sessionWorker = sessionWorker;
+      this.paginator = new _sessionPaginator(this.loadSessionFromWorker.bind(this));
     }
     var _proto = RecorderManager.prototype;
     _proto.startRecord = function startRecord() {
@@ -28,6 +29,17 @@ define(["threads"], function (_threads) {
       }).then(function (sessionWorker) {
         return sessionWorker.initInstance(instance).then(function () {
           return new RecorderManager(sessionWorker);
+        });
+      });
+    };
+    _proto.loadSessionFromWorker = function loadSessionFromWorker(offset, limit) {
+      return this.sessionWorker.sessions(offset, limit).then(function (items) {
+        return items.map(function (it) {
+          return {
+            timestamp: new Date(it.timestamp),
+            href: new URL(it.href),
+            title: it.title
+          };
         });
       });
     };
