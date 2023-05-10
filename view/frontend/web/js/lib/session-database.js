@@ -1,8 +1,10 @@
 /*eslint-disable */
 /* jscs:disable */
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; _setPrototypeOf(subClass, superClass); }
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 define(["dexie", "VMPL_BugReplay/js/api/session"], function (_dexie, _session) {
+  // @ts-ignore
   var SessionDatabase = /*#__PURE__*/function (_dexie$Dexie) {
     "use strict";
 
@@ -10,10 +12,10 @@ define(["dexie", "VMPL_BugReplay/js/api/session"], function (_dexie, _session) {
     function SessionDatabase(databaseName) {
       var _this;
       _this = _dexie$Dexie.call(this, databaseName) || this;
-      _this.version(1).stores({
+      _dexie$Dexie.prototype.version.call(_assertThisInitialized(_this), 1).stores({
         events: 'timestamp,type,data'
       });
-      _this.version(2).stores({
+      _dexie$Dexie.prototype.version.call(_assertThisInitialized(_this), 2).stores({
         events: '&timestamp,*type,data'
       });
       return _this;

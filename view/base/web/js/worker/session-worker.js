@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["threads/worker", "VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session-database", "VMPL_BugReplay/js/lib/worker-serializer"], function (_worker, _session, _sessionDatabase, _workerSerializer) {
+define(["threads/worker", "VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session-database", "threads", "VMPL_BugReplay/js/lib/worker-serializer"], function (_worker, _session, _sessionDatabase, _threads, _workerSerializer) {
   "use strict";
 
   _sessionDatabase = _interopRequireDefault(_sessionDatabase);
@@ -86,7 +86,7 @@ define(["threads/worker", "VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/li
     };
     return SessionWorker;
   }();
-  (0, _worker.registerSerializer)(_workerSerializer.default);
+  (0, _threads.registerSerializer)(_workerSerializer.default);
   var sessionWorker = new SessionWorker();
   (0, _worker.expose)(sessionWorker.exportToObject());
 });

@@ -1,16 +1,20 @@
-import {spawn} from "threads";
+// @ts-ignore
+import {JsonSerializable, registerSerializer, SerializerImplementation, spawn} from "threads";
 import {RecordEvent, RecordSession, SessionWorker} from "VMPL_BugReplay/js/api/session";
 import {ConfigWorkerContent} from "VMPL_BugReplay/js/api/response";
-import SessionPaginator from "VMPL_BugReplay/js/lib/session-paginator";
+import ItemPaginator from "VMPL_BugReplay/js/lib/items-paginator";
+import {IPaginatorFilter, IPaginatorLoader, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
+import WorkerSerializer from "VMPL_BugReplay/js/lib/worker-serializer";
 
-export default class RecorderManager {
+export default class RecorderManager implements IPaginatorLoader, SerializerImplementation {
     stopRecord: Function;
-    readonly paginator: SessionPaginator
+    readonly paginator: ItemPaginator<RecordSession[], RecorderManager>;
 
     protected constructor(
         protected readonly sessionWorker: SessionWorker,
     ) {
-        this.paginator = new SessionPaginator(this.loadSessionFromWorker.bind(this))
+        this.paginator = new ItemPaginator([], this);
+        registerSerializer(WorkerSerializer);
     }
 
     startRecord() {
@@ -33,14 +37,17 @@ export default class RecorderManager {
             })
     }
 
-    loadSessionFromWorker(offset: number, limit: number) {
-        return this.sessionWorker.sessions(offset, limit)
-            .then(items => items.map<RecordSession>(it => {
-                return {
-                    timestamp: new Date(it.timestamp),
-                    href: new URL(it.href),
-                    title: it.title,
-                }
-            }))
+    loadPaginatorItems(offset: number, limit: number, filter: IPaginatorFilter): Promise<IPaginatorResponse> {
+        return this.sessionWorker.sessions(offset, limit, filter)
+            .then(items => {
+                items.items = items.items.map((it: any) => {
+                    return {
+                        timestamp: new Date(it.timestamp),
+                        href: new URL(it.href),
+                        title: it.title,
+                    }
+                })
+                return items;
+            });
     }
 }

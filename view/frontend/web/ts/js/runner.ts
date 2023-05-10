@@ -16,7 +16,7 @@ class Runner {
                 this.manager.paginator.getCurrentPage()
                     .then(items => console.log(items));
             },
-            goForPage: this.manager.paginator.goPage.bind(this.manager.paginator),
+            goForPage: (value: number) => (this.manager.paginator.page = value),
         }
     }
 }

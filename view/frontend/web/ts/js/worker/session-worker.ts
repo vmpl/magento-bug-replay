@@ -1,12 +1,14 @@
-import {expose} from 'threads/worker';
+// @ts-ignore
+import {expose, registerSerializer} from 'threads/worker';
 import {
     EventType,
     RecordEvent,
-    RecordSession,
     SessionWorker as SessionWorkerInterface,
     SnapshotWithMeta
 } from 'VMPL_BugReplay/js/api/session'
 import SessionDatabase from "VMPL_BugReplay/js/lib/session-database";
+import {IPaginatorFilter, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
+import WorkerSerializer from "VMPL_BugReplay/js/lib/worker-serializer";
 
 class SessionWorker implements SessionWorkerInterface {
     protected database: SessionDatabase;
@@ -29,12 +31,11 @@ class SessionWorker implements SessionWorkerInterface {
             .then(() => true);
     }
 
-    sessions(offset: number = 0, limit: number): Promise<any[]> {
+    sessions(offset: number = 0, limit: number, filter: IPaginatorFilter): Promise<IPaginatorResponse> {
         return this.database.getFullSnapshotsWithMeta()
             .then(items => {
-                const sessions: any[] = [];
+                let sessions: any[] = [];
                 items
-                    .splice(offset * 2, limit * 2)
                     .reduce<SnapshotWithMeta[]>((accumulator, currentValue) => {
                         let snapshotMeta: SnapshotWithMeta = accumulator.pop() ?? {snapshot: null, meta: null};
                         if (snapshotMeta.meta !== null && snapshotMeta.snapshot !== null) {
@@ -70,10 +71,15 @@ class SessionWorker implements SessionWorkerInterface {
                         })
                     })
 
-                return sessions;
+                sessions = filter.match(sessions);
+                return {
+                    meta: {totalRecords: sessions.length},
+                    items: sessions
+                }
             })
     }
 }
+registerSerializer(WorkerSerializer);
 
 const sessionWorker = new SessionWorker();
 expose(sessionWorker.exportToObject());

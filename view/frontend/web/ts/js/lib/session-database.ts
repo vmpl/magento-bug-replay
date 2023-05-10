@@ -1,3 +1,4 @@
+// @ts-ignore
 import {Dexie} from "dexie";
 import {EventType, RecordEvent} from "VMPL_BugReplay/js/api/session";
 
@@ -6,10 +7,10 @@ export default class SessionDatabase extends Dexie {
 
     constructor(databaseName: string) {
         super(databaseName);
-        this.version(1).stores({
+        super.version(1).stores({
             events: 'timestamp,type,data',
         });
-        this.version(2).stores({
+        super.version(2).stores({
             events: '&timestamp,*type,data',
         })
     }

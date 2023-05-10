@@ -9,6 +9,8 @@
     "noImplicitAny": true,
     "pretty": true,
     "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "lib": [
       "dom",
       "es6",

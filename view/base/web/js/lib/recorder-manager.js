@@ -8,7 +8,7 @@ define(["threads", "VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/l
     function RecorderManager(sessionWorker) {
       this.sessionWorker = sessionWorker;
       this.paginator = new _itemsPaginator([], this);
-      (0, _threads.registerSerializer)(_workerSerializer);
+      (0, _threads.registerSerializer)(_workerSerializer());
     }
     var _proto = RecorderManager.prototype;
     _proto.startRecord = function startRecord() {

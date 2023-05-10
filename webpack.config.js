@@ -7,10 +7,11 @@ module.exports = {
         threads: './node_modules/threads/index.mjs',
         'threads/worker': './node_modules/threads/worker.mjs',
         dexie: './node_modules/dexie/import-wrapper.mjs',
+        'typescript-json-serializer': './node_modules/typescript-json-serializer/dist/index.cjs.js',
     },
     output: {
         filename: './[name].js',
-        path: path.resolve('./view/frontend/web/js/lib'),
+        path: path.resolve('./view/base/web/js/lib'),
         libraryTarget: "umd"
     },
     module: {

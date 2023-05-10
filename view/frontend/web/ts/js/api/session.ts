@@ -1,3 +1,5 @@
+import {IPaginatorFilter, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
+
 export enum EventType {
     DomContentLoaded = 0,
     Load = 1,
@@ -25,5 +27,5 @@ export type SnapshotWithMeta = {snapshot: RecordEvent, meta: RecordEvent};
 export interface SessionWorker {
     initInstance(instance: string): Promise<any>;
     post(event: RecordEvent): Promise<boolean>;
-    sessions(offset: number, limit: number): Promise<any[]>
+    sessions(offset: number, limit: number, filter: IPaginatorFilter): Promise<IPaginatorResponse>
 }

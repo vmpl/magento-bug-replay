@@ -21,7 +21,9 @@ define(["VMPL_BugReplay/js/lib/recorder-manager"], function (_recorderManager) {
             return console.log(items);
           });
         },
-        goForPage: this.manager.paginator.goPage.bind(this.manager.paginator)
+        goForPage: function goForPage(value) {
+          return _this.manager.paginator.page = value;
+        }
       };
     };
     return Runner;
