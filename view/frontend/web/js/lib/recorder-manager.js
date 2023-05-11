@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["threads", "VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker-serializer"], function (_threads, _itemsPaginator, _workerSerializer) {
+define(["threads", "VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker-serializer", "VMPL_BugReplay/js/lib/worker/client"], function (_threads, _itemsPaginator, _workerSerializer, _client) {
   // @ts-ignore
   var RecorderManager = /*#__PURE__*/function () {
     "use strict";
@@ -27,7 +27,7 @@ define(["threads", "VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/l
       return fetch('/vmpl-bug-report/config/worker').then(function (response) {
         return response.json();
       }).then(function (content) {
-        return (0, _threads.spawn)(new Worker(content.assetUrl.sessionLoader));
+        return (0, _client.WorkerClient)(content.assetUrl.sessionLoader);
       }).then(function (sessionWorker) {
         return sessionWorker.initInstance(instance).then(function () {
           return new RecorderManager(sessionWorker);

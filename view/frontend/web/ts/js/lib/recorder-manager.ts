@@ -5,6 +5,7 @@ import {ConfigWorkerContent} from "VMPL_BugReplay/js/api/response";
 import ItemPaginator from "VMPL_BugReplay/js/lib/items-paginator";
 import {IPaginatorFilter, IPaginatorLoader, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import WorkerSerializer from "VMPL_BugReplay/js/lib/worker-serializer";
+import {WorkerClient} from "VMPL_BugReplay/js/lib/worker/client";
 
 export default class RecorderManager implements IPaginatorLoader, SerializerImplementation {
     stopRecord: Function;
@@ -30,7 +31,7 @@ export default class RecorderManager implements IPaginatorLoader, SerializerImpl
     static init(instance: string = 'BugReplay'): Promise<RecorderManager> {
         return fetch('/vmpl-bug-report/config/worker')
             .then(response => response.json())
-            .then((content: ConfigWorkerContent) => spawn(new Worker(content.assetUrl.sessionLoader)))
+            .then((content: ConfigWorkerContent) => WorkerClient<SessionWorker>(content.assetUrl.sessionLoader))
             .then((sessionWorker: SessionWorker) => {
                 return sessionWorker.initInstance(instance)
                     .then(() => new RecorderManager(sessionWorker))

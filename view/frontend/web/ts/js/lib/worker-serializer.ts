@@ -6,6 +6,12 @@ const serializer: SerializerImplementation = {
     },
 
     deserialize(message: JsonSerializable, defaultDeserialize: (msg: JsonSerializable) => any): any {
+        if (message.hasOwnProperty('$$classModule')) {
+            console.log(message['$$classModule']);
+            const [ScriptUrl, ModuleClass, DeserializeClass] = message['$$classModule'].split(';')
+            const moduleDefinition = require.async([ModuleClass]);
+            console.log(moduleDefinition)
+        }
         return defaultDeserialize(message);
     }
 }
