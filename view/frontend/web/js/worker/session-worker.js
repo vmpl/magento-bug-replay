@@ -31,6 +31,7 @@ define(["threads/worker", "VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/li
         offset = 0;
       }
       return this.database.getFullSnapshotsWithMeta().then(function (items) {
+        var _filter$match;
         var sessions = [];
         items.reduce(function (accumulator, currentValue) {
           var _accumulator$pop;
@@ -75,7 +76,7 @@ define(["threads/worker", "VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/li
             title: (_tagMetaTitle$attribu = tagMetaTitle == null ? void 0 : (_tagMetaTitle$attribu2 = tagMetaTitle.attributes) == null ? void 0 : _tagMetaTitle$attribu2.content) != null ? _tagMetaTitle$attribu : 'Unknown'
           });
         });
-        sessions = filter.match(sessions);
+        sessions = (_filter$match = filter == null ? void 0 : filter.match(sessions)) != null ? _filter$match : sessions;
         return {
           meta: {
             totalRecords: sessions.length

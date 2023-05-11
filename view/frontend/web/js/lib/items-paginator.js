@@ -4,16 +4,8 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return typeof key === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; _setPrototypeOf(subClass, superClass); }
-function _wrapNativeSuper(Class) { var _cache = typeof Map === "function" ? new Map() : undefined; _wrapNativeSuper = function _wrapNativeSuper(Class) { if (Class === null || !_isNativeFunction(Class)) return Class; if (typeof Class !== "function") { throw new TypeError("Super expression must either be null or a function"); } if (typeof _cache !== "undefined") { if (_cache.has(Class)) return _cache.get(Class); _cache.set(Class, Wrapper); } function Wrapper() { return _construct(Class, arguments, _getPrototypeOf(this).constructor); } Wrapper.prototype = Object.create(Class.prototype, { constructor: { value: Wrapper, enumerable: false, writable: true, configurable: true } }); return _setPrototypeOf(Wrapper, Class); }; return _wrapNativeSuper(Class); }
-function _construct(Parent, args, Class) { if (_isNativeReflectConstruct()) { _construct = Reflect.construct.bind(); } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-function _isNativeFunction(fn) { return Function.toString.call(fn).indexOf("[native code]") !== -1; }
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-define(["VMPL_BugReplay/js/lib/worker-serializer"], function (_workerSerializer) {
-  var _dec, _class, _descriptor, _dec2, _dec3, _dec4, _dec5, _dec6, _class3, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6;
+define(["VMPL_BugReplay/js/lib/decorator-serializer"], function (_decoratorSerializer) {
+  var _dec, _dec2, _class, _class2, _descriptor, _dec3, _dec4, _class4, _class5, _descriptor2;
   function _initializerDefineProperty(target, property, descriptor, context) { if (!descriptor) return; Object.defineProperty(target, property, { enumerable: descriptor.enumerable, configurable: descriptor.configurable, writable: descriptor.writable, value: descriptor.initializer ? descriptor.initializer.call(context) : void 0 }); }
   function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
   function _initializerWarningHelper(descriptor, context) { throw new Error('Decorating class property failed. Please ensure that ' + 'proposal-class-properties is enabled and runs after the decorators transform.'); }
@@ -25,10 +17,13 @@ define(["VMPL_BugReplay/js/lib/worker-serializer"], function (_workerSerializer)
     CompareTypes[CompareTypes["regex"] = 4] = "regex";
     return CompareTypes;
   }(CompareTypes || {});
-  var CompareType = (_dec = (0, _workerSerializer.serializable)(), (_class = /*#__PURE__*/function () {
+  var CompareType = (_dec = (0, _decoratorSerializer.serialize)(), _dec2 = (0, _decoratorSerializer.serializable)(), _dec(_class = (_class2 = /*#__PURE__*/function () {
     "use strict";
 
     function CompareType(type) {
+      if (type === void 0) {
+        type = CompareTypes.equal;
+      }
       _initializerDefineProperty(this, "type", _descriptor, this);
       this.type = type;
     }
@@ -50,18 +45,16 @@ define(["VMPL_BugReplay/js/lib/worker-serializer"], function (_workerSerializer)
       }
     };
     return CompareType;
-  }(), (_descriptor = _applyDecoratedDescriptor(_class.prototype, "type", [_dec], {
+  }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "type", [_dec2], {
     configurable: true,
     enumerable: true,
     writable: true,
     initializer: null
-  })), _class));
-  var PaginatorFilter = (_dec2 = (0, _workerSerializer.serializable)(), _dec3 = (0, _workerSerializer.serializable)(), _dec4 = (0, _workerSerializer.serializable)(), _dec5 = (0, _workerSerializer.serializable)(), _dec6 = (0, _workerSerializer.serializable)(), (_class3 = /*#__PURE__*/function (_Object) {
+  })), _class2)) || _class);
+  var PaginatorFilter = (_dec3 = (0, _decoratorSerializer.serialize)(), _dec4 = (0, _decoratorSerializer.serializable)(), _dec3(_class4 = (_class5 = /*#__PURE__*/function () {
     "use strict";
 
-    _inheritsLoose(PaginatorFilter, _Object);
     function PaginatorFilter(and, property, compare, value, groups) {
-      var _this;
       if (and === void 0) {
         and = true;
       }
@@ -77,18 +70,12 @@ define(["VMPL_BugReplay/js/lib/worker-serializer"], function (_workerSerializer)
       if (groups === void 0) {
         groups = [];
       }
-      _this = _Object.call(this) || this;
-      _initializerDefineProperty(_assertThisInitialized(_this), "and", _descriptor2, _assertThisInitialized(_this));
-      _initializerDefineProperty(_assertThisInitialized(_this), "property", _descriptor3, _assertThisInitialized(_this));
-      _initializerDefineProperty(_assertThisInitialized(_this), "compare", _descriptor4, _assertThisInitialized(_this));
-      _initializerDefineProperty(_assertThisInitialized(_this), "value", _descriptor5, _assertThisInitialized(_this));
-      _initializerDefineProperty(_assertThisInitialized(_this), "groups", _descriptor6, _assertThisInitialized(_this));
-      _this.groups = groups;
-      _this.value = value;
-      _this.compare = compare;
-      _this.property = property;
-      _this.and = and;
-      return _this;
+      _initializerDefineProperty(this, "compare", _descriptor2, this);
+      this.and = and;
+      this.property = property;
+      this.value = value;
+      this.groups = groups;
+      this.compare = compare;
     }
     var _proto2 = PaginatorFilter.prototype;
     _proto2.append = function append() {
@@ -116,32 +103,12 @@ define(["VMPL_BugReplay/js/lib/worker-serializer"], function (_workerSerializer)
       return propertyComponents.length === 0 ? itemValue : this.getItemValue(itemValue, propertyComponents.join('.'));
     };
     return PaginatorFilter;
-  }( /*#__PURE__*/_wrapNativeSuper(Object)), (_descriptor2 = _applyDecoratedDescriptor(_class3.prototype, "and", [_dec2], {
+  }(), (_descriptor2 = _applyDecoratedDescriptor(_class5.prototype, "compare", [_dec4], {
     configurable: true,
     enumerable: true,
     writable: true,
     initializer: null
-  }), _descriptor3 = _applyDecoratedDescriptor(_class3.prototype, "property", [_dec3], {
-    configurable: true,
-    enumerable: true,
-    writable: true,
-    initializer: null
-  }), _descriptor4 = _applyDecoratedDescriptor(_class3.prototype, "compare", [_dec4], {
-    configurable: true,
-    enumerable: true,
-    writable: true,
-    initializer: null
-  }), _descriptor5 = _applyDecoratedDescriptor(_class3.prototype, "value", [_dec5], {
-    configurable: true,
-    enumerable: true,
-    writable: true,
-    initializer: null
-  }), _descriptor6 = _applyDecoratedDescriptor(_class3.prototype, "groups", [_dec6], {
-    configurable: true,
-    enumerable: true,
-    writable: true,
-    initializer: null
-  })), _class3));
+  })), _class5)) || _class4);
   var _default = /*#__PURE__*/function () {
     "use strict";
 
@@ -155,15 +122,15 @@ define(["VMPL_BugReplay/js/lib/worker-serializer"], function (_workerSerializer)
     }
     var _proto3 = _default.prototype;
     _proto3.getCurrentPage = function getCurrentPage() {
-      var _this2 = this;
+      var _this = this;
       var offset = (this._page - 1) * this._size;
       var limit = this._size;
       if (offset >= this.items.length) {
         var leftChunk = this.items.slice(0, offset);
         var rightChunk = this.items.slice(offset + limit);
         return this.loader.loadPaginatorItems(offset, limit, this._filter).then(function (response) {
-          _this2.totalRecords = response.meta.totalRecords;
-          _this2.items = [].concat(leftChunk, response.items, rightChunk);
+          _this.totalRecords = response.meta.totalRecords;
+          _this.items = [].concat(leftChunk, response.items, rightChunk);
           return response.items;
         });
       }

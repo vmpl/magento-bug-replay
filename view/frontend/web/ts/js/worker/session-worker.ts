@@ -71,7 +71,7 @@ class SessionWorker implements SessionWorkerInterface {
                         })
                     })
 
-                sessions = filter.match(sessions);
+                sessions = filter?.match(sessions) ?? sessions;
                 return {
                     meta: {totalRecords: sessions.length},
                     items: sessions

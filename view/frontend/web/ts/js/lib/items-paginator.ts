@@ -3,7 +3,7 @@ import {
     IPaginatorLoader,
     PaginatorItems
 } from "VMPL_BugReplay/js/api/paginator";
-import {serializable} from "VMPL_BugReplay/js/lib/worker-serializer";
+import {serializable, serialize} from "VMPL_BugReplay/js/lib/decorator-serializer";
 
 enum CompareTypes {
     equal,
@@ -13,11 +13,12 @@ enum CompareTypes {
     regex,
 }
 
+@serialize()
 export class CompareType implements ICompare {
     @serializable() protected readonly type: CompareTypes;
 
     constructor(
-        type: CompareTypes,
+        type: CompareTypes = CompareTypes.equal,
     ) {
         this.type = type;
     }
@@ -40,26 +41,18 @@ export class CompareType implements ICompare {
     }
 }
 
-export class PaginatorFilter extends Object implements IPaginatorFilter {
-    @serializable() public and: boolean;
-    @serializable() public property: PropertyKey;
+@serialize()
+export class PaginatorFilter implements IPaginatorFilter {
     @serializable() public compare: ICompare;
-    @serializable() public value: any;
-    @serializable() protected groups: PaginatorFilter[];
 
     constructor(
-        and: boolean = true,
-        property: PropertyKey = null,
+        public and: boolean = true,
+        public property: PropertyKey = null,
         compare: ICompare = new CompareType(CompareTypes.equal),
-        value: any = undefined,
-        groups: PaginatorFilter[] = [],
+        public value: any = undefined,
+        protected groups: PaginatorFilter[] = [],
     ) {
-        super();
-        this.groups = groups;
-        this.value = value;
         this.compare = compare;
-        this.property = property;
-        this.and = and;
     }
 
     append(...filters: [PaginatorFilter]): PaginatorFilter {
