@@ -1,22 +1,16 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["threads/worker", "VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session-database", "VMPL_BugReplay/js/lib/worker-serializer"], function (_worker, _session, _sessionDatabase, _workerSerializer) {
+define(["threads/worker", "VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session-database", "VMPL_BugReplay/js/lib/worker-serializer", "VMPL_BugReplay/js/lib/decorator/worker-class"], function (_worker, _session, _sessionDatabase, _workerSerializer, _workerClass) {
   "use strict";
 
   _sessionDatabase = _interopRequireDefault(_sessionDatabase);
   _workerSerializer = _interopRequireDefault(_workerSerializer);
+  var _class;
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-  // @ts-ignore
-  var SessionWorker = /*#__PURE__*/function () {
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; } // @ts-ignore
+  var SessionWorker = (_class = /*#__PURE__*/function () {
     function SessionWorker() {}
     var _proto = SessionWorker.prototype;
-    _proto.exportToObject = function exportToObject() {
-      return {
-        initInstance: this.initInstance.bind(this),
-        post: this.post.bind(this),
-        sessions: this.sessions.bind(this)
-      };
-    };
     _proto.initInstance = function initInstance(instance) {
       this.database = new _sessionDatabase.default(instance);
       return Promise.resolve();
@@ -86,9 +80,10 @@ define(["threads/worker", "VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/li
       });
     };
     return SessionWorker;
-  }();
+  }(), (_applyDecoratedDescriptor(_class.prototype, "initInstance", [_workerClass.exportToObject], Object.getOwnPropertyDescriptor(_class.prototype, "initInstance"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "post", [_workerClass.exportToObject], Object.getOwnPropertyDescriptor(_class.prototype, "post"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "sessions", [_workerClass.exportToObject], Object.getOwnPropertyDescriptor(_class.prototype, "sessions"), _class.prototype)), _class);
   (0, _worker.registerSerializer)(_workerSerializer.default);
   var sessionWorker = new SessionWorker();
-  (0, _worker.expose)(sessionWorker.exportToObject());
+  // @ts-ignore
+  (0, _worker.expose)(sessionWorker.$exportObject());
 });
 //# sourceMappingURL=session-worker.js.map

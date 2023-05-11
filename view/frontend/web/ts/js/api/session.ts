@@ -10,7 +10,7 @@ export enum EventType {
     Plugin = 6
 }
 
-export interface RecordEvent {
+export interface IRecordEvent {
     timestamp: number,
     type: EventType,
     data: any,
@@ -22,10 +22,10 @@ export interface RecordSession {
     title: string;
 }
 
-export type SnapshotWithMeta = {snapshot: RecordEvent, meta: RecordEvent};
+export type SnapshotWithMeta = {snapshot: IRecordEvent, meta: IRecordEvent};
 
 export interface SessionWorker {
     initInstance(instance: string): Promise<any>;
-    post(event: RecordEvent): Promise<boolean>;
+    post(event: IRecordEvent): Promise<boolean>;
     sessions(offset: number, limit: number, filter: IPaginatorFilter): Promise<IPaginatorResponse>
 }

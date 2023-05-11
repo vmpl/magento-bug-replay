@@ -4,11 +4,9 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return typeof key === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-define(["VMPL_BugReplay/js/lib/decorator-serializer"], function (_decoratorSerializer) {
-  var _dec, _dec2, _class, _class2, _descriptor, _dec3, _dec4, _class4, _class5, _descriptor2;
-  function _initializerDefineProperty(target, property, descriptor, context) { if (!descriptor) return; Object.defineProperty(target, property, { enumerable: descriptor.enumerable, configurable: descriptor.configurable, writable: descriptor.writable, value: descriptor.initializer ? descriptor.initializer.call(context) : void 0 }); }
-  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
-  function _initializerWarningHelper(descriptor, context) { throw new Error('Decorating class property failed. Please ensure that ' + 'proposal-class-properties is enabled and runs after the decorators transform.'); }
+define(["VMPL_BugReplay/js/lib/decorator/worker-class", "module"], function (_workerClass, module) {
+  var _dec, _class, _dec2, _class2;
+  function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
   var CompareTypes = /*#__PURE__*/function (CompareTypes) {
     CompareTypes[CompareTypes["equal"] = 0] = "equal";
     CompareTypes[CompareTypes["in"] = 1] = "in";
@@ -17,14 +15,14 @@ define(["VMPL_BugReplay/js/lib/decorator-serializer"], function (_decoratorSeria
     CompareTypes[CompareTypes["regex"] = 4] = "regex";
     return CompareTypes;
   }(CompareTypes || {});
-  var CompareType = (_dec = (0, _decoratorSerializer.serialize)(), _dec2 = (0, _decoratorSerializer.serializable)(), _dec(_class = (_class2 = /*#__PURE__*/function () {
+  var CompareType = (_dec = (0, _workerClass.injectableArgument)(module.id), _dec(_class = /*#__PURE__*/function () {
     "use strict";
 
     function CompareType(type) {
       if (type === void 0) {
         type = CompareTypes.equal;
       }
-      _initializerDefineProperty(this, "type", _descriptor, this);
+      this.type = type;
       this.type = type;
     }
     var _proto = CompareType.prototype;
@@ -45,13 +43,8 @@ define(["VMPL_BugReplay/js/lib/decorator-serializer"], function (_decoratorSeria
       }
     };
     return CompareType;
-  }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "type", [_dec2], {
-    configurable: true,
-    enumerable: true,
-    writable: true,
-    initializer: null
-  })), _class2)) || _class);
-  var PaginatorFilter = (_dec3 = (0, _decoratorSerializer.serialize)(), _dec4 = (0, _decoratorSerializer.serializable)(), _dec3(_class4 = (_class5 = /*#__PURE__*/function () {
+  }()) || _class);
+  var PaginatorFilter = (_dec2 = (0, _workerClass.injectableArgument)(module.id), _dec2(_class2 = /*#__PURE__*/function () {
     "use strict";
 
     function PaginatorFilter(and, property, compare, value, groups) {
@@ -70,12 +63,11 @@ define(["VMPL_BugReplay/js/lib/decorator-serializer"], function (_decoratorSeria
       if (groups === void 0) {
         groups = [];
       }
-      _initializerDefineProperty(this, "compare", _descriptor2, this);
       this.and = and;
       this.property = property;
+      this.compare = compare;
       this.value = value;
       this.groups = groups;
-      this.compare = compare;
     }
     var _proto2 = PaginatorFilter.prototype;
     _proto2.append = function append() {
@@ -103,12 +95,7 @@ define(["VMPL_BugReplay/js/lib/decorator-serializer"], function (_decoratorSeria
       return propertyComponents.length === 0 ? itemValue : this.getItemValue(itemValue, propertyComponents.join('.'));
     };
     return PaginatorFilter;
-  }(), (_descriptor2 = _applyDecoratedDescriptor(_class5.prototype, "compare", [_dec4], {
-    configurable: true,
-    enumerable: true,
-    writable: true,
-    initializer: null
-  })), _class5)) || _class4);
+  }()) || _class2);
   var _default = /*#__PURE__*/function () {
     "use strict";
 

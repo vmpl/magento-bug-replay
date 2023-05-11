@@ -2,35 +2,31 @@
 import {expose, registerSerializer} from 'threads/worker';
 import {
     EventType,
-    RecordEvent,
+    IRecordEvent,
     SessionWorker as SessionWorkerInterface,
     SnapshotWithMeta
 } from 'VMPL_BugReplay/js/api/session'
 import SessionDatabase from "VMPL_BugReplay/js/lib/session-database";
 import {IPaginatorFilter, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import WorkerSerializer from "VMPL_BugReplay/js/lib/worker-serializer";
+import {exportToObject} from "VMPL_BugReplay/js/lib/decorator/worker-class";
 
 class SessionWorker implements SessionWorkerInterface {
     protected database: SessionDatabase;
 
-    exportToObject(): Object {
-        return {
-            initInstance: this.initInstance.bind(this),
-            post: this.post.bind(this),
-            sessions: this.sessions.bind(this),
-        }
-    }
-
+    @exportToObject
     initInstance(instance: string): Promise<any> {
         this.database = new SessionDatabase(instance);
         return Promise.resolve();
     }
 
-    post(event: RecordEvent): Promise<boolean> {
+    @exportToObject
+    post(event: IRecordEvent): Promise<boolean> {
         return this.database.postRecord(event)
             .then(() => true);
     }
 
+    @exportToObject
     sessions(offset: number = 0, limit: number, filter: IPaginatorFilter): Promise<IPaginatorResponse> {
         return this.database.getFullSnapshotsWithMeta()
             .then(items => {
@@ -82,4 +78,5 @@ class SessionWorker implements SessionWorkerInterface {
 registerSerializer(WorkerSerializer);
 
 const sessionWorker = new SessionWorker();
-expose(sessionWorker.exportToObject());
+// @ts-ignore
+expose(sessionWorker.$exportObject());

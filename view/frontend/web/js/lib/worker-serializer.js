@@ -3,9 +3,6 @@
 define([], function () {
   var serializer = {
     serialize: function serialize(input, defaultSerialize) {
-      if (input != null && input.hasOwnProperty('$serializable')) {
-        return defaultSerialize(input.$serializable());
-      }
       return defaultSerialize(input);
     },
     deserialize: function deserialize(message, defaultDeserialize) {

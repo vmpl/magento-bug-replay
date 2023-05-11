@@ -2,10 +2,6 @@ import {JsonSerializable, SerializerImplementation} from "threads";
 
 const serializer: SerializerImplementation = {
     serialize(input: any, defaultSerialize: (inp: any) => JsonSerializable): JsonSerializable {
-        if (input?.hasOwnProperty('$serializable')) {
-            return defaultSerialize(input.$serializable());
-        }
-
         return defaultSerialize(input);
     },
 

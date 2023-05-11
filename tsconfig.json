@@ -13,7 +13,7 @@
     "experimentalDecorators": true,
     "lib": [
       "dom",
-      "es6",
+      "es2017",
       "webworker"
     ],
     "types": [

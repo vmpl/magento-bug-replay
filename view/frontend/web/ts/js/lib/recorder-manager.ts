@@ -1,6 +1,6 @@
 // @ts-ignore
 import {JsonSerializable, registerSerializer, SerializerImplementation, spawn} from "threads";
-import {RecordEvent, RecordSession, SessionWorker} from "VMPL_BugReplay/js/api/session";
+import {IRecordEvent, RecordSession, SessionWorker} from "VMPL_BugReplay/js/api/session";
 import {ConfigWorkerContent} from "VMPL_BugReplay/js/api/response";
 import ItemPaginator from "VMPL_BugReplay/js/lib/items-paginator";
 import {IPaginatorFilter, IPaginatorLoader, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
@@ -20,7 +20,7 @@ export default class RecorderManager implements IPaginatorLoader, SerializerImpl
     startRecord() {
         ((self) => {
             self.stopRecord = rrweb.record({
-                emit(event: RecordEvent) {
+                emit(event: IRecordEvent) {
                     self.sessionWorker.post(event);
                 }
             })

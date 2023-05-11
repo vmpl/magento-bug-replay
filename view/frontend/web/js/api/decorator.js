@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
 define([], function () {
-  "use strict";
+  return {};
 });
-//# sourceMappingURL=decorator-serializer.js.map
+//# sourceMappingURL=decorator.js.map
