@@ -15,7 +15,7 @@ define(["VMPL_BugReplay/js/lib/decorator/worker-class", "module"], function (_wo
     CompareTypes[CompareTypes["regex"] = 4] = "regex";
     return CompareTypes;
   }(CompareTypes || {});
-  var CompareType = (_dec = (0, _workerClass.injectableArgument)(module.uri, module.id), _dec(_class = /*#__PURE__*/function () {
+  var CompareType = (_dec = (0, _workerClass.injectableArgument)(module.id), _dec(_class = /*#__PURE__*/function () {
     "use strict";
 
     function CompareType(type) {
@@ -44,7 +44,7 @@ define(["VMPL_BugReplay/js/lib/decorator/worker-class", "module"], function (_wo
     };
     return CompareType;
   }()) || _class);
-  var PaginatorFilter = (_dec2 = (0, _workerClass.injectableArgument)(module.uri, module.id), _dec2(_class2 = /*#__PURE__*/function () {
+  var PaginatorFilter = (_dec2 = (0, _workerClass.injectableArgument)(module.id), _dec2(_class2 = /*#__PURE__*/function () {
     "use strict";
 
     function PaginatorFilter(and, property, compare, value, groups) {

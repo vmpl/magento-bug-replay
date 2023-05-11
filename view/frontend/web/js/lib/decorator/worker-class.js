@@ -15,7 +15,7 @@ define([], function () {
     }
     return outString;
   }
-  function injectableArgument(url, module) {
+  function injectableArgument(module) {
     return function (target) {
       return /*#__PURE__*/function (_target) {
         "use strict";
@@ -27,7 +27,7 @@ define([], function () {
             args[_key] = arguments[_key];
           }
           _this = _target.call.apply(_target, [this].concat(args)) || this;
-          _this.$$classModule = url + ":" + module + ";" + target.name;
+          _this.$$classModule = module + ";" + target.name;
           return _this;
         }
         return _class2;

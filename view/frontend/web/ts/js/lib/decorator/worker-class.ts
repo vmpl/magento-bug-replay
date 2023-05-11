@@ -13,10 +13,10 @@ function randomstring(length: number = 64): string {
     return outString;
 }
 
-export function injectableArgument(url: string, module: string) {
+export function injectableArgument(module: string) {
     return function <T extends { new(...args: any[]): {} }>(target: T) {
         return class extends target {
-            $$classModule: string = `${url}:${module};${target.name}`;
+            $$classModule: string = `${module};${target.name}`;
         };
     }
 }

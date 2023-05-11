@@ -14,7 +14,7 @@ enum CompareTypes {
     regex,
 }
 
-@injectableArgument(module.uri, module.id)
+@injectableArgument(module.id)
 export class CompareType implements ICompare {
     constructor(
         protected readonly type: CompareTypes = CompareTypes.equal,
@@ -40,7 +40,7 @@ export class CompareType implements ICompare {
     }
 }
 
-@injectableArgument(module.uri, module.id)
+@injectableArgument(module.id)
 export class PaginatorFilter implements IPaginatorFilter {
     constructor(
         public and: boolean = true,
