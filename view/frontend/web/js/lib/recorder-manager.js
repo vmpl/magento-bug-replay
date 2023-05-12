@@ -1,14 +1,12 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["threads", "VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker-serializer", "VMPL_BugReplay/js/lib/worker/client"], function (_threads, _itemsPaginator, _workerSerializer, _client) {
-  // @ts-ignore
+define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/client"], function (_itemsPaginator, _client) {
   var RecorderManager = /*#__PURE__*/function () {
     "use strict";
 
     function RecorderManager(sessionWorker) {
       this.sessionWorker = sessionWorker;
       this.paginator = new _itemsPaginator([], this);
-      (0, _threads.registerSerializer)(_workerSerializer);
     }
     var _proto = RecorderManager.prototype;
     _proto.startRecord = function startRecord() {

@@ -3,8 +3,8 @@ import {
     IPaginatorLoader,
     PaginatorItems
 } from "VMPL_BugReplay/js/api/paginator";
-import {injectableArgument} from "VMPL_BugReplay/js/lib/decorator/worker-class";
 import * as module from "module";
+import {workerArgument} from "VMPL_BugReplay/js/lib/worker/decorator";
 
 enum CompareTypes {
     equal,
@@ -14,7 +14,7 @@ enum CompareTypes {
     regex,
 }
 
-@injectableArgument(module.id)
+@workerArgument(module.id)
 export class CompareType implements ICompare {
     constructor(
         protected readonly type: CompareTypes = CompareTypes.equal,
@@ -40,7 +40,7 @@ export class CompareType implements ICompare {
     }
 }
 
-@injectableArgument(module.id)
+@workerArgument(module.id)
 export class PaginatorFilter implements IPaginatorFilter {
     constructor(
         public and: boolean = true,
@@ -61,12 +61,13 @@ export class PaginatorFilter implements IPaginatorFilter {
     }
 
     protected matchItem(item: Object): boolean {
-        if (!item.hasOwnProperty(this.property)) {
-            throw new Error(`item do not have property named: ${this.property.toString()}`)
-        }
-
         const groupsMatched: Array<boolean> = this.groups.map(it => it.matchItem(item));
-        groupsMatched.push(this.compare.match(this.getItemValue(item, this.property), this.value));
+        if (this.property) {
+            if (!item.hasOwnProperty(this.property)) {
+                throw new Error(`item do not have property named: ${this.property.toString()}`)
+            }
+            groupsMatched.push(this.compare.match(this.getItemValue(item, this.property), this.value));
+        }
 
         return this.and
             ? !groupsMatched.includes(false)

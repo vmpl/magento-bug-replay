@@ -4,7 +4,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return typeof key === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-define(["VMPL_BugReplay/js/lib/decorator/worker-class", "module"], function (_workerClass, module) {
+define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _decorator) {
   var _dec, _class, _dec2, _class2;
   function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
   var CompareTypes = /*#__PURE__*/function (CompareTypes) {
@@ -15,7 +15,7 @@ define(["VMPL_BugReplay/js/lib/decorator/worker-class", "module"], function (_wo
     CompareTypes[CompareTypes["regex"] = 4] = "regex";
     return CompareTypes;
   }(CompareTypes || {});
-  var CompareType = (_dec = (0, _workerClass.injectableArgument)(module.id), _dec(_class = /*#__PURE__*/function () {
+  var CompareType = (_dec = (0, _decorator.workerArgument)(module.id), _dec(_class = /*#__PURE__*/function () {
     "use strict";
 
     function CompareType(type) {
@@ -44,7 +44,7 @@ define(["VMPL_BugReplay/js/lib/decorator/worker-class", "module"], function (_wo
     };
     return CompareType;
   }()) || _class);
-  var PaginatorFilter = (_dec2 = (0, _workerClass.injectableArgument)(module.id), _dec2(_class2 = /*#__PURE__*/function () {
+  var PaginatorFilter = (_dec2 = (0, _decorator.workerArgument)(module.id), _dec2(_class2 = /*#__PURE__*/function () {
     "use strict";
 
     function PaginatorFilter(and, property, compare, value, groups) {
@@ -79,13 +79,15 @@ define(["VMPL_BugReplay/js/lib/decorator/worker-class", "module"], function (_wo
       return items.filter(this.matchItem.bind(this));
     };
     _proto2.matchItem = function matchItem(item) {
-      if (!item.hasOwnProperty(this.property)) {
-        throw new Error("item do not have property named: " + this.property.toString());
-      }
       var groupsMatched = this.groups.map(function (it) {
         return it.matchItem(item);
       });
-      groupsMatched.push(this.compare.match(this.getItemValue(item, this.property), this.value));
+      if (this.property) {
+        if (!item.hasOwnProperty(this.property)) {
+          throw new Error("item do not have property named: " + this.property.toString());
+        }
+        groupsMatched.push(this.compare.match(this.getItemValue(item, this.property), this.value));
+      }
       return this.and ? !groupsMatched.includes(false) : groupsMatched.includes(true);
     };
     _proto2.getItemValue = function getItemValue(item, property) {

@@ -1,13 +1,10 @@
-// @ts-ignore
-import {JsonSerializable, registerSerializer, SerializerImplementation, spawn} from "threads";
 import {IRecordEvent, RecordSession, SessionWorker} from "VMPL_BugReplay/js/api/session";
 import {ConfigWorkerContent} from "VMPL_BugReplay/js/api/response";
 import ItemPaginator from "VMPL_BugReplay/js/lib/items-paginator";
 import {IPaginatorFilter, IPaginatorLoader, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
-import WorkerSerializer from "VMPL_BugReplay/js/lib/worker-serializer";
 import {WorkerClient} from "VMPL_BugReplay/js/lib/worker/client";
 
-export default class RecorderManager implements IPaginatorLoader, SerializerImplementation {
+export default class RecorderManager implements IPaginatorLoader {
     stopRecord: Function;
     readonly paginator: ItemPaginator<RecordSession[], RecorderManager>;
 
@@ -15,7 +12,6 @@ export default class RecorderManager implements IPaginatorLoader, SerializerImpl
         protected readonly sessionWorker: SessionWorker,
     ) {
         this.paginator = new ItemPaginator([], this);
-        registerSerializer(WorkerSerializer);
     }
 
     startRecord() {

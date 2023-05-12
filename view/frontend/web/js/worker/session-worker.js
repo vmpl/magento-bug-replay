@@ -73,7 +73,7 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session-database
           meta: {
             totalRecords: sessions.length
           },
-          items: sessions
+          items: sessions.slice(offset, limit)
         };
       });
     };
