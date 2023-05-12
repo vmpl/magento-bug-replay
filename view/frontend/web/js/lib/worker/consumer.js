@@ -33,9 +33,10 @@ define(["VMPL_BugReplay/js/lib/worker/converter"], function (_converter) {
           Promise.all(event.data.arguments.map(_converter.objectToClass.bind(_converter))).then(function (args) {
             return target.prototype[event.data.method].apply(_this2, args);
           }).then(function (result) {
-            return postMessage(result);
+            return _converter.classToObject(result);
+          }).then(function (message) {
+            return postMessage(message);
           }).catch(function (error) {
-            console.error(error);
             throw error;
           });
         };

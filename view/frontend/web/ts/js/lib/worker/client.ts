@@ -1,4 +1,4 @@
-import {IMessageWorker} from "VMPL_BugReplay/js/lib/worker/api";
+import {IMessageWorker} from "VMPL_BugReplay/js/api/worker";
 import Converter from "VMPL_BugReplay/js/lib/worker/converter";
 
 export function WorkerClient<T>(scriptUrl: string): Promise<T> {
@@ -11,7 +11,8 @@ export function WorkerClient<T>(scriptUrl: string): Promise<T> {
                 return [method, (...args: any[]) => {
                     const listener = new Promise(resolve => {
                         worker.addEventListener('message', (event) => {
-                            resolve(event.data);
+                            Converter.objectToClass(event.data)
+                                .then(data => resolve(data))
                         }, {once: true, passive: true});
                     })
 

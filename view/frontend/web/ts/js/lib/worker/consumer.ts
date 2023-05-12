@@ -1,4 +1,4 @@
-import {IMessageWorker, IWebWorker} from "VMPL_BugReplay/js/lib/worker/api";
+import {IMessageWorker, IWebWorker} from "VMPL_BugReplay/js/api/worker";
 import Converter from "VMPL_BugReplay/js/lib/worker/converter";
 
 export function WorkerConsumer(namespace: string = null) {
@@ -22,9 +22,9 @@ export function WorkerConsumer(namespace: string = null) {
                     .then((args: any[]) => {
                         return target.prototype[event.data.method].apply(this, args);
                     })
-                    .then(result => postMessage(result))
+                    .then(result => Converter.classToObject(result))
+                    .then(message => postMessage(message))
                     .catch(error => {
-                        console.error(error);
                         throw error;
                     })
             }

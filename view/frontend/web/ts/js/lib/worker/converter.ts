@@ -34,14 +34,14 @@ export default class Converter {
                         convertedObject = Object.fromEntries(convertedObject);
 
                         if (data.hasOwnProperty('$$classModule')) {
-                            const [ModuleClass, LoadedClass] = data['$$classModule'].split(';');
+                            const [ModuleClass, RequiredClass] = data['$$classModule'].split(';');
                             return new Promise(resolve => {
                                 require([ModuleClass], function (modules: any) {
-                                    if (modules[LoadedClass]['$$deserialize'] instanceof Function) {
-                                        resolve(modules[LoadedClass]['$$deserialize'](convertedObject));
+                                    const loadedClass = modules[RequiredClass];
+                                    if (loadedClass['$$deserialize'] instanceof Function) {
+                                        resolve(loadedClass['$$deserialize'](convertedObject));
                                     } else {
-                                        const module = new modules[LoadedClass]();
-                                        resolve(Object.assign(module, convertedObject));
+                                        resolve(Object.assign(new loadedClass(), convertedObject));
                                     }
                                 })
                             });

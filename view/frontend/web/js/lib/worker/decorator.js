@@ -5,6 +5,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Objec
 define([], function () {
   function WorkerArgument(module) {
     return function (target) {
+      var className = target.name.startsWith('_class') ? Object.getPrototypeOf(target).name : target.name;
       return /*#__PURE__*/function (_target) {
         "use strict";
 
@@ -15,7 +16,7 @@ define([], function () {
             args[_key] = arguments[_key];
           }
           _this = _target.call.apply(_target, [this].concat(args)) || this;
-          _this.$$classModule = module + ";" + target.name;
+          _this.$$classModule = module + ";" + className;
           return _this;
         }
         return _class2;

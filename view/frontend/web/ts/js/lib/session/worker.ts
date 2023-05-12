@@ -4,15 +4,16 @@ import {
     SessionWorker as SessionWorkerInterface,
     SnapshotWithMeta
 } from 'VMPL_BugReplay/js/api/session'
-import SessionDatabase from "VMPL_BugReplay/js/lib/session-database";
+import SessionDatabase from "VMPL_BugReplay/js/lib/session/database";
 import {IPaginatorFilter, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import {WorkerConsumer} from "VMPL_BugReplay/js/lib/worker/consumer";
+import {RecordSession} from "VMPL_BugReplay/js/lib/session/models";
 
 @WorkerConsumer()
-class SessionWorker implements SessionWorkerInterface {
+class Worker implements SessionWorkerInterface {
     protected database: SessionDatabase;
 
-    initInstance(instance: string): Promise<any> {
+    initInstance(instance: string): Promise<void> {
         this.database = new SessionDatabase(instance);
         return Promise.resolve();
     }
@@ -58,11 +59,11 @@ class SessionWorker implements SessionWorkerInterface {
                             .childNodes.find((it: any) => it.tagName === 'head')
                             .childNodes.find((it: any) => it.attributes?.name === 'title')
 
-                        sessions.push({
-                            timestamp: snapshotMeta.meta.timestamp,
-                            href: snapshotMeta.meta.data.href,
-                            title: tagMetaTitle?.attributes?.content ?? 'Unknown',
-                        })
+                        sessions.push(new RecordSession(
+                            new URL(snapshotMeta.meta.data.href),
+                            tagMetaTitle?.attributes?.content ?? 'Unknown',
+                            new Date(snapshotMeta.meta.timestamp),
+                        ))
                     })
 
                 sessions = filter?.match(sessions) ?? sessions;
@@ -77,6 +78,8 @@ class SessionWorker implements SessionWorkerInterface {
         return Promise.all(sessions.map(session => this.database.getEvents(session.timestamp.getTime())))
             .then(events => {
                 const items = <IRecordEvent[]>[].concat(...events);
+                // @ts-ignore
+                items.sort((a, b) => a.timestamp > b.timestamp)
                 return {
                     items: items,
                     meta: {
@@ -87,4 +90,4 @@ class SessionWorker implements SessionWorkerInterface {
     }
 }
 
-(new SessionWorker());
+(new Worker());

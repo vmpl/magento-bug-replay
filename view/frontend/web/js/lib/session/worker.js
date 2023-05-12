@@ -1,16 +1,16 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session-database", "VMPL_BugReplay/js/lib/worker/consumer"], function (_session, _sessionDatabase, _consumer) {
+define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database", "VMPL_BugReplay/js/lib/worker/consumer", "VMPL_BugReplay/js/lib/session/models"], function (_session, _database, _consumer, _models) {
   "use strict";
 
-  _sessionDatabase = _interopRequireDefault(_sessionDatabase);
+  _database = _interopRequireDefault(_database);
   var _dec, _class;
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-  var SessionWorker = (_dec = (0, _consumer.WorkerConsumer)(), _dec(_class = /*#__PURE__*/function () {
-    function SessionWorker() {}
-    var _proto = SessionWorker.prototype;
+  var Worker = (_dec = (0, _consumer.WorkerConsumer)(), _dec(_class = /*#__PURE__*/function () {
+    function Worker() {}
+    var _proto = Worker.prototype;
     _proto.initInstance = function initInstance(instance) {
-      this.database = new _sessionDatabase.default(instance);
+      this.database = new _database.default(instance);
       return Promise.resolve();
     };
     _proto.post = function post(event) {
@@ -62,11 +62,7 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session-database
             var _it$attributes;
             return ((_it$attributes = it.attributes) == null ? void 0 : _it$attributes.name) === 'title';
           });
-          sessions.push({
-            timestamp: snapshotMeta.meta.timestamp,
-            href: snapshotMeta.meta.data.href,
-            title: (_tagMetaTitle$attribu = tagMetaTitle == null ? void 0 : (_tagMetaTitle$attribu2 = tagMetaTitle.attributes) == null ? void 0 : _tagMetaTitle$attribu2.content) != null ? _tagMetaTitle$attribu : 'Unknown'
-          });
+          sessions.push(new _models.RecordSession(new URL(snapshotMeta.meta.data.href), (_tagMetaTitle$attribu = tagMetaTitle == null ? void 0 : (_tagMetaTitle$attribu2 = tagMetaTitle.attributes) == null ? void 0 : _tagMetaTitle$attribu2.content) != null ? _tagMetaTitle$attribu : 'Unknown', new Date(snapshotMeta.meta.timestamp)));
         });
         sessions = (_filter$match = filter == null ? void 0 : filter.match(sessions)) != null ? _filter$match : sessions;
         return {
@@ -84,6 +80,10 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session-database
       })).then(function (events) {
         var _ref;
         var items = (_ref = []).concat.apply(_ref, events);
+        // @ts-ignore
+        items.sort(function (a, b) {
+          return a.timestamp > b.timestamp;
+        });
         return {
           items: items,
           meta: {
@@ -92,8 +92,8 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session-database
         };
       });
     };
-    return SessionWorker;
+    return Worker;
   }()) || _class);
-  new SessionWorker();
+  new Worker();
 });
-//# sourceMappingURL=session-worker.js.map
+//# sourceMappingURL=worker.js.map

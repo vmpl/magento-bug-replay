@@ -3,4 +3,4 @@
 define([], function () {
   return {};
 });
-//# sourceMappingURL=decorator.js.map
+//# sourceMappingURL=worker.js.map

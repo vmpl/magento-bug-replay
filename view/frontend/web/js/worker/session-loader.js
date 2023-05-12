@@ -11,5 +11,5 @@
         content.assetUrl.requireConfig,
     )
 
-    require(['VMPL_BugReplay/js/worker/session-worker'])
+    require(['VMPL_BugReplay/js/lib/session/worker'])
 })()

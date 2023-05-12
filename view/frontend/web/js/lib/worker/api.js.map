@@ -1,1 +1,0 @@
-{"version":3,"file":"api.js","names":[],"sources":["../../../ts/js/lib/worker/api.ts"],"sourcesContent":["export declare type IWebWorker = {\n    new(...args: any[]): {},\n    [property: string]: any,\n}\n\nexport interface IMessageWorker extends Object {\n    method: string,\n    arguments: Promise<any>[] | any[],\n}\n"],"mappings":""}

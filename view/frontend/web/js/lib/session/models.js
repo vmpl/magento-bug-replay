@@ -25,4 +25,4 @@ define(["VMPL_BugReplay/js/lib/worker/decorator", "module"], function (_decorato
     RecordSession: RecordSession
   };
 });
-//# sourceMappingURL=session-models.js.map
+//# sourceMappingURL=models.js.map

@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/client", "VMPL_BugReplay/js/lib/session-models"], function (_itemsPaginator, _client, _sessionModels) {
+define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/client"], function (_itemsPaginator, _client) {
   var RecorderManager = /*#__PURE__*/function () {
     "use strict";
 
@@ -38,12 +38,7 @@ define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/c
       });
     };
     _proto.loadPaginatorItems = function loadPaginatorItems(offset, limit, filter) {
-      return this.sessionWorker.sessions(offset, limit, filter).then(function (items) {
-        items.items = items.items.map(function (it) {
-          return new _sessionModels.RecordSession(new URL(it.href), it.title, new Date(it.timestamp));
-        });
-        return items;
-      });
+      return this.sessionWorker.sessions(offset, limit, filter);
     };
     return RecorderManager;
   }();

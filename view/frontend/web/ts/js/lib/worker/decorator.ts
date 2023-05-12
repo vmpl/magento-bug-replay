@@ -1,7 +1,8 @@
 export function WorkerArgument(module: string) {
     return function <T extends { new(...args: any[]): {} }>(target: T) {
+        const className = target.name.startsWith('_class') ? Object.getPrototypeOf(target).name : target.name;
         return class extends target {
-            $$classModule: string = `${module};${target.name}`;
+            $$classModule: string = `${module};${className}`;
         };
     }
 }

@@ -10,7 +10,9 @@ define(["VMPL_BugReplay/js/lib/worker/converter"], function (_converter) {
           return [method, function () {
             var listener = new Promise(function (resolve) {
               worker.addEventListener('message', function (event) {
-                resolve(event.data);
+                _converter.objectToClass(event.data).then(function (data) {
+                  return resolve(data);
+                });
               }, {
                 once: true,
                 passive: true

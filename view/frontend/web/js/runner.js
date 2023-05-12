@@ -30,9 +30,15 @@ define(["VMPL_BugReplay/js/lib/recorder-manager", "VMPL_BugReplay/js/lib/items-p
           }
           _this.manager.paginator.filter = new _itemsPaginator.PaginatorFilter('title', title);
         },
-        getTwoFirstSessionEvents: function getTwoFirstSessionEvents() {
+        getTwoFirstSessionEvents: function getTwoFirstSessionEvents(from, to) {
+          if (from === void 0) {
+            from = 0;
+          }
+          if (to === void 0) {
+            to = 2;
+          }
           _this.manager.paginator.getCurrentPage().then(function (sessions) {
-            return _this.manager.getEventsForSessionAt(sessions.slice(0, 2));
+            return _this.manager.getEventsForSessionAt(sessions.slice(from, to));
           }).then(function (events) {
             return console.log(events);
           });

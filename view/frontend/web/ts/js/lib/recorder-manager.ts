@@ -3,7 +3,7 @@ import {ConfigWorkerContent} from "VMPL_BugReplay/js/api/response";
 import ItemPaginator from "VMPL_BugReplay/js/lib/items-paginator";
 import {IPaginatorFilter, IPaginatorLoader, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import {WorkerClient} from "VMPL_BugReplay/js/lib/worker/client";
-import {RecordSession} from "VMPL_BugReplay/js/lib/session-models";
+declare const rrweb: {record: Function};
 
 export default class RecorderManager implements IPaginatorLoader<IRecordSession> {
     readonly paginator: ItemPaginator<IRecordSession, RecorderManager>;
@@ -45,16 +45,6 @@ export default class RecorderManager implements IPaginatorLoader<IRecordSession>
         limit: number,
         filter: IPaginatorFilter<IRecordSession>,
     ): Promise<IPaginatorResponse<IRecordSession>> {
-        return this.sessionWorker.sessions(offset, limit, filter)
-            .then(items => {
-                items.items = items.items.map(it => {
-                    return new RecordSession(
-                        new URL(it.href),
-                        it.title,
-                        new Date(it.timestamp)
-                    );
-                })
-                return items;
-            });
+        return this.sessionWorker.sessions(offset, limit, filter);
     }
 }

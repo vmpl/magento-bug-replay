@@ -39,14 +39,14 @@ define([], function () {
             if (data.hasOwnProperty('$$classModule')) {
               var _data$$$classModule$s = data['$$classModule'].split(';'),
                 ModuleClass = _data$$$classModule$s[0],
-                LoadedClass = _data$$$classModule$s[1];
+                RequiredClass = _data$$$classModule$s[1];
               return new Promise(function (resolve) {
                 require([ModuleClass], function (modules) {
-                  if (modules[LoadedClass]['$$deserialize'] instanceof Function) {
-                    resolve(modules[LoadedClass]['$$deserialize'](convertedObject));
+                  var loadedClass = modules[RequiredClass];
+                  if (loadedClass['$$deserialize'] instanceof Function) {
+                    resolve(loadedClass['$$deserialize'](convertedObject));
                   } else {
-                    var module = new modules[LoadedClass]();
-                    resolve(Object.assign(module, convertedObject));
+                    resolve(Object.assign(new loadedClass(), convertedObject));
                   }
                 });
               });
