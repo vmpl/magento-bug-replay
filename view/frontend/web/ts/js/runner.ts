@@ -20,6 +20,13 @@ class Runner {
             goForPage: (value: number) => (this.manager.paginator.page = value),
             addFilterWithTitle: (title: string = 'Jackets - Tops - Women') => {
                 this.manager.paginator.filter = new PaginatorFilter('title', title);
+            },
+            getTwoFirstSessionEvents: () => {
+                this.manager.paginator.getCurrentPage()
+                    .then(sessions => {
+                        return this.manager.getEventsForSessionAt(sessions.slice(0, 2))
+                    })
+                    .then(events => console.log(events))
             }
         }
     }

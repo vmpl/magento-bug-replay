@@ -29,6 +29,13 @@ define(["VMPL_BugReplay/js/lib/recorder-manager", "VMPL_BugReplay/js/lib/items-p
             title = 'Jackets - Tops - Women';
           }
           _this.manager.paginator.filter = new _itemsPaginator.PaginatorFilter('title', title);
+        },
+        getTwoFirstSessionEvents: function getTwoFirstSessionEvents() {
+          _this.manager.paginator.getCurrentPage().then(function (sessions) {
+            return _this.manager.getEventsForSessionAt(sessions.slice(0, 2));
+          }).then(function (events) {
+            return console.log(events);
+          });
         }
       };
     };

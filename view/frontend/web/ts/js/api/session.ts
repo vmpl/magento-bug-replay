@@ -16,7 +16,7 @@ export interface IRecordEvent {
     data: any,
 }
 
-export interface RecordSession {
+export interface IRecordSession {
     timestamp: Date;
     href: URL;
     title: string;
@@ -27,5 +27,6 @@ export type SnapshotWithMeta = {snapshot: IRecordEvent, meta: IRecordEvent};
 export interface SessionWorker {
     initInstance(instance: string): Promise<any>;
     post(event: IRecordEvent): Promise<boolean>;
-    sessions(offset: number, limit: number, filter: IPaginatorFilter): Promise<IPaginatorResponse>
+    sessions(offset: number, limit: number, filter: IPaginatorFilter<IRecordSession>): Promise<IPaginatorResponse<IRecordSession>>;
+    events(sessions: IRecordSession[]): Promise<IPaginatorResponse<IRecordEvent>>;
 }

@@ -30,6 +30,16 @@ define(["dexie", "VMPL_BugReplay/js/api/session"], function (_dexie, _session) {
         return types.indexOf(it.type.valueOf()) !== -1;
       }).toArray();
     };
+    _proto.getEvents = function getEvents(timestamp) {
+      var _this2 = this;
+      return this.events.orderBy('timestamp').reverse().filter(function (it) {
+        return it.timestamp > timestamp;
+      }).limit(1).first().then(function (nextSession) {
+        return _this2.events.orderBy('timestamp').reverse().filter(function (it) {
+          return it.timestamp >= timestamp && it.timestamp < nextSession.timestamp;
+        }).toArray();
+      });
+    };
     return SessionDatabase;
   }(_dexie.Dexie);
   return SessionDatabase;

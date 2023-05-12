@@ -1,6 +1,6 @@
 import {
     EventType,
-    IRecordEvent,
+    IRecordEvent, IRecordSession,
     SessionWorker as SessionWorkerInterface,
     SnapshotWithMeta
 } from 'VMPL_BugReplay/js/api/session'
@@ -22,7 +22,10 @@ class SessionWorker implements SessionWorkerInterface {
             .then(() => true);
     }
 
-    sessions(offset: number = 0, limit: number, filter: IPaginatorFilter): Promise<IPaginatorResponse> {
+    sessions(
+        offset: number = 0,
+        limit: number, filter: IPaginatorFilter<IRecordSession>
+    ): Promise<IPaginatorResponse<IRecordSession>> {
         return this.database.getFullSnapshotsWithMeta()
             .then(items => {
                 let sessions: any[] = [];
@@ -66,6 +69,19 @@ class SessionWorker implements SessionWorkerInterface {
                 return {
                     meta: {totalRecords: sessions.length},
                     items: sessions.slice(offset, limit)
+                }
+            })
+    }
+
+    events(sessions: IRecordSession[]): Promise<IPaginatorResponse<IRecordEvent>> {
+        return Promise.all(sessions.map(session => this.database.getEvents(session.timestamp.getTime())))
+            .then(events => {
+                const items = <IRecordEvent[]>[].concat(...events);
+                return {
+                    items: items,
+                    meta: {
+                        totalRecords: items.length,
+                    }
                 }
             })
     }

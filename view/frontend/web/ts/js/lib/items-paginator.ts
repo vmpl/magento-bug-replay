@@ -1,10 +1,9 @@
 import {
     ICompare, IPaginatorFilter,
     IPaginatorLoader,
-    PaginatorItems
 } from "VMPL_BugReplay/js/api/paginator";
 import * as module from "module";
-import {workerArgument} from "VMPL_BugReplay/js/lib/worker/decorator";
+import {WorkerArgument} from "VMPL_BugReplay/js/lib/worker/decorator";
 
 enum CompareTypes {
     equal,
@@ -14,7 +13,7 @@ enum CompareTypes {
     regex,
 }
 
-@workerArgument(module.id)
+@WorkerArgument(module.id)
 export class CompareType implements ICompare {
     constructor(
         protected readonly type: CompareTypes = CompareTypes.equal,
@@ -40,23 +39,23 @@ export class CompareType implements ICompare {
     }
 }
 
-@workerArgument(module.id)
-export class PaginatorFilter implements IPaginatorFilter {
+@WorkerArgument(module.id)
+export class PaginatorFilter<T extends Object> implements IPaginatorFilter<T> {
     constructor(
         public property: PropertyKey = null,
         public value: any = undefined,
         public compare: ICompare = new CompareType(CompareTypes.equal),
         public and: boolean = true,
-        protected groups: PaginatorFilter[] = [],
+        protected groups: PaginatorFilter<T>[] = [],
     ) {
     }
 
-    append(...filters: [PaginatorFilter]): PaginatorFilter {
+    append(...filters: PaginatorFilter<T>[]): PaginatorFilter<T> {
         this.groups.push(...filters);
         return this;
     }
 
-    match(items: PaginatorItems): PaginatorItems {
+    match(items: Array<T>): Array<T> {
         return items.filter(this.matchItem.bind(this));
     }
 
@@ -83,8 +82,8 @@ export class PaginatorFilter implements IPaginatorFilter {
     }
 }
 
-export default class <Items extends PaginatorItems, Loader extends IPaginatorLoader> {
-    protected readonly _filter: PaginatorFilter = new PaginatorFilter();
+export default class <T extends Object, L extends IPaginatorLoader<T>> {
+    protected readonly _filter: PaginatorFilter<T> = new PaginatorFilter();
     protected _page: number = 1;
     protected _size: number = 20;
 
@@ -112,9 +111,9 @@ export default class <Items extends PaginatorItems, Loader extends IPaginatorLoa
         this._size = value;
     }
 
-    set filter(value: PaginatorFilter) {
+    set filter(value: PaginatorFilter<T>) {
         this.page = 1;
-        this.items = <Items>[];
+        this.items = [];
         this._filter.append(value);
     }
 
@@ -125,25 +124,30 @@ export default class <Items extends PaginatorItems, Loader extends IPaginatorLoa
     }
 
     constructor(
-        protected items: Items,
-        protected readonly loader: Loader,
+        protected items: Array<T>,
+        protected readonly loader: L,
     ) {
     }
 
-    getCurrentPage(): Promise<Items> {
+    getCurrentPage(): Promise<Array<T>> {
         const offset = (this._page - 1) * this._size;
         const limit = this._size;
 
         if (offset >= this.items.length) {
-            const leftChunk = <Items>this.items.slice(0, offset);
-            const rightChunk: Items = <Items>this.items.slice(offset + limit);
+            const leftChunk = <Array<T>>this.items.slice(0, offset);
+            const rightChunk = <Array<T>>this.items.slice(offset + limit);
             return this.loader.loadPaginatorItems(offset, limit, this._filter).then(response => {
                 this.totalRecords = response.meta.totalRecords;
-                this.items = <Items>[].concat(leftChunk, response.items, rightChunk);
-                return <Items>response.items;
+                this.items = <Array<T>>[].concat(leftChunk, response.items, rightChunk);
+                return <Array<T>>response.items;
             })
         }
 
-        return Promise.resolve(<Items>this.items.slice(offset, limit));
+        return Promise.resolve(<Array<T>>this.items.slice(offset, limit));
+    }
+
+    fetch(index: number): Promise<T> {
+        return this.loader.loadPaginatorItems(index, 1, this._filter)
+            .then(result => result.items.shift());
     }
 }

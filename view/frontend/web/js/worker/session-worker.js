@@ -77,6 +77,21 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session-database
         };
       });
     };
+    _proto.events = function events(sessions) {
+      var _this = this;
+      return Promise.all(sessions.map(function (session) {
+        return _this.database.getEvents(session.timestamp.getTime());
+      })).then(function (events) {
+        var _ref;
+        var items = (_ref = []).concat.apply(_ref, events);
+        return {
+          items: items,
+          meta: {
+            totalRecords: items.length
+          }
+        };
+      });
+    };
     return SessionWorker;
   }()) || _class);
   new SessionWorker();

@@ -1,12 +1,13 @@
-import {IRecordEvent, RecordSession, SessionWorker} from "VMPL_BugReplay/js/api/session";
+import {IRecordEvent, IRecordSession, SessionWorker} from "VMPL_BugReplay/js/api/session";
 import {ConfigWorkerContent} from "VMPL_BugReplay/js/api/response";
 import ItemPaginator from "VMPL_BugReplay/js/lib/items-paginator";
 import {IPaginatorFilter, IPaginatorLoader, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import {WorkerClient} from "VMPL_BugReplay/js/lib/worker/client";
+import {RecordSession} from "VMPL_BugReplay/js/lib/session-models";
 
-export default class RecorderManager implements IPaginatorLoader {
+export default class RecorderManager implements IPaginatorLoader<IRecordSession> {
+    readonly paginator: ItemPaginator<IRecordSession, RecorderManager>;
     stopRecord: Function;
-    readonly paginator: ItemPaginator<RecordSession[], RecorderManager>;
 
     protected constructor(
         protected readonly sessionWorker: SessionWorker,
@@ -34,15 +35,24 @@ export default class RecorderManager implements IPaginatorLoader {
             })
     }
 
-    loadPaginatorItems(offset: number, limit: number, filter: IPaginatorFilter): Promise<IPaginatorResponse> {
+    getEventsForSessionAt(sessions: IRecordSession[]): Promise<IRecordEvent[]> {
+        return this.sessionWorker.events(sessions)
+            .then(response => response.items);
+    }
+
+    loadPaginatorItems(
+        offset: number,
+        limit: number,
+        filter: IPaginatorFilter<IRecordSession>,
+    ): Promise<IPaginatorResponse<IRecordSession>> {
         return this.sessionWorker.sessions(offset, limit, filter)
             .then(items => {
-                items.items = items.items.map((it: any) => {
-                    return {
-                        timestamp: new Date(it.timestamp),
-                        href: new URL(it.href),
-                        title: it.title,
-                    }
+                items.items = items.items.map(it => {
+                    return new RecordSession(
+                        new URL(it.href),
+                        it.title,
+                        new Date(it.timestamp)
+                    );
                 })
                 return items;
             });

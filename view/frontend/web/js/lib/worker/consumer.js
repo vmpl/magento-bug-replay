@@ -30,9 +30,7 @@ define(["VMPL_BugReplay/js/lib/worker/converter"], function (_converter) {
           if (!target.prototype.hasOwnProperty(event.data.method)) {
             return;
           }
-          Promise.all(event.data.arguments.map(function (it) {
-            return _converter.objectToClass(it);
-          })).then(function (args) {
+          Promise.all(event.data.arguments.map(_converter.objectToClass.bind(_converter))).then(function (args) {
             return target.prototype[event.data.method].apply(_this2, args);
           }).then(function (result) {
             return postMessage(result);

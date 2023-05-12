@@ -1,4 +1,5 @@
 import {IMessageWorker} from "VMPL_BugReplay/js/lib/worker/api";
+import Converter from "VMPL_BugReplay/js/lib/worker/converter";
 
 export function WorkerClient<T>(scriptUrl: string): Promise<T> {
     const worker = new Worker(scriptUrl);
@@ -14,7 +15,7 @@ export function WorkerClient<T>(scriptUrl: string): Promise<T> {
                         }, {once: true, passive: true});
                     })
 
-                    Promise.all(args)
+                    Promise.all(args.map(Converter.classToObject.bind(Converter)))
                         .then(resolved => worker.postMessage(<IMessageWorker>{
                             method,
                             arguments: resolved

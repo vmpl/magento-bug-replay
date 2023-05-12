@@ -15,7 +15,7 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
     CompareTypes[CompareTypes["regex"] = 4] = "regex";
     return CompareTypes;
   }(CompareTypes || {});
-  var CompareType = (_dec = (0, _decorator.workerArgument)(module.id), _dec(_class = /*#__PURE__*/function () {
+  var CompareType = (_dec = (0, _decorator.WorkerArgument)(module.id), _dec(_class = /*#__PURE__*/function () {
     "use strict";
 
     function CompareType(type) {
@@ -44,7 +44,7 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
     };
     return CompareType;
   }()) || _class);
-  var PaginatorFilter = (_dec2 = (0, _decorator.workerArgument)(module.id), _dec2(_class2 = /*#__PURE__*/function () {
+  var PaginatorFilter = (_dec2 = (0, _decorator.WorkerArgument)(module.id), _dec2(_class2 = /*#__PURE__*/function () {
     "use strict";
 
     function PaginatorFilter(property, value, compare, and, groups) {
@@ -124,6 +124,11 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
         });
       }
       return Promise.resolve(this.items.slice(offset, limit));
+    };
+    _proto3.fetch = function fetch(index) {
+      return this.loader.loadPaginatorItems(index, 1, this._filter).then(function (result) {
+        return result.items.shift();
+      });
     };
     _createClass(_default, [{
       key: "page",

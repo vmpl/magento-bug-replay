@@ -18,7 +18,7 @@ export function WorkerConsumer(namespace: string = null) {
                     return;
                 }
 
-                Promise.all(event.data.arguments.map(it => Converter.objectToClass(it)))
+                Promise.all(event.data.arguments.map(Converter.objectToClass.bind(Converter)))
                     .then((args: any[]) => {
                         return target.prototype[event.data.method].apply(this, args);
                     })

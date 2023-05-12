@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define([], function () {
+define(["VMPL_BugReplay/js/lib/worker/converter"], function (_converter) {
   function WorkerClient(scriptUrl) {
     var worker = new Worker(scriptUrl);
     return new Promise(function (resolve) {
@@ -19,7 +19,7 @@ define([], function () {
             for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
               args[_key] = arguments[_key];
             }
-            Promise.all(args).then(function (resolved) {
+            Promise.all(args.map(_converter.classToObject.bind(_converter))).then(function (resolved) {
               return worker.postMessage({
                 method: method,
                 arguments: resolved

@@ -26,4 +26,18 @@ export default class SessionDatabase extends Dexie {
             .filter((it: IRecordEvent) => types.indexOf(it.type.valueOf()) !== -1)
             .toArray();
     }
+
+    getEvents(timestamp: number): Promise<IRecordEvent[]> {
+        return this.events
+            .orderBy('timestamp').reverse()
+            .filter((it: IRecordEvent) => it.timestamp > timestamp)
+            .limit(1)
+            .first()
+            .then((nextSession: IRecordEvent) => {
+                return this.events
+                    .orderBy('timestamp').reverse()
+                    .filter((it: IRecordEvent) => it.timestamp >= timestamp && it.timestamp < nextSession.timestamp)
+                    .toArray()
+            })
+    }
 }

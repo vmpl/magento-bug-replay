@@ -5,6 +5,24 @@ define([], function () {
     "use strict";
 
     function Converter() {}
+    Converter.classToObject = function classToObject(data) {
+      switch (true) {
+        case data instanceof Array:
+          return Promise.all(data.map(this.classToObject.bind(this)));
+        case data instanceof Object:
+          if (data['$$serialize'] instanceof Function) {
+            return Promise.resolve(data['$$serialize']());
+          }
+          return Promise.all(Object.values(data).map(this.classToObject.bind(this))).then(function (values) {
+            var convertedObject = Object.keys(data).map(function (key, index) {
+              return [key, values[index]];
+            });
+            return Object.fromEntries(convertedObject);
+          });
+        default:
+          return Promise.resolve(data);
+      }
+    };
     Converter.objectToClass = function objectToClass(data) {
       var _this = this;
       switch (true) {
@@ -24,8 +42,12 @@ define([], function () {
                 LoadedClass = _data$$$classModule$s[1];
               return new Promise(function (resolve) {
                 require([ModuleClass], function (modules) {
-                  var module = new modules[LoadedClass]();
-                  resolve(Object.assign(module, convertedObject));
+                  if (modules[LoadedClass]['$$deserialize'] instanceof Function) {
+                    resolve(modules[LoadedClass]['$$deserialize'](convertedObject));
+                  } else {
+                    var module = new modules[LoadedClass]();
+                    resolve(Object.assign(module, convertedObject));
+                  }
                 });
               });
             }
