@@ -43,10 +43,10 @@ export class CompareType implements ICompare {
 @workerArgument(module.id)
 export class PaginatorFilter implements IPaginatorFilter {
     constructor(
-        public and: boolean = true,
         public property: PropertyKey = null,
-        public compare: ICompare = new CompareType(CompareTypes.equal),
         public value: any = undefined,
+        public compare: ICompare = new CompareType(CompareTypes.equal),
+        public and: boolean = true,
         protected groups: PaginatorFilter[] = [],
     ) {
     }

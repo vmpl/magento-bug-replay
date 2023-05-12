@@ -47,26 +47,26 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
   var PaginatorFilter = (_dec2 = (0, _decorator.workerArgument)(module.id), _dec2(_class2 = /*#__PURE__*/function () {
     "use strict";
 
-    function PaginatorFilter(and, property, compare, value, groups) {
-      if (and === void 0) {
-        and = true;
-      }
+    function PaginatorFilter(property, value, compare, and, groups) {
       if (property === void 0) {
         property = null;
-      }
-      if (compare === void 0) {
-        compare = new CompareType(CompareTypes.equal);
       }
       if (value === void 0) {
         value = undefined;
       }
+      if (compare === void 0) {
+        compare = new CompareType(CompareTypes.equal);
+      }
+      if (and === void 0) {
+        and = true;
+      }
       if (groups === void 0) {
         groups = [];
       }
-      this.and = and;
       this.property = property;
-      this.compare = compare;
       this.value = value;
+      this.compare = compare;
+      this.and = and;
       this.groups = groups;
     }
     var _proto2 = PaginatorFilter.prototype;

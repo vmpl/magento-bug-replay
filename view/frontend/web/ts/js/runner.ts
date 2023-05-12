@@ -1,4 +1,5 @@
 import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
+import {PaginatorFilter} from "VMPL_BugReplay/js/lib/items-paginator";
 
 class Runner {
     constructor(protected readonly manager: RecorderManager) {
@@ -17,6 +18,9 @@ class Runner {
                     .then(items => console.log(items));
             },
             goForPage: (value: number) => (this.manager.paginator.page = value),
+            addFilterWithTitle: (title: string = 'Jackets - Tops - Women') => {
+                this.manager.paginator.filter = new PaginatorFilter('title', title);
+            }
         }
     }
 }

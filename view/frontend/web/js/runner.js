@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["VMPL_BugReplay/js/lib/recorder-manager"], function (_recorderManager) {
+define(["VMPL_BugReplay/js/lib/recorder-manager", "VMPL_BugReplay/js/lib/items-paginator"], function (_recorderManager, _itemsPaginator) {
   var Runner = /*#__PURE__*/function () {
     "use strict";
 
@@ -23,6 +23,12 @@ define(["VMPL_BugReplay/js/lib/recorder-manager"], function (_recorderManager) {
         },
         goForPage: function goForPage(value) {
           return _this.manager.paginator.page = value;
+        },
+        addFilterWithTitle: function addFilterWithTitle(title) {
+          if (title === void 0) {
+            title = 'Jackets - Tops - Women';
+          }
+          _this.manager.paginator.filter = new _itemsPaginator.PaginatorFilter('title', title);
         }
       };
     };
