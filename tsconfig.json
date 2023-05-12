@@ -9,9 +9,11 @@
     "noImplicitAny": true,
     "pretty": true,
     "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "lib": [
       "dom",
-      "es6",
+      "es2019",
       "webworker"
     ],
     "types": [

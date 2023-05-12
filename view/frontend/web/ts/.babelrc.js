@@ -18,11 +18,13 @@ module.exports = {
                     browsers: ['last 2 versions']
                 },
                 modules: 'amd'
-            }
+            },
         ]
     ],
     plugins: [
         '@babel/plugin-transform-typescript',
+        ['@babel/plugin-proposal-decorators', {version: "legacy"}],
+        ['@babel/plugin-proposal-class-properties', {"loose": true}],
         ['@comandeer/babel-plugin-banner', {
             'banner': "/*eslint-disable */\n/* jscs:disable */",
         }],

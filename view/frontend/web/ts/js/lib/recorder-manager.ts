@@ -1,19 +1,24 @@
-import {spawn} from "threads";
-import {RecordEvent, SessionWorker} from "VMPL_BugReplay/js/api/session";
+import {IRecordEvent, IRecordSession, SessionWorker} from "VMPL_BugReplay/js/api/session";
 import {ConfigWorkerContent} from "VMPL_BugReplay/js/api/response";
+import ItemPaginator from "VMPL_BugReplay/js/lib/items-paginator";
+import {IPaginatorFilter, IPaginatorLoader, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
+import {WorkerClient} from "VMPL_BugReplay/js/lib/worker/client";
+declare const rrweb: {record: Function};
 
-export default class RecorderManager {
+export default class RecorderManager implements IPaginatorLoader<IRecordSession> {
+    readonly paginator: ItemPaginator<IRecordSession, RecorderManager>;
     stopRecord: Function;
 
     protected constructor(
         protected readonly sessionWorker: SessionWorker,
     ) {
+        this.paginator = new ItemPaginator([], this);
     }
 
     startRecord() {
         ((self) => {
             self.stopRecord = rrweb.record({
-                emit(event: RecordEvent) {
+                emit(event: IRecordEvent) {
                     self.sessionWorker.post(event);
                 }
             })
@@ -23,10 +28,23 @@ export default class RecorderManager {
     static init(instance: string = 'BugReplay'): Promise<RecorderManager> {
         return fetch('/vmpl-bug-report/config/worker')
             .then(response => response.json())
-            .then((content: ConfigWorkerContent) => spawn(new Worker(content.assetUrl.sessionLoader)))
+            .then((content: ConfigWorkerContent) => WorkerClient<SessionWorker>(content.assetUrl.sessionLoader))
             .then((sessionWorker: SessionWorker) => {
                 return sessionWorker.initInstance(instance)
-                    .then(() => new RecorderManager((sessionWorker)))
+                    .then(() => new RecorderManager(sessionWorker))
             })
+    }
+
+    getEventsForSessionAt(sessions: IRecordSession[]): Promise<IRecordEvent[]> {
+        return this.sessionWorker.events(sessions)
+            .then(response => response.items);
+    }
+
+    loadPaginatorItems(
+        offset: number,
+        limit: number,
+        filter: IPaginatorFilter<IRecordSession>,
+    ): Promise<IPaginatorResponse<IRecordSession>> {
+        return this.sessionWorker.sessions(offset, limit, filter);
     }
 }
