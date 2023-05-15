@@ -85,7 +85,7 @@ export class PaginatorFilter<T extends Object> implements IPaginatorFilter<T> {
 export default class <T extends Object, L extends IPaginatorLoader<T>> {
     protected readonly _filter: PaginatorFilter<T> = new PaginatorFilter();
     protected _page: number = 1;
-    protected _size: number = 20;
+    protected _size: number = 5;
 
     protected totalRecords: number = undefined;
 
@@ -143,7 +143,7 @@ export default class <T extends Object, L extends IPaginatorLoader<T>> {
             })
         }
 
-        return Promise.resolve(<Array<T>>this.items.slice(offset, limit));
+        return Promise.resolve(<Array<T>>this.items.slice(offset, offset + limit));
     }
 
     fetch(index: number): Promise<T> {

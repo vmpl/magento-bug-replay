@@ -104,7 +104,7 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
     function _default(items, loader) {
       this._filter = new PaginatorFilter();
       this._page = 1;
-      this._size = 20;
+      this._size = 5;
       this.totalRecords = undefined;
       this.items = items;
       this.loader = loader;
@@ -123,7 +123,7 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
           return response.items;
         });
       }
-      return Promise.resolve(this.items.slice(offset, limit));
+      return Promise.resolve(this.items.slice(offset, offset + limit));
     };
     _proto3.fetch = function fetch(index) {
       return this.loader.loadPaginatorItems(index, 1, this._filter).then(function (result) {
