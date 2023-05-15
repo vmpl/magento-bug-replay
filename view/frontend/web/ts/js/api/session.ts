@@ -29,4 +29,5 @@ export interface SessionWorker {
     post(event: IRecordEvent): Promise<boolean>;
     sessions(offset: number, limit: number, filter: IPaginatorFilter<IRecordSession>): Promise<IPaginatorResponse<IRecordSession>>;
     events(sessions: IRecordSession[]): Promise<IPaginatorResponse<IRecordEvent>>;
+    export(sessions?: IRecordSession[]): Promise<Blob>;
 }

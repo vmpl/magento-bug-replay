@@ -1,6 +1,6 @@
-import {IRecordSession} from "VMPL_BugReplay/js/api/session";
 import {WorkerArgument, WorkerSerializable} from "VMPL_BugReplay/js/lib/worker/decorator";
-import * as module from "module";
+import module from "module";
+import {IRecordSession} from "VMPL_BugReplay/js/api/session";
 
 @WorkerArgument(module.id)
 @WorkerSerializable({

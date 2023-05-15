@@ -7,7 +7,7 @@ import {
 import SessionDatabase from "VMPL_BugReplay/js/lib/session/database";
 import {IPaginatorFilter, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import {WorkerConsumer} from "VMPL_BugReplay/js/lib/worker/consumer";
-import {RecordSession} from "VMPL_BugReplay/js/lib/session/models";
+import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
 
 @WorkerConsumer()
 class Worker implements SessionWorkerInterface {
@@ -87,6 +87,15 @@ class Worker implements SessionWorkerInterface {
                     }
                 }
             })
+    }
+
+    export(sessions?: IRecordSession[]): Promise<Blob> {
+        // @ts-ignore
+        const sorted = (sessions ?? []).sort(it => it.timestamp.getTime() < it.timestamp.getTime());
+        const fromDate = sorted.shift()?.timestamp;
+        const toDate = sorted.pop()?.timestamp;
+
+        return this.database.exportSessions(fromDate, toDate);
     }
 }
 

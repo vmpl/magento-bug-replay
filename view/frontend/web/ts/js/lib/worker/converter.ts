@@ -4,6 +4,8 @@ export default class Converter {
 
     static classToObject(data: any): Promise<any> {
         switch (true) {
+            case data instanceof Blob:
+                return Promise.resolve(data);
             case data instanceof Array:
                 return Promise.all(data.map(this.classToObject.bind(this)));
             case data instanceof Object:
@@ -24,6 +26,8 @@ export default class Converter {
 
     static objectToClass(data: any): Promise<any> {
         switch (true) {
+            case data instanceof Blob:
+                return Promise.resolve(data);
             case data instanceof Array:
                 return Promise.all(data.map(this.objectToClass.bind(this)));
             case data instanceof Object:

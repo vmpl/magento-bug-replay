@@ -27,6 +27,10 @@ class Runner {
                         return this.manager.getEventsForSessionAt(sessions.slice(from, to))
                     })
                     .then(events => console.log(events))
+            },
+            uploadSessions: () => {
+                this.manager.uploadSessions()
+                    .then(() => console.log('finished'));
             }
         }
     }

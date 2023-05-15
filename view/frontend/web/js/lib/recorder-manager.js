@@ -37,6 +37,17 @@ define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/c
         return response.items;
       });
     };
+    _proto.uploadSessions = function uploadSessions(sessions) {
+      return this.sessionWorker.export(sessions).then(function (data) {
+        return data.text();
+      }).then(function (content) {
+        return JSON.parse(content);
+      }).then(function (object) {
+        return console.log(object);
+      }).then(function () {
+        return true;
+      });
+    };
     _proto.loadPaginatorItems = function loadPaginatorItems(offset, limit, filter) {
       return this.sessionWorker.sessions(offset, limit, filter);
     };

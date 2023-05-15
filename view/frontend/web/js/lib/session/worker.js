@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database", "VMPL_BugReplay/js/lib/worker/consumer", "VMPL_BugReplay/js/lib/session/models"], function (_session, _database, _consumer, _models) {
+define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database", "VMPL_BugReplay/js/lib/worker/consumer", "VMPL_BugReplay/js/lib/session/model/record-session"], function (_session, _database, _consumer, _recordSession) {
   "use strict";
 
   _database = _interopRequireDefault(_database);
@@ -62,7 +62,7 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
             var _it$attributes;
             return ((_it$attributes = it.attributes) == null ? void 0 : _it$attributes.name) === 'title';
           });
-          sessions.push(new _models.RecordSession(new URL(snapshotMeta.meta.data.href), (_tagMetaTitle$attribu = tagMetaTitle == null ? void 0 : (_tagMetaTitle$attribu2 = tagMetaTitle.attributes) == null ? void 0 : _tagMetaTitle$attribu2.content) != null ? _tagMetaTitle$attribu : 'Unknown', new Date(snapshotMeta.meta.timestamp)));
+          sessions.push(new _recordSession.RecordSession(new URL(snapshotMeta.meta.data.href), (_tagMetaTitle$attribu = tagMetaTitle == null ? void 0 : (_tagMetaTitle$attribu2 = tagMetaTitle.attributes) == null ? void 0 : _tagMetaTitle$attribu2.content) != null ? _tagMetaTitle$attribu : 'Unknown', new Date(snapshotMeta.meta.timestamp)));
         });
         sessions = (_filter$match = filter == null ? void 0 : filter.match(sessions)) != null ? _filter$match : sessions;
         return {
@@ -91,6 +91,16 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
           }
         };
       });
+    };
+    _proto.export = function _export(sessions) {
+      var _sorted$shift, _sorted$pop;
+      // @ts-ignore
+      var sorted = (sessions != null ? sessions : []).sort(function (it) {
+        return it.timestamp.getTime() < it.timestamp.getTime();
+      });
+      var fromDate = (_sorted$shift = sorted.shift()) == null ? void 0 : _sorted$shift.timestamp;
+      var toDate = (_sorted$pop = sorted.pop()) == null ? void 0 : _sorted$pop.timestamp;
+      return this.database.exportSessions(fromDate, toDate);
     };
     return Worker;
   }()) || _class);

@@ -42,6 +42,11 @@ define(["VMPL_BugReplay/js/lib/recorder-manager", "VMPL_BugReplay/js/lib/items-p
           }).then(function (events) {
             return console.log(events);
           });
+        },
+        uploadSessions: function uploadSessions() {
+          _this.manager.uploadSessions().then(function () {
+            return console.log('finished');
+          });
         }
       };
     };

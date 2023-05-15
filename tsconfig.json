@@ -4,6 +4,7 @@
     "baseUrl": ".",
     "strictNullChecks": false,
     "module": "esnext",
+    "moduleResolution": "NodeNext",
     "target": "ES6",
     "allowJs": true,
     "noImplicitAny": true,

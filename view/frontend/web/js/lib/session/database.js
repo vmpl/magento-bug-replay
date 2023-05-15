@@ -1,10 +1,8 @@
 /*eslint-disable */
 /* jscs:disable */
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; _setPrototypeOf(subClass, superClass); }
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-define(["dexie", "VMPL_BugReplay/js/api/session"], function (_dexie, _session) {
-  // @ts-ignore
+define(["dexie", "dexie-export-import", "VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/model/record-event"], function (_dexie, _dexieExportImport, _session, _recordEvent) {
   var Database = /*#__PURE__*/function (_dexie$Dexie) {
     "use strict";
 
@@ -12,17 +10,16 @@ define(["dexie", "VMPL_BugReplay/js/api/session"], function (_dexie, _session) {
     function Database(databaseName) {
       var _this;
       _this = _dexie$Dexie.call(this, databaseName) || this;
-      _dexie$Dexie.prototype.version.call(_assertThisInitialized(_this), 1).stores({
-        events: 'timestamp,type,data'
-      });
-      _dexie$Dexie.prototype.version.call(_assertThisInitialized(_this), 2).stores({
+      var counter = 0;
+      _this.version(++counter).stores({
         events: '&timestamp,*type,data'
       });
+      _this.events.mapToClass(_recordEvent.RecordEvent);
       return _this;
     }
     var _proto = Database.prototype;
     _proto.postRecord = function postRecord(record) {
-      return this.events.add(record);
+      return this.events.put(record);
     };
     _proto.getFullSnapshotsWithMeta = function getFullSnapshotsWithMeta() {
       var types = Array.of(_session.EventType.FullSnapshot.valueOf(), _session.EventType.Meta.valueOf());
@@ -41,6 +38,18 @@ define(["dexie", "VMPL_BugReplay/js/api/session"], function (_dexie, _session) {
           var _nextSession$timestam;
           return (it == null ? void 0 : it.timestamp) >= timestamp && (it == null ? void 0 : it.timestamp) < ((_nextSession$timestam = nextSession == null ? void 0 : nextSession.timestamp) != null ? _nextSession$timestam : Number.MAX_VALUE);
         }).toArray();
+      });
+    };
+    _proto.exportSessions = function exportSessions(fromDate, toDate) {
+      return (0, _dexieExportImport.exportDB)(this, {
+        filter: function filter(table, value, key) {
+          switch (table) {
+            case 'events':
+              return value.timestamp >= ((fromDate == null ? void 0 : fromDate.getTime()) || Number.MIN_VALUE) && value.timestamp <= ((toDate == null ? void 0 : toDate.getTime()) || Number.MAX_VALUE);
+            default:
+              return false;
+          }
+        }
       });
     };
     return Database;
