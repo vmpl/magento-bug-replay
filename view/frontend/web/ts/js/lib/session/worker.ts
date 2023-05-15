@@ -2,12 +2,10 @@ import {
     EventType,
     IRecordEvent, IRecordSession,
     SessionWorker as SessionWorkerInterface,
-    SnapshotWithMeta
 } from 'VMPL_BugReplay/js/api/session'
 import SessionDatabase from "VMPL_BugReplay/js/lib/session/database";
 import {IPaginatorFilter, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import {WorkerConsumer} from "VMPL_BugReplay/js/lib/worker/consumer";
-import {RecordSession} from "VMPL_BugReplay/js/lib/session/models";
 
 @WorkerConsumer()
 class Worker implements SessionWorkerInterface {
@@ -18,75 +16,108 @@ class Worker implements SessionWorkerInterface {
         return Promise.resolve();
     }
 
-    post(event: IRecordEvent): Promise<boolean> {
-        return this.database.postRecord(event)
-            .then(() => true);
+    post(event: IRecordEvent): Promise<number> {
+        return Promise.all([
+            this.database.buffer.where('type').equals(EventType.Meta).count(),
+            this.database.buffer.where('type').equals(EventType.FullSnapshot).count(),
+        ])
+            .then(([metaCount, snapshotCount]) => {
+                return metaCount === snapshotCount && snapshotCount === 0
+                    ? Promise.resolve()
+                    : this.flushBuffer()
+            })
+            .then(() => this.database.buffer.put(event).catch(error => {
+                throw error;
+            }));
     }
 
     sessions(
         offset: number = 0,
         limit: number, filter: IPaginatorFilter<IRecordSession>
     ): Promise<IPaginatorResponse<IRecordSession>> {
-        return this.database.getFullSnapshotsWithMeta()
-            .then(items => {
-                let sessions: any[] = [];
-                items
-                    .reduce<SnapshotWithMeta[]>((accumulator, currentValue) => {
-                        let snapshotMeta: SnapshotWithMeta = accumulator.pop() ?? {snapshot: null, meta: null};
-                        if (snapshotMeta.meta !== null && snapshotMeta.snapshot !== null) {
-                            accumulator.push(snapshotMeta);
-                            snapshotMeta = {snapshot: null, meta: null};
-                        }
-
-                        switch (true) {
-                            case currentValue.type === EventType.Meta && snapshotMeta.meta === null:
-                                snapshotMeta.meta = currentValue;
-                                break;
-                            case currentValue.type === EventType.FullSnapshot && snapshotMeta.snapshot === null:
-                                snapshotMeta.snapshot = currentValue;
-                                break;
-                            default:
-                                break;
-                        }
-
-                        accumulator.push(snapshotMeta);
-                        return accumulator;
-                    }, [])
-                    .filter(it => !(it.meta === null || it.snapshot === null))
-                    .forEach((snapshotMeta: SnapshotWithMeta) => {
-                        const tagMetaTitle = snapshotMeta.snapshot.data.node
-                            .childNodes.find((it: any) => it.tagName === 'html')
-                            .childNodes.find((it: any) => it.tagName === 'head')
-                            .childNodes.find((it: any) => it.attributes?.name === 'title')
-
-                        sessions.push(new RecordSession(
-                            new URL(snapshotMeta.meta.data.href),
-                            tagMetaTitle?.attributes?.content ?? 'Unknown',
-                            new Date(snapshotMeta.meta.timestamp),
-                        ))
-                    })
-
-                sessions = filter?.match(sessions) ?? sessions;
+        return this.database.sessions
+            .with({events: 'events'})
+            .then(filter.match.bind(filter))
+            .then(sessions => {
+                const count = sessions.length;
                 return {
-                    meta: {totalRecords: sessions.length},
-                    items: sessions.slice(offset, limit)
+                    items: sessions.slice(offset, offset + limit),
+                    meta: {
+                        totalRecords: count,
+                    }
                 }
             })
     }
 
     events(sessions: IRecordSession[]): Promise<IPaginatorResponse<IRecordEvent>> {
-        return Promise.all(sessions.map(session => this.database.getEvents(session.timestamp.getTime())))
+        const sessionsIds = sessions
+            .map(it => it.id)
+            .filter(it => Number.isInteger(it))
+        return this.database.events
+            .where('sessionId')
+            .anyOf(sessionsIds)
+            .toArray()
             .then(events => {
-                const items = <IRecordEvent[]>[].concat(...events);
-                // @ts-ignore
-                items.sort((a, b) => a.timestamp > b.timestamp)
-                return {
-                    items: items,
+                return <IPaginatorResponse<IRecordEvent>>{
+                    items: events,
                     meta: {
-                        totalRecords: items.length,
+                        totalRecords: events.length,
                     }
                 }
             })
+    }
+
+    export(sessions?: IRecordSession[]): Promise<Blob> {
+        // @ts-ignore
+        const sorted = (sessions ?? []).sort(it => it.timestamp < it.timestamp);
+        const fromDate = sorted.shift()?.timestamp;
+        const toDate = sorted.pop()?.timestamp;
+
+        return this.database.export({
+            filter: (table: string, value: any, key?: any): boolean => {
+                switch (table) {
+                    case 'sessions':
+                        return sessions?.length ? sessions.some(it => it.id === (<IRecordSession>value).id) : true;
+                    case 'events':
+                        return (<IRecordEvent>value).timestamp >= (fromDate || Number.MIN_VALUE)
+                            && (<IRecordEvent>value).timestamp <= (toDate || Number.MAX_VALUE);
+                    default:
+                        return false;
+                }
+            }
+        });
+    }
+
+    private flushBuffer() {
+        return Promise.all([
+            this.database.buffer.where('type').equals(EventType.Meta).first(),
+            this.database.buffer.where('type').equals(EventType.FullSnapshot).first(),
+        ]).then(([meta, snapshot]) => {
+            const tagMetaTitle = snapshot?.data.node
+                .childNodes.find((it: any) => it?.tagName === 'html')
+                .childNodes.find((it: any) => it?.tagName === 'head')
+                .childNodes.find((it: any) => it?.attributes?.name === 'title')
+
+            return this.database.transaction('rw', [this.database.buffer, this.database.events, this.database.sessions], () => {
+                return this.database.sessions.put({
+                    href: meta.data.href,
+                    title: tagMetaTitle?.attributes?.content ?? 'Unknown',
+                    timestamp: meta.timestamp,
+
+                }).catch(error => {
+                    throw error;
+                }).then(sessionId => {
+                    return this.database.buffer
+                        .toArray()
+                        .then(events => events.map(it => {
+                            it.sessionId = sessionId;
+                            return it;
+                        }))
+                        .then(events => this.database.events.bulkPut(events))
+                        .then(() => this.database.buffer.clear())
+                })
+            })
+        }).then(() => {})
     }
 }
 

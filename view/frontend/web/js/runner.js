@@ -38,9 +38,14 @@ define(["VMPL_BugReplay/js/lib/recorder-manager", "VMPL_BugReplay/js/lib/items-p
             to = 2;
           }
           _this.manager.paginator.getCurrentPage().then(function (sessions) {
-            return _this.manager.getEventsForSessionAt(sessions.slice(from, to));
+            return _this.manager.getEventsForSessionAt(sessions.slice(from, from + to));
           }).then(function (events) {
             return console.log(events);
+          });
+        },
+        uploadSessions: function uploadSessions() {
+          _this.manager.uploadSessions().then(function () {
+            return console.log('finished');
           });
         }
       };

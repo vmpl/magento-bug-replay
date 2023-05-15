@@ -4,10 +4,9 @@ module.exports = {
     mode: process.env.NODE_ENV ?? 'production',
     devtool: 'source-map',
     entry: {
-        threads: './node_modules/threads/index.mjs',
-        'threads/worker': './node_modules/threads/worker.mjs',
-        dexie: './node_modules/dexie/import-wrapper.mjs',
-        'typescript-json-serializer': './node_modules/typescript-json-serializer/dist/index.cjs.js',
+        dexie: './node_modules/dexie/dist/dexie.js',
+        'dexie-export-import': './node_modules/dexie-export-import/dist/dexie-export-import.mjs',
+        'dexie-relationships': './node_modules/dexie-relationships/dist/index.min.js',
     },
     output: {
         filename: './[name].js',

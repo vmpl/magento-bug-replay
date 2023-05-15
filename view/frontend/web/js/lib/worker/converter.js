@@ -7,6 +7,8 @@ define([], function () {
     function Converter() {}
     Converter.classToObject = function classToObject(data) {
       switch (true) {
+        case data instanceof Blob:
+          return Promise.resolve(data);
         case data instanceof Array:
           return Promise.all(data.map(this.classToObject.bind(this)));
         case data instanceof Object:
@@ -26,6 +28,8 @@ define([], function () {
     Converter.objectToClass = function objectToClass(data) {
       var _this = this;
       switch (true) {
+        case data instanceof Blob:
+          return Promise.resolve(data);
         case data instanceof Array:
           return Promise.all(data.map(this.objectToClass.bind(this)));
         case data instanceof Object:

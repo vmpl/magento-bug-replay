@@ -24,9 +24,13 @@ class Runner {
             getTwoFirstSessionEvents: (from: number = 0, to: number = 2) => {
                 this.manager.paginator.getCurrentPage()
                     .then(sessions => {
-                        return this.manager.getEventsForSessionAt(sessions.slice(from, to))
+                        return this.manager.getEventsForSessionAt(sessions.slice(from, from + to))
                     })
                     .then(events => console.log(events))
+            },
+            uploadSessions: () => {
+                this.manager.uploadSessions()
+                    .then(() => console.log('finished'));
             }
         }
     }

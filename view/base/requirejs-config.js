@@ -1,11 +1,10 @@
 var config = {
     map: {
         '*': {
-            'threads': 'VMPL_BugReplay/js/lib/threads',
-            'threads/worker': 'VMPL_BugReplay/js/lib/threads/worker',
             'dexie': 'VMPL_BugReplay/js/lib/dexie',
+            'dexie-export-import': 'VMPL_BugReplay/js/lib/dexie-export-import',
+            'dexie-relationships': 'VMPL_BugReplay/js/lib/dexie-relationships',
             'rrweb': 'VMPL_BugReplay/js/lib/rrweb',
-            'typescript-json-serializer': 'VMPL_BugReplay/js/lib/typescript-json-serializer',
         }
     },
     worker: {

@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database", "VMPL_BugReplay/js/lib/worker/consumer", "VMPL_BugReplay/js/lib/session/models"], function (_session, _database, _consumer, _models) {
+define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database", "VMPL_BugReplay/js/lib/worker/consumer"], function (_session, _database, _consumer) {
   "use strict";
 
   _database = _interopRequireDefault(_database);
@@ -14,83 +14,106 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
       return Promise.resolve();
     };
     _proto.post = function post(event) {
-      return this.database.postRecord(event).then(function () {
-        return true;
+      var _this = this;
+      return Promise.all([this.database.buffer.where('type').equals(_session.EventType.Meta).count(), this.database.buffer.where('type').equals(_session.EventType.FullSnapshot).count()]).then(function (_ref) {
+        var metaCount = _ref[0],
+          snapshotCount = _ref[1];
+        return metaCount === snapshotCount && snapshotCount === 0 ? Promise.resolve() : _this.flushBuffer();
+      }).then(function () {
+        return _this.database.buffer.put(event).catch(function (error) {
+          throw error;
+        });
       });
     };
     _proto.sessions = function sessions(offset, limit, filter) {
       if (offset === void 0) {
         offset = 0;
       }
-      return this.database.getFullSnapshotsWithMeta().then(function (items) {
-        var _filter$match;
-        var sessions = [];
-        items.reduce(function (accumulator, currentValue) {
-          var _accumulator$pop;
-          var snapshotMeta = (_accumulator$pop = accumulator.pop()) != null ? _accumulator$pop : {
-            snapshot: null,
-            meta: null
-          };
-          if (snapshotMeta.meta !== null && snapshotMeta.snapshot !== null) {
-            accumulator.push(snapshotMeta);
-            snapshotMeta = {
-              snapshot: null,
-              meta: null
-            };
-          }
-          switch (true) {
-            case currentValue.type === _session.EventType.Meta && snapshotMeta.meta === null:
-              snapshotMeta.meta = currentValue;
-              break;
-            case currentValue.type === _session.EventType.FullSnapshot && snapshotMeta.snapshot === null:
-              snapshotMeta.snapshot = currentValue;
-              break;
-            default:
-              break;
-          }
-          accumulator.push(snapshotMeta);
-          return accumulator;
-        }, []).filter(function (it) {
-          return !(it.meta === null || it.snapshot === null);
-        }).forEach(function (snapshotMeta) {
-          var _tagMetaTitle$attribu, _tagMetaTitle$attribu2;
-          var tagMetaTitle = snapshotMeta.snapshot.data.node.childNodes.find(function (it) {
-            return it.tagName === 'html';
-          }).childNodes.find(function (it) {
-            return it.tagName === 'head';
-          }).childNodes.find(function (it) {
-            var _it$attributes;
-            return ((_it$attributes = it.attributes) == null ? void 0 : _it$attributes.name) === 'title';
-          });
-          sessions.push(new _models.RecordSession(new URL(snapshotMeta.meta.data.href), (_tagMetaTitle$attribu = tagMetaTitle == null ? void 0 : (_tagMetaTitle$attribu2 = tagMetaTitle.attributes) == null ? void 0 : _tagMetaTitle$attribu2.content) != null ? _tagMetaTitle$attribu : 'Unknown', new Date(snapshotMeta.meta.timestamp)));
-        });
-        sessions = (_filter$match = filter == null ? void 0 : filter.match(sessions)) != null ? _filter$match : sessions;
+      return this.database.sessions.with({
+        events: 'events'
+      }).then(filter.match.bind(filter)).then(function (sessions) {
+        var count = sessions.length;
         return {
+          items: sessions.slice(offset, offset + limit),
           meta: {
-            totalRecords: sessions.length
-          },
-          items: sessions.slice(offset, limit)
+            totalRecords: count
+          }
         };
       });
     };
     _proto.events = function events(sessions) {
-      var _this = this;
-      return Promise.all(sessions.map(function (session) {
-        return _this.database.getEvents(session.timestamp.getTime());
-      })).then(function (events) {
-        var _ref;
-        var items = (_ref = []).concat.apply(_ref, events);
-        // @ts-ignore
-        items.sort(function (a, b) {
-          return a.timestamp > b.timestamp;
-        });
+      var sessionsIds = sessions.map(function (it) {
+        return it.id;
+      }).filter(function (it) {
+        return Number.isInteger(it);
+      });
+      return this.database.events.where('sessionId').anyOf(sessionsIds).toArray().then(function (events) {
         return {
-          items: items,
+          items: events,
           meta: {
-            totalRecords: items.length
+            totalRecords: events.length
           }
         };
       });
+    };
+    _proto.export = function _export(sessions) {
+      var _sorted$shift, _sorted$pop;
+      // @ts-ignore
+      var sorted = (sessions != null ? sessions : []).sort(function (it) {
+        return it.timestamp < it.timestamp;
+      });
+      var fromDate = (_sorted$shift = sorted.shift()) == null ? void 0 : _sorted$shift.timestamp;
+      var toDate = (_sorted$pop = sorted.pop()) == null ? void 0 : _sorted$pop.timestamp;
+      return this.database.export({
+        filter: function filter(table, value, key) {
+          switch (table) {
+            case 'sessions':
+              return sessions != null && sessions.length ? sessions.some(function (it) {
+                return it.id === value.id;
+              }) : true;
+            case 'events':
+              return value.timestamp >= (fromDate || Number.MIN_VALUE) && value.timestamp <= (toDate || Number.MAX_VALUE);
+            default:
+              return false;
+          }
+        }
+      });
+    };
+    _proto.flushBuffer = function flushBuffer() {
+      var _this2 = this;
+      return Promise.all([this.database.buffer.where('type').equals(_session.EventType.Meta).first(), this.database.buffer.where('type').equals(_session.EventType.FullSnapshot).first()]).then(function (_ref2) {
+        var meta = _ref2[0],
+          snapshot = _ref2[1];
+        var tagMetaTitle = snapshot == null ? void 0 : snapshot.data.node.childNodes.find(function (it) {
+          return (it == null ? void 0 : it.tagName) === 'html';
+        }).childNodes.find(function (it) {
+          return (it == null ? void 0 : it.tagName) === 'head';
+        }).childNodes.find(function (it) {
+          var _it$attributes;
+          return (it == null ? void 0 : (_it$attributes = it.attributes) == null ? void 0 : _it$attributes.name) === 'title';
+        });
+        return _this2.database.transaction('rw', [_this2.database.buffer, _this2.database.events, _this2.database.sessions], function () {
+          var _tagMetaTitle$attribu, _tagMetaTitle$attribu2;
+          return _this2.database.sessions.put({
+            href: meta.data.href,
+            title: (_tagMetaTitle$attribu = tagMetaTitle == null ? void 0 : (_tagMetaTitle$attribu2 = tagMetaTitle.attributes) == null ? void 0 : _tagMetaTitle$attribu2.content) != null ? _tagMetaTitle$attribu : 'Unknown',
+            timestamp: meta.timestamp
+          }).catch(function (error) {
+            throw error;
+          }).then(function (sessionId) {
+            return _this2.database.buffer.toArray().then(function (events) {
+              return events.map(function (it) {
+                it.sessionId = sessionId;
+                return it;
+              });
+            }).then(function (events) {
+              return _this2.database.events.bulkPut(events);
+            }).then(function () {
+              return _this2.database.buffer.clear();
+            });
+          });
+        });
+      }).then(function () {});
     };
     return Worker;
   }()) || _class);
