@@ -84,7 +84,18 @@ class Worker implements SessionWorkerInterface {
                     default:
                         return false;
                 }
-            }
+            },
+        });
+    }
+
+    delete(sessions: IRecordSession[]): Promise<void> {
+        const sessionIds = sessions.map(it => it.id).filter(it => !!it);
+        return this.database.transaction('rw', [this.database.events, this.database.sessions], () => {
+            return this.database.events
+                .where('sessionId')
+                .anyOf(sessionIds)
+                .eachPrimaryKey(it => this.database.events.delete(it))
+                .then(() => this.database.sessions.bulkDelete(sessionIds))
         });
     }
 

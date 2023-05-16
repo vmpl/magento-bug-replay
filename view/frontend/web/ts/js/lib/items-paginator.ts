@@ -4,6 +4,7 @@ import {
 } from "VMPL_BugReplay/js/api/paginator";
 import * as module from "module";
 import {WorkerArgument} from "VMPL_BugReplay/js/lib/worker/decorator";
+import {of} from "rxjs";
 
 enum CompareTypes {
     equal,
@@ -82,19 +83,14 @@ export class PaginatorFilter<T extends Object> implements IPaginatorFilter<T> {
     }
 }
 
-export default class <T extends Object, L extends IPaginatorLoader<T>> {
+export default class<T extends Object, L extends IPaginatorLoader<T>> implements AsyncIterable<T> {
     protected readonly _filter: PaginatorFilter<T> = new PaginatorFilter();
     protected _page: number = 1;
     protected _size: number = 5;
 
-    protected totalRecords: number = undefined;
-
     set page(value: number) {
         if (!(this._page > 0)) {
             throw new Error('Page cannot be lower then 1.');
-        }
-        if (value > this.lastPage) {
-            throw new Error('Page cannot be greater then lastPage.');
         }
 
         this._page = value;
@@ -104,7 +100,7 @@ export default class <T extends Object, L extends IPaginatorLoader<T>> {
         if (value <= 0) {
             throw new Error('Size have to be greater then 0.');
         }
-        if (this.totalRecords !== undefined && this.totalRecords > value) {
+        if (this.items.length && this.items.length > value) {
             throw new Error('Size is greater then records found');
         }
 
@@ -117,37 +113,51 @@ export default class <T extends Object, L extends IPaginatorLoader<T>> {
         this._filter.append(value);
     }
 
-    get lastPage(): number {
-        let lastPage = this.totalRecords / this._size;
-        lastPage += this.totalRecords % this._size ? 1 : 0;
-        return lastPage;
-    }
-
     constructor(
         protected items: Array<T>,
         protected readonly loader: L,
     ) {
     }
 
-    getCurrentPage(): Promise<Array<T>> {
+    protected loadPage(): Promise<void> {
         const offset = (this._page - 1) * this._size;
         const limit = this._size;
 
-        if (offset >= this.items.length) {
-            const leftChunk = <Array<T>>this.items.slice(0, offset);
-            const rightChunk = <Array<T>>this.items.slice(offset + limit);
-            return this.loader.loadPaginatorItems(offset, limit, this._filter).then(response => {
-                this.totalRecords = response.meta.totalRecords;
-                this.items = <Array<T>>[].concat(leftChunk, response.items, rightChunk);
-                return <Array<T>>response.items;
-            })
+        if (!this.items.length || this.items.slice(offset, offset + limit).includes(undefined)) {
+            return this.loader.loadPaginatorItems(offset, limit, this._filter)
+                .then(response => {
+                    this.items.length
+                        || (this.items = new Array(response.meta.totalRecords));
+
+                    response.items.forEach((item, index) => {
+                        this.items[offset + index] = item;
+                    })
+                })
         }
 
-        return Promise.resolve(<Array<T>>this.items.slice(offset, offset + limit));
+        return Promise.resolve();
     }
 
-    fetch(index: number): Promise<T> {
-        return this.loader.loadPaginatorItems(index, 1, this._filter)
-            .then(result => result.items.shift());
+    fetch(atIndex: number): Promise<T> {
+        this.page = (atIndex / this._size) + 1;
+        return this.loadPage()
+            .then(() => this.items[atIndex]);
+    }
+
+    clear() {
+        this._page = 1;
+        this.items = [];
+    }
+
+    [Symbol.asyncIterator](): AsyncIterator<T> {
+        let counter: number = 0;
+        return {
+            next: (): Promise<IteratorResult<T>> => {
+                return this.fetch(++counter)
+                    .then(item => {
+                        return {value: item, done: counter == this.items.length}
+                    });
+            }
+        }
     }
 }

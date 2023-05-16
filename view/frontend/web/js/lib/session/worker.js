@@ -79,8 +79,23 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
         }
       });
     };
-    _proto.flushBuffer = function flushBuffer() {
+    _proto.delete = function _delete(sessions) {
       var _this2 = this;
+      var sessionIds = sessions.map(function (it) {
+        return it.id;
+      }).filter(function (it) {
+        return !!it;
+      });
+      return this.database.transaction('rw', [this.database.events, this.database.sessions], function () {
+        return _this2.database.events.where('sessionId').anyOf(sessionIds).eachPrimaryKey(function (it) {
+          return _this2.database.events.delete(it);
+        }).then(function () {
+          return _this2.database.sessions.bulkDelete(sessionIds);
+        });
+      });
+    };
+    _proto.flushBuffer = function flushBuffer() {
+      var _this3 = this;
       return Promise.all([this.database.buffer.where('type').equals(_session.EventType.Meta).first(), this.database.buffer.where('type').equals(_session.EventType.FullSnapshot).first()]).then(function (_ref2) {
         var meta = _ref2[0],
           snapshot = _ref2[1];
@@ -92,24 +107,24 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
           var _it$attributes;
           return (it == null ? void 0 : (_it$attributes = it.attributes) == null ? void 0 : _it$attributes.name) === 'title';
         });
-        return _this2.database.transaction('rw', [_this2.database.buffer, _this2.database.events, _this2.database.sessions], function () {
+        return _this3.database.transaction('rw', [_this3.database.buffer, _this3.database.events, _this3.database.sessions], function () {
           var _tagMetaTitle$attribu, _tagMetaTitle$attribu2;
-          return _this2.database.sessions.put({
+          return _this3.database.sessions.put({
             href: meta.data.href,
             title: (_tagMetaTitle$attribu = tagMetaTitle == null ? void 0 : (_tagMetaTitle$attribu2 = tagMetaTitle.attributes) == null ? void 0 : _tagMetaTitle$attribu2.content) != null ? _tagMetaTitle$attribu : 'Unknown',
             timestamp: meta.timestamp
           }).catch(function (error) {
             throw error;
           }).then(function (sessionId) {
-            return _this2.database.buffer.toArray().then(function (events) {
+            return _this3.database.buffer.toArray().then(function (events) {
               return events.map(function (it) {
                 it.sessionId = sessionId;
                 return it;
               });
             }).then(function (events) {
-              return _this2.database.events.bulkPut(events);
+              return _this3.database.events.bulkPut(events);
             }).then(function () {
-              return _this2.database.buffer.clear();
+              return _this3.database.buffer.clear();
             });
           });
         });

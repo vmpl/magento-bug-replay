@@ -5,6 +5,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return typeof key === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _decorator) {
+  var _Symbol$asyncIterator;
   var _dec, _class, _dec2, _class2;
   function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
   var CompareTypes = /*#__PURE__*/function (CompareTypes) {
@@ -98,6 +99,7 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
     };
     return PaginatorFilter;
   }()) || _class2);
+  _Symbol$asyncIterator = Symbol.asyncIterator;
   var _default = /*#__PURE__*/function () {
     "use strict";
 
@@ -105,39 +107,54 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
       this._filter = new PaginatorFilter();
       this._page = 1;
       this._size = 5;
-      this.totalRecords = undefined;
       this.items = items;
       this.loader = loader;
     }
     var _proto3 = _default.prototype;
-    _proto3.getCurrentPage = function getCurrentPage() {
+    _proto3.loadPage = function loadPage() {
       var _this = this;
       var offset = (this._page - 1) * this._size;
       var limit = this._size;
-      if (offset >= this.items.length) {
-        var leftChunk = this.items.slice(0, offset);
-        var rightChunk = this.items.slice(offset + limit);
+      if (!this.items.length || this.items.slice(offset, offset + limit).includes(undefined)) {
         return this.loader.loadPaginatorItems(offset, limit, this._filter).then(function (response) {
-          _this.totalRecords = response.meta.totalRecords;
-          _this.items = [].concat(leftChunk, response.items, rightChunk);
-          return response.items;
+          _this.items.length || (_this.items = new Array(response.meta.totalRecords));
+          response.items.forEach(function (item, index) {
+            _this.items[offset + index] = item;
+          });
         });
       }
-      return Promise.resolve(this.items.slice(offset, offset + limit));
+      return Promise.resolve();
     };
-    _proto3.fetch = function fetch(index) {
-      return this.loader.loadPaginatorItems(index, 1, this._filter).then(function (result) {
-        return result.items.shift();
+    _proto3.fetch = function fetch(atIndex) {
+      var _this2 = this;
+      this.page = atIndex / this._size + 1;
+      return this.loadPage().then(function () {
+        return _this2.items[atIndex];
       });
+    };
+    _proto3.clear = function clear() {
+      this._page = 1;
+      this.items = [];
+    };
+    _proto3[_Symbol$asyncIterator] = function () {
+      var _this3 = this;
+      var counter = 0;
+      return {
+        next: function next() {
+          return _this3.fetch(++counter).then(function (item) {
+            return {
+              value: item,
+              done: counter == _this3.items.length
+            };
+          });
+        }
+      };
     };
     _createClass(_default, [{
       key: "page",
       set: function set(value) {
         if (!(this._page > 0)) {
           throw new Error('Page cannot be lower then 1.');
-        }
-        if (value > this.lastPage) {
-          throw new Error('Page cannot be greater then lastPage.');
         }
         this._page = value;
       }
@@ -147,7 +164,7 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
         if (value <= 0) {
           throw new Error('Size have to be greater then 0.');
         }
-        if (this.totalRecords !== undefined && this.totalRecords > value) {
+        if (this.items.length && this.items.length > value) {
           throw new Error('Size is greater then records found');
         }
         this._size = value;
@@ -158,13 +175,6 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
         this.page = 1;
         this.items = [];
         this._filter.append(value);
-      }
-    }, {
-      key: "lastPage",
-      get: function get() {
-        var lastPage = this.totalRecords / this._size;
-        lastPage += this.totalRecords % this._size ? 1 : 0;
-        return lastPage;
       }
     }]);
     return _default;

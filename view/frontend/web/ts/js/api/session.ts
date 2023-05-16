@@ -30,4 +30,5 @@ export interface SessionWorker {
     sessions(offset: number, limit: number, filter: IPaginatorFilter<IRecordSession>): Promise<IPaginatorResponse<IRecordSession>>;
     events(sessions: IRecordSession[]): Promise<IPaginatorResponse<IRecordEvent>>;
     export(sessions?: IRecordSession[]): Promise<Blob>;
+    delete(sessions: IRecordSession[]): Promise<void>;
 }

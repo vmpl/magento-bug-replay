@@ -48,6 +48,20 @@ export default class RecorderManager implements IPaginatorLoader<IRecordSession>
             .then(() => true)
     }
 
+    async deleteSession(at?: number): Promise<void> {
+        if (at !== undefined) {
+            return this.paginator.fetch(at)
+                .then(session => this.sessionWorker.delete([session]))
+                .then(() => this.paginator.clear())
+        }
+
+        const sessions = [];
+        for await (const session of this.paginator) {
+            sessions.push(session);
+        }
+        return this.sessionWorker.delete(sessions.filter(it => it !== undefined));
+    }
+
     loadPaginatorItems(
         offset: number,
         limit: number,
