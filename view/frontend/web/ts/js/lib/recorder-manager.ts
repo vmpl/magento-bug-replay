@@ -40,12 +40,8 @@ export default class RecorderManager implements IPaginatorLoader<IRecordSession>
             .then(response => response.items);
     }
 
-    uploadSessions(sessions?: IRecordSession[]): Promise<boolean> {
+    uploadSessions(sessions?: IRecordSession[]): Promise<void> {
         return this.sessionWorker.export(sessions)
-            .then(data => data.text())
-            .then(content => JSON.parse(content))
-            .then(object => console.log(object))
-            .then(() => true)
     }
 
     async deleteSession(at?: number): Promise<void> {

@@ -43,15 +43,7 @@ define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/c
       });
     };
     _proto.uploadSessions = function uploadSessions(sessions) {
-      return this.sessionWorker.export(sessions).then(function (data) {
-        return data.text();
-      }).then(function (content) {
-        return JSON.parse(content);
-      }).then(function (object) {
-        return console.log(object);
-      }).then(function () {
-        return true;
-      });
+      return this.sessionWorker.export(sessions);
     };
     _proto.deleteSession = /*#__PURE__*/function () {
       var _deleteSession = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(at) {

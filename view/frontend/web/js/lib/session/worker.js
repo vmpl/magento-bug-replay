@@ -1,9 +1,10 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database", "VMPL_BugReplay/js/lib/worker/consumer"], function (_session, _database, _consumer) {
+define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database", "VMPL_BugReplay/js/lib/worker/consumer", "axios"], function (_session, _database, _consumer, _axios) {
   "use strict";
 
   _database = _interopRequireDefault(_database);
+  _axios = _interopRequireDefault(_axios);
   var _dec, _class;
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
   var Worker = (_dec = (0, _consumer.WorkerConsumer)(), _dec(_class = /*#__PURE__*/function () {
@@ -77,6 +78,12 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
               return false;
           }
         }
+      }).then(function (blob) {
+        var body = new FormData();
+        body.append('database', new File([blob], 'database.json'), 'database.json');
+        return _axios.default.post('/vmpl-bug-report/upload/sessions', body).then(function () {
+          return console.log('send');
+        });
       });
     };
     _proto.delete = function _delete(sessions) {

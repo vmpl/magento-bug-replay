@@ -6,6 +6,7 @@ import {
 import SessionDatabase from "VMPL_BugReplay/js/lib/session/database";
 import {IPaginatorFilter, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import {WorkerConsumer} from "VMPL_BugReplay/js/lib/worker/consumer";
+import axios from "axios";
 
 @WorkerConsumer()
 class Worker implements SessionWorkerInterface {
@@ -67,7 +68,7 @@ class Worker implements SessionWorkerInterface {
             })
     }
 
-    export(sessions?: IRecordSession[]): Promise<Blob> {
+    export(sessions?: IRecordSession[]): Promise<void> {
         // @ts-ignore
         const sorted = (sessions ?? []).sort(it => it.timestamp < it.timestamp);
         const fromDate = sorted.shift()?.timestamp;
@@ -85,7 +86,13 @@ class Worker implements SessionWorkerInterface {
                         return false;
                 }
             },
-        });
+        }).then(blob => {
+            const body = new FormData();
+            body.append('database', new File([blob], 'database.json'), 'database.json');
+            return axios.post('/vmpl-bug-report/upload/sessions', body)
+                .then(() => console.log('send'));
+
+        })
     }
 
     delete(sessions: IRecordSession[]): Promise<void> {
