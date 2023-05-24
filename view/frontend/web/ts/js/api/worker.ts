@@ -3,7 +3,15 @@ export declare type IWebWorker = {
     [property: string]: any,
 }
 
-export interface IMessageWorker extends Object {
+interface IMessageWorker extends Object {
+    id: string,
     method: string,
+}
+
+export interface IMethodWorker extends IMessageWorker {
     arguments: Promise<any>[] | any[],
+}
+
+export interface IResultWorker extends IMessageWorker {
+    result: Promise<any> | any;
 }

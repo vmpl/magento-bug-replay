@@ -17,6 +17,7 @@ export class RecordSession implements IRecordSession {
         readonly href: string,
         readonly timestamp: number,
         public id: number = null,
+        public readonly uploaded?: string,
         public readonly events?: IRecordEvent[],
     ) {
     }

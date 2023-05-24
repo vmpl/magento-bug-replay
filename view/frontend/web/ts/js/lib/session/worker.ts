@@ -68,20 +68,22 @@ class Worker implements SessionWorkerInterface {
             })
     }
 
-    export(sessions?: IRecordSession[]): Promise<void> {
-        // @ts-ignore
-        const sorted = (sessions ?? []).sort(it => it.timestamp < it.timestamp);
-        const fromDate = sorted.shift()?.timestamp;
-        const toDate = sorted.pop()?.timestamp;
+    export(sessions: IRecordSession[]): Promise<number[]> {
+        const sessionIds = sessions
+            .filter(it => it?.id && !it?.uploaded)
+            .map(it => it.id);
+
+        if (!sessionIds.length) {
+            return Promise.resolve([]);
+        }
 
         return this.database.export({
             filter: (table: string, value: any, key?: any): boolean => {
                 switch (table) {
                     case 'sessions':
-                        return sessions?.length ? sessions.some(it => it.id === (<IRecordSession>value).id) : true;
+                        return sessionIds.includes((<IRecordSession>value).id);
                     case 'events':
-                        return (<IRecordEvent>value).timestamp >= (fromDate || Number.MIN_VALUE)
-                            && (<IRecordEvent>value).timestamp <= (toDate || Number.MAX_VALUE);
+                        return sessionIds.includes((<IRecordEvent>value).sessionId);
                     default:
                         return false;
                 }
@@ -90,8 +92,14 @@ class Worker implements SessionWorkerInterface {
             const body = new FormData();
             body.append('database', new File([blob], 'database.json'), 'database.json');
             return axios.post('/vmpl-bug-report/upload/sessions', body)
-                .then(() => console.log('send'));
-
+                .then(response => response.data);
+        }).then(({fileName}) => {
+            return Promise.all(
+                sessionIds
+                    .map(id => {
+                        return this.database.sessions.update(id, {uploaded: fileName})
+                    }),
+            );
         })
     }
 
@@ -121,7 +129,6 @@ class Worker implements SessionWorkerInterface {
                     href: meta.data.href,
                     title: tagMetaTitle?.attributes?.content ?? 'Unknown',
                     timestamp: meta.timestamp,
-
                 }).catch(error => {
                     throw error;
                 }).then(sessionId => {

@@ -5,7 +5,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return typeof key === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _decorator) {
-  var _Symbol$asyncIterator;
   var _dec, _class, _dec2, _class2;
   function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
   var CompareTypes = /*#__PURE__*/function (CompareTypes) {
@@ -99,7 +98,6 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
     };
     return PaginatorFilter;
   }()) || _class2);
-  _Symbol$asyncIterator = Symbol.asyncIterator;
   var _default = /*#__PURE__*/function () {
     "use strict";
 
@@ -115,7 +113,9 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
       var _this = this;
       var offset = (this._page - 1) * this._size;
       var limit = this._size;
-      if (!this.items.length || this.items.slice(offset, offset + limit).includes(undefined)) {
+
+      // @ts-ignore
+      if (!this.items.length || this.items.slice(offset, offset + limit).includes()) {
         return this.loader.loadPaginatorItems(offset, limit, this._filter).then(function (response) {
           _this.items.length || (_this.items = new Array(response.meta.totalRecords));
           response.items.forEach(function (item, index) {
@@ -127,7 +127,7 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
     };
     _proto3.fetch = function fetch(atIndex) {
       var _this2 = this;
-      this.page = atIndex / this._size + 1;
+      this.page = Number((atIndex / this._size).toFixed()) + 1;
       return this.loadPage().then(function () {
         return _this2.items[atIndex];
       });
@@ -136,19 +136,25 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
       this._page = 1;
       this.items = [];
     };
-    _proto3[_Symbol$asyncIterator] = function () {
+    _proto3.forEach = function forEach(each) {
       var _this3 = this;
-      var counter = 0;
-      return {
-        next: function next() {
-          return _this3.fetch(++counter).then(function (item) {
-            return {
-              value: item,
-              done: counter == _this3.items.length
-            };
-          });
-        }
+      var index = 0;
+      var next = function next() {
+        return _this3.fetch(index++).then(function (it) {
+          return !each || each(it, index);
+        }).then(function () {
+          if (index < _this3.items.length) {
+            return next();
+          }
+        });
       };
+      return next();
+    };
+    _proto3.all = function all() {
+      var _this4 = this;
+      return this.forEach().then(function () {
+        return _this4.items;
+      });
     };
     _createClass(_default, [{
       key: "page",

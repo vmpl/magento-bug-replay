@@ -34,14 +34,17 @@ define(["VMPL_BugReplay/js/lib/worker/converter"], function (_converter) {
             return target.prototype[event.data.method].apply(_this2, args);
           }).then(function (result) {
             return _converter.classToObject(result);
-          }).then(function (message) {
-            return postMessage(message);
+          }).then(function (data) {
+            return postMessage({
+              id: event.data.id,
+              method: event.data.method,
+              result: data
+            });
           }).catch(function (error) {
             throw error;
           });
         };
         _proto.run = function run() {
-          addEventListener('message', this.$$messageHandler.bind(this));
           var methods = Object.entries(Object.getOwnPropertyDescriptors(target.prototype)).filter(function (_ref) {
             var property = _ref[0],
               descriptor = _ref[1];
@@ -51,9 +54,11 @@ define(["VMPL_BugReplay/js/lib/worker/converter"], function (_converter) {
             return property;
           });
           postMessage({
+            id: '$$init',
             method: '$$init',
-            arguments: methods
+            result: methods
           });
+          addEventListener('message', this.$$messageHandler.bind(this));
         };
         return _class;
       }(target);

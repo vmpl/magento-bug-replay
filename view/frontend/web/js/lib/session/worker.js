@@ -58,22 +58,22 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
       });
     };
     _proto.export = function _export(sessions) {
-      var _sorted$shift, _sorted$pop;
-      // @ts-ignore
-      var sorted = (sessions != null ? sessions : []).sort(function (it) {
-        return it.timestamp < it.timestamp;
+      var _this2 = this;
+      var sessionIds = sessions.filter(function (it) {
+        return (it == null ? void 0 : it.id) && !(it != null && it.uploaded);
+      }).map(function (it) {
+        return it.id;
       });
-      var fromDate = (_sorted$shift = sorted.shift()) == null ? void 0 : _sorted$shift.timestamp;
-      var toDate = (_sorted$pop = sorted.pop()) == null ? void 0 : _sorted$pop.timestamp;
+      if (!sessionIds.length) {
+        return Promise.resolve([]);
+      }
       return this.database.export({
         filter: function filter(table, value, key) {
           switch (table) {
             case 'sessions':
-              return sessions != null && sessions.length ? sessions.some(function (it) {
-                return it.id === value.id;
-              }) : true;
+              return sessionIds.includes(value.id);
             case 'events':
-              return value.timestamp >= (fromDate || Number.MIN_VALUE) && value.timestamp <= (toDate || Number.MAX_VALUE);
+              return sessionIds.includes(value.sessionId);
             default:
               return false;
           }
@@ -81,31 +81,38 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
       }).then(function (blob) {
         var body = new FormData();
         body.append('database', new File([blob], 'database.json'), 'database.json');
-        return _axios.default.post('/vmpl-bug-report/upload/sessions', body).then(function () {
-          return console.log('send');
+        return _axios.default.post('/vmpl-bug-report/upload/sessions', body).then(function (response) {
+          return response.data;
         });
+      }).then(function (_ref2) {
+        var fileName = _ref2.fileName;
+        return Promise.all(sessionIds.map(function (id) {
+          return _this2.database.sessions.update(id, {
+            uploaded: fileName
+          });
+        }));
       });
     };
     _proto.delete = function _delete(sessions) {
-      var _this2 = this;
+      var _this3 = this;
       var sessionIds = sessions.map(function (it) {
         return it.id;
       }).filter(function (it) {
         return !!it;
       });
       return this.database.transaction('rw', [this.database.events, this.database.sessions], function () {
-        return _this2.database.events.where('sessionId').anyOf(sessionIds).eachPrimaryKey(function (it) {
-          return _this2.database.events.delete(it);
+        return _this3.database.events.where('sessionId').anyOf(sessionIds).eachPrimaryKey(function (it) {
+          return _this3.database.events.delete(it);
         }).then(function () {
-          return _this2.database.sessions.bulkDelete(sessionIds);
+          return _this3.database.sessions.bulkDelete(sessionIds);
         });
       });
     };
     _proto.flushBuffer = function flushBuffer() {
-      var _this3 = this;
-      return Promise.all([this.database.buffer.where('type').equals(_session.EventType.Meta).first(), this.database.buffer.where('type').equals(_session.EventType.FullSnapshot).first()]).then(function (_ref2) {
-        var meta = _ref2[0],
-          snapshot = _ref2[1];
+      var _this4 = this;
+      return Promise.all([this.database.buffer.where('type').equals(_session.EventType.Meta).first(), this.database.buffer.where('type').equals(_session.EventType.FullSnapshot).first()]).then(function (_ref3) {
+        var meta = _ref3[0],
+          snapshot = _ref3[1];
         var tagMetaTitle = snapshot == null ? void 0 : snapshot.data.node.childNodes.find(function (it) {
           return (it == null ? void 0 : it.tagName) === 'html';
         }).childNodes.find(function (it) {
@@ -114,24 +121,24 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
           var _it$attributes;
           return (it == null ? void 0 : (_it$attributes = it.attributes) == null ? void 0 : _it$attributes.name) === 'title';
         });
-        return _this3.database.transaction('rw', [_this3.database.buffer, _this3.database.events, _this3.database.sessions], function () {
+        return _this4.database.transaction('rw', [_this4.database.buffer, _this4.database.events, _this4.database.sessions], function () {
           var _tagMetaTitle$attribu, _tagMetaTitle$attribu2;
-          return _this3.database.sessions.put({
+          return _this4.database.sessions.put({
             href: meta.data.href,
             title: (_tagMetaTitle$attribu = tagMetaTitle == null ? void 0 : (_tagMetaTitle$attribu2 = tagMetaTitle.attributes) == null ? void 0 : _tagMetaTitle$attribu2.content) != null ? _tagMetaTitle$attribu : 'Unknown',
             timestamp: meta.timestamp
           }).catch(function (error) {
             throw error;
           }).then(function (sessionId) {
-            return _this3.database.buffer.toArray().then(function (events) {
+            return _this4.database.buffer.toArray().then(function (events) {
               return events.map(function (it) {
                 it.sessionId = sessionId;
                 return it;
               });
             }).then(function (events) {
-              return _this3.database.events.bulkPut(events);
+              return _this4.database.events.bulkPut(events);
             }).then(function () {
-              return _this3.database.buffer.clear();
+              return _this4.database.buffer.clear();
             });
           });
         });

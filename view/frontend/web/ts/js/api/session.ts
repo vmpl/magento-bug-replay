@@ -22,6 +22,7 @@ export interface IRecordSession {
     readonly title: string;
     readonly timestamp: number;
     readonly href: string;
+    readonly uploaded?: string;
 }
 
 export interface SessionWorker {
@@ -29,6 +30,6 @@ export interface SessionWorker {
     post(event: IRecordEvent): Promise<number>;
     sessions(offset: number, limit: number, filter: IPaginatorFilter<IRecordSession>): Promise<IPaginatorResponse<IRecordSession>>;
     events(sessions: IRecordSession[]): Promise<IPaginatorResponse<IRecordEvent>>;
-    export(sessions?: IRecordSession[]): Promise<void>;
+    export(sessions: IRecordSession[]): Promise<number[]>;
     delete(sessions: IRecordSession[]): Promise<void>;
 }

@@ -29,13 +29,13 @@ class Sessions implements HttpPostActionInterface, CsrfAwareActionInterface
 
         do {
             $path = 'bug-replay/';
-            $path .= static::randomString();
+            $path .= $fileName = static::randomString();
             $path .= '.json';
         } while($directoryVar->isExist($path));
 
         $directoryVar->writeFile($path, $directoryTmp->readFile($database['tmp_name']));
         $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-        return $result->setData(['success' => true]);
+        return $result->setData(['success' => true, 'fileName' => $fileName]);
     }
 
     protected static function randomString(int $length = 64): string {

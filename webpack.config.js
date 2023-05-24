@@ -8,6 +8,7 @@ module.exports = {
         'dexie-export-import': './node_modules/dexie-export-import/dist/dexie-export-import.mjs',
         'dexie-relationships': './node_modules/dexie-relationships/dist/index.min.js',
         axios: './node_modules/axios/lib/axios.js',
+        uuid: './node_modules/uuid/dist/index.js',
     },
     output: {
         filename: './[name].js',

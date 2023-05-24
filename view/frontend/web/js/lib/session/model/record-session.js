@@ -9,7 +9,7 @@ define(["VMPL_BugReplay/js/lib/worker/decorator", "module"], function (_decorato
   var RecordSession = (_dec = (0, _decorator.WorkerArgument)(_module.id), _dec(_class = /*#__PURE__*/function () {
     "use strict";
 
-    function RecordSession(title, href, timestamp, id, events) {
+    function RecordSession(title, href, timestamp, id, uploaded, events) {
       if (id === void 0) {
         id = null;
       }
@@ -17,6 +17,7 @@ define(["VMPL_BugReplay/js/lib/worker/decorator", "module"], function (_decorato
       this.href = href;
       this.timestamp = timestamp;
       this.id = id;
+      this.uploaded = uploaded;
       this.events = events;
     }
     _createClass(RecordSession, [{

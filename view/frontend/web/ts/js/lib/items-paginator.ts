@@ -5,6 +5,7 @@ import {
 import * as module from "module";
 import {WorkerArgument} from "VMPL_BugReplay/js/lib/worker/decorator";
 import {of} from "rxjs";
+import {ArrayTypeAnnotation} from "@babel/types";
 
 enum CompareTypes {
     equal,
@@ -83,7 +84,7 @@ export class PaginatorFilter<T extends Object> implements IPaginatorFilter<T> {
     }
 }
 
-export default class<T extends Object, L extends IPaginatorLoader<T>> implements AsyncIterable<T> {
+export default class<T extends Object, L extends IPaginatorLoader<T>> {
     protected readonly _filter: PaginatorFilter<T> = new PaginatorFilter();
     protected _page: number = 1;
     protected _size: number = 5;
@@ -123,7 +124,8 @@ export default class<T extends Object, L extends IPaginatorLoader<T>> implements
         const offset = (this._page - 1) * this._size;
         const limit = this._size;
 
-        if (!this.items.length || this.items.slice(offset, offset + limit).includes(undefined)) {
+        // @ts-ignore
+        if (!this.items.length || this.items.slice(offset, offset + limit).includes()) {
             return this.loader.loadPaginatorItems(offset, limit, this._filter)
                 .then(response => {
                     this.items.length
@@ -139,7 +141,7 @@ export default class<T extends Object, L extends IPaginatorLoader<T>> implements
     }
 
     fetch(atIndex: number): Promise<T> {
-        this.page = (atIndex / this._size) + 1;
+        this.page = Number((atIndex / this._size).toFixed()) + 1;
         return this.loadPage()
             .then(() => this.items[atIndex]);
     }
@@ -149,15 +151,23 @@ export default class<T extends Object, L extends IPaginatorLoader<T>> implements
         this.items = [];
     }
 
-    [Symbol.asyncIterator](): AsyncIterator<T> {
-        let counter: number = 0;
-        return {
-            next: (): Promise<IteratorResult<T>> => {
-                return this.fetch(++counter)
-                    .then(item => {
-                        return {value: item, done: counter == this.items.length}
-                    });
-            }
-        }
+    forEach(each?: (item: T, index: number) => void): Promise<void> {
+        let index = 0;
+        const next: () => Promise<void> = () => {
+            return this.fetch(index++)
+                .then(it => !each || each(it, index))
+                .then(() => {
+                    if (index < this.items.length) {
+                        return next();
+                    }
+                })
+        };
+
+        return next();
+    }
+
+    all(): Promise<T[]> {
+        return this.forEach()
+            .then(() => this.items);
     }
 }

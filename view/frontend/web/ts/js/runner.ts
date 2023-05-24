@@ -1,5 +1,6 @@
 import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
 import {PaginatorFilter} from "VMPL_BugReplay/js/lib/items-paginator";
+import {IRecordSession} from "VMPL_BugReplay/js/api/session";
 
 class Runner {
     constructor(
@@ -23,10 +24,10 @@ class Runner {
 
         // @ts-ignore
         window.demo = {
-            getSessionRecords: async () => {
-                for await (const session of this.manager.paginator) {
-                    console.log(session);
-                }
+            getSessionRecords: () => {
+                this.manager.paginator.forEach((item) => {
+                    console.log(item)
+                });
             },
             goForPage: (value: number) => (this.manager.paginator.page = value),
             addFilterWithTitle: (title: string = 'Jackets - Tops - Women') => {
@@ -38,7 +39,10 @@ class Runner {
                     .then(events => console.log(events))
             },
             uploadSessions: () => {
-                this.manager.uploadSessions()
+                this.manager.paginator.all()
+                    .then(sessions => {
+                        return this.manager.uploadSessions(sessions);
+                    })
                     .then(() => console.log('finished'));
             },
             deleteFirstSession: () => {
@@ -46,8 +50,10 @@ class Runner {
                     .then(() => console.log('deleted'));
             },
             deleteAllSessions: () => {
-                this.manager.deleteSession()
-                    .then(() => console.log('deletedAll'));
+                this.manager.paginator.forEach((item, index) => {
+                    this.manager.deleteSession(index);
+                })
+                    .then(() => console.log('deletedAll'))
             }
         }
     }

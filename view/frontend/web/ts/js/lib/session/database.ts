@@ -12,7 +12,8 @@ export default class Database extends Dexie {
 
     constructor(databaseName: string) {
         super(databaseName, {addons: [relationships]});
-        this.mapFirstVersion();
+        this.initial();
+        this.addingUploadFlag();
         this.sessions.mapToClass(RecordSession);
         this.events.mapToClass(RecordEvent);
         this.buffer.mapToClass(RecordEvent);
@@ -22,9 +23,17 @@ export default class Database extends Dexie {
         return exportDB(this, options);
     }
 
-    private mapFirstVersion() {
+    private initial() {
         this.version(1).stores({
             sessions: '++id,&timestamp,href,title',
+            events: '&timestamp,*type,data,sessionId -> sessions.id',
+            buffer: '&timestamp,*type,data',
+        });
+    }
+
+    private addingUploadFlag() {
+        this.version(2).stores({
+            sessions: '++id,&timestamp,href,title,*uploaded',
             events: '&timestamp,*type,data,sessionId -> sessions.id',
             buffer: '&timestamp,*type,data',
         });

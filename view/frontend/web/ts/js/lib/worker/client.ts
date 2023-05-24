@@ -1,30 +1,63 @@
-import {IMessageWorker} from "VMPL_BugReplay/js/api/worker";
+import {IMethodWorker, IResultWorker} from "VMPL_BugReplay/js/api/worker";
 import Converter from "VMPL_BugReplay/js/lib/worker/converter";
+import {v4 as uuid} from 'uuid';
 
-export function WorkerClient<T>(scriptUrl: string): Promise<T> {
-    const worker = new Worker(scriptUrl);
+class ClientEvent extends Event {
+    constructor(
+        type: string,
+        public readonly data: any,
+        eventInitDict?: EventInit,
+    ) {
+        super(type, eventInitDict);
+    }
+}
 
-    return new Promise(resolve => {
-        worker.addEventListener('message', (event: MessageEvent<IMessageWorker>) => {
-            const methods = event.data.arguments;
-            resolve(Object.fromEntries(methods.map(method => {
-                return [method, (...args: any[]) => {
-                    const listener = new Promise(resolve => {
-                        worker.addEventListener('message', (event) => {
-                            Converter.objectToClass(event.data)
-                                .then(data => resolve(data))
-                        }, {once: true, passive: true});
+class Client {
+    protected constructor(
+        public readonly worker: Worker,
+        protected readonly dispatcher = new EventTarget(),
+    ) {
+        this.worker.addEventListener('message', this.onMessage.bind(this));
+    }
+
+    static init(worker: Worker): Promise<Object> {
+        const instance = new Client(worker);
+        return new Promise(resolve => {
+            instance.dispatcher.addEventListener('$$init', (event: ClientEvent) => {
+                const entries = (<string[]>event.data)
+                    .map(method => {
+                        return [method, (...args: any[]) => (instance.postMessage(method, args))];
                     })
 
-                    Promise.all(args.map(Converter.classToObject.bind(Converter)))
-                        .then(resolved => worker.postMessage(<IMessageWorker>{
-                            method,
-                            arguments: resolved
-                        }));
+                resolve(Object.fromEntries(entries))
+            }, {once: true});
+        })
+    }
 
-                    return listener;
-                }];
-            })))
-        }, {once: true});
-    });
+    protected onMessage(event: MessageEvent<IResultWorker>) {
+        Converter.objectToClass(event.data.result)
+            .then(result => new ClientEvent(event.data.id, result))
+            .then(event => this.dispatcher.dispatchEvent(event))
+    }
+
+    protected postMessage(method: string, args: any[]): Promise<any> {
+        const id = uuid();
+        Promise.all(args.map(Converter.classToObject.bind(Converter)))
+            .then(resolved => this.worker.postMessage(<IMethodWorker>{
+                id,
+                method,
+                arguments: resolved,
+            }));
+
+        return new Promise(resolve => {
+            this.dispatcher.addEventListener(id, (event: ClientEvent) => {
+                resolve(event.data);
+            }, {once: true});
+        });
+    }
+}
+
+export function WorkerClient<T extends Object>(scriptUrl: string): Promise<T> {
+    return Client.init(new Worker(scriptUrl))
+        .then((client: T) => client);
 }

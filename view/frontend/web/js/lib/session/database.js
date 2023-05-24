@@ -12,7 +12,8 @@ define(["dexie", "dexie-export-import", "dexie-relationships", "VMPL_BugReplay/j
       _this = _dexie$Dexie.call(this, databaseName, {
         addons: [_dexieRelationships]
       }) || this;
-      _this.mapFirstVersion();
+      _this.initial();
+      _this.addingUploadFlag();
       _this.sessions.mapToClass(_recordSession.RecordSession);
       _this.events.mapToClass(_recordEvent.RecordEvent);
       _this.buffer.mapToClass(_recordEvent.RecordEvent);
@@ -22,9 +23,16 @@ define(["dexie", "dexie-export-import", "dexie-relationships", "VMPL_BugReplay/j
     _proto.export = function _export(options) {
       return (0, _dexieExportImport.exportDB)(this, options);
     };
-    _proto.mapFirstVersion = function mapFirstVersion() {
+    _proto.initial = function initial() {
       this.version(1).stores({
         sessions: '++id,&timestamp,href,title',
+        events: '&timestamp,*type,data,sessionId -> sessions.id',
+        buffer: '&timestamp,*type,data'
+      });
+    };
+    _proto.addingUploadFlag = function addingUploadFlag() {
+      this.version(2).stores({
+        sessions: '++id,&timestamp,href,title,*uploaded',
         events: '&timestamp,*type,data,sessionId -> sessions.id',
         buffer: '&timestamp,*type,data'
       });

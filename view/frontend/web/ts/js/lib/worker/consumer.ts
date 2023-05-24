@@ -1,4 +1,4 @@
-import {IMessageWorker, IWebWorker} from "VMPL_BugReplay/js/api/worker";
+import {IMethodWorker, IResultWorker, IWebWorker} from "VMPL_BugReplay/js/api/worker";
 import Converter from "VMPL_BugReplay/js/lib/worker/converter";
 
 export function WorkerConsumer(namespace: string = null) {
@@ -13,7 +13,7 @@ export function WorkerConsumer(namespace: string = null) {
                 this.run();
             }
 
-            $$messageHandler(event: MessageEvent<IMessageWorker>) {
+            $$messageHandler(event: MessageEvent<IMethodWorker>) {
                 if (!target.prototype.hasOwnProperty(event.data.method)) {
                     return;
                 }
@@ -23,25 +23,30 @@ export function WorkerConsumer(namespace: string = null) {
                         return target.prototype[event.data.method].apply(this, args);
                     })
                     .then(result => Converter.classToObject(result))
-                    .then(message => postMessage(message))
+                    .then(data => postMessage(<IResultWorker>{
+                        id: event.data.id,
+                        method: event.data.method,
+                        result: data
+                    }))
                     .catch(error => {
                         throw error;
                     })
             }
 
             run(): void {
-                addEventListener('message', this.$$messageHandler.bind(this));
-
                 const methods = Object.entries(Object.getOwnPropertyDescriptors(target.prototype))
                     .filter(([property, descriptor]) => {
                         return descriptor.value instanceof Function;
                     })
                     .map(([property]) => property);
 
-                postMessage(<IMessageWorker>{
+                postMessage(<IResultWorker>{
+                    id: '$$init',
                     method: '$$init',
-                    arguments: methods
+                    result: methods
                 });
+
+                addEventListener('message', this.$$messageHandler.bind(this));
             }
         }
     }
