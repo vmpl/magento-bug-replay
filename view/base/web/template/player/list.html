@@ -1,0 +1,16 @@
+<ul>
+    <!-- ko foreach: list -->
+    <li>
+        <p data-bind="text: title"></p>
+        <p data-bind="text: timestamp"></p>
+        <button data-bind="click: $parent.sessionReplay">
+            <!-- ko i18n -->Replay<!-- /ko -->
+        </button>
+    </li>
+    <!-- /ko -->
+    <li>
+        <button data-bind="click: dynamicLoad">
+            <!-- ko i18n -->Load<!-- /ko -->
+        </button>
+    </li>
+</ul>
