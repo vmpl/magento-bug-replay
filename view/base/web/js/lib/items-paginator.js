@@ -112,11 +112,11 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
     _proto3.loadPage = function loadPage() {
       var _this = this;
       var offset = (this._page - 1) * this._size;
-      var limit = this._size;
+      var limit = offset + this._size;
 
       // @ts-ignore
-      if (!this.items.length || this.items.slice(offset, offset + limit).includes()) {
-        return this.loader.loadPaginatorItems(offset, limit, this._filter).then(function (response) {
+      if (!this.items.length || this.items.slice(offset, limit).includes()) {
+        return this.loader.loadPaginatorItems(offset, this._size, this._filter).then(function (response) {
           _this.items.length || (_this.items = new Array(response.meta.totalRecords));
           response.items.forEach(function (item, index) {
             _this.items[offset + index] = item;
@@ -161,14 +161,21 @@ define(["module", "VMPL_BugReplay/js/lib/worker/decorator"], function (module, _
       var offset = (this._page - 1) * this._size;
       var limit = offset + this._size;
       return this.loadPage().then(function () {
-        return _this5.items.slice(offset, limit);
+        var items = _this5.items.slice(offset, limit);
+        if (!items.length) {
+          throw new Error('None');
+        }
+        return items;
       });
     };
     _createClass(_default, [{
       key: "page",
+      get: function get() {
+        return this._page;
+      },
       set: function set(value) {
-        if (!(this._page > 0)) {
-          throw new Error('Page cannot be lower then 1.');
+        if (!(value > 0)) {
+          throw new Error("Page cannot be lower then 1, given " + value);
         }
         this._page = value;
       }

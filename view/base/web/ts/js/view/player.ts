@@ -7,21 +7,31 @@ export default Component.extend({
     afterRender(element: HTMLDivElement) {
         if (!this.element) {
             this.element = element;
+            window.addEventListener(
+                'resize',
+                this.bindPlayer.bind(this),
+                {passive: true},
+            )
         }
 
-        Data.events.subscribe(() => {
-            while (this.element.lastElementChild) {
-                this.element.removeChild(this.element.lastElementChild);
-            }
+        Data.events.subscribe(this.bindPlayer.bind(this))
+    },
+    bindPlayer() {
+        while (this.element.lastElementChild) {
+            this.element.removeChild(this.element.lastElementChild);
+        }
 
-            const events = Data.events();
-            console.log(events)
-            this.player = new rrwebPlayer({
-                target: this.element,
-                props: {
-                    events,
-                }
-            })
+        const width = this.element.clientWidth;
+        const height = width * 656 / 1024;
+        const events = Data.events();
+
+        this.player = new rrwebPlayer({
+            target: this.element,
+            props: {
+                events,
+                width,
+                height,
+            }
         })
     }
 });

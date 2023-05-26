@@ -90,11 +90,15 @@ export default class<T extends Object, L extends IPaginatorLoader<T>> {
     protected _size: number = 5;
 
     set page(value: number) {
-        if (!(this._page > 0)) {
-            throw new Error('Page cannot be lower then 1.');
+        if (!(value > 0)) {
+            throw new Error(`Page cannot be lower then 1, given ${value}`);
         }
 
         this._page = value;
+    }
+
+    get page(): number {
+        return this._page;
     }
 
     set size(value: number) {
@@ -122,11 +126,11 @@ export default class<T extends Object, L extends IPaginatorLoader<T>> {
 
     protected loadPage(): Promise<void> {
         const offset = (this._page - 1) * this._size;
-        const limit = this._size;
+        const limit = offset + this._size;
 
         // @ts-ignore
-        if (!this.items.length || this.items.slice(offset, offset + limit).includes()) {
-            return this.loader.loadPaginatorItems(offset, limit, this._filter)
+        if (!this.items.length || this.items.slice(offset, limit).includes()) {
+            return this.loader.loadPaginatorItems(offset, this._size, this._filter)
                 .then(response => {
                     this.items.length
                         || (this.items = new Array(response.meta.totalRecords));
@@ -176,6 +180,12 @@ export default class<T extends Object, L extends IPaginatorLoader<T>> {
         const limit = offset + this._size;
 
         return this.loadPage()
-            .then(() => this.items.slice(offset, limit))
+            .then(() => {
+                const items = this.items.slice(offset, limit);
+                if (!items.length) {
+                    throw new Error('None');
+                }
+                return items;
+            })
     }
 }

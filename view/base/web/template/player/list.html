@@ -1,16 +1,26 @@
-<ul>
-    <!-- ko foreach: list -->
-    <li>
-        <p data-bind="text: title"></p>
-        <p data-bind="text: timestamp"></p>
-        <button data-bind="click: $parent.sessionReplay">
-            <!-- ko i18n -->Replay<!-- /ko -->
+<ul class="list" css="open: listOpen">
+    <li class="expand">
+        <button click="toggleListOpen">
+            <!-- ko if: listOpen -->
+                <!-- ko i18n: 'Close' --><!-- /ko -->
+            <!-- /ko -->
+            <!-- ko ifnot: listOpen -->
+                <!-- ko i18n: 'Open' --><!-- /ko -->
+            <!-- /ko -->
         </button>
     </li>
+    <!-- ko foreach: itemList -->
+        <li class="item" css="active: $parent.itemActive() === id">
+            <p>
+                <!-- ko text: title --><!-- /ko -->
+            </p>
+            <p>
+                <!-- ko text: timestamp --><!-- /ko -->
+            </p>
+            <button click="$parent.setActiveItem.bind($parent)">
+                <!-- ko i18n: 'Replay' --><!-- /ko -->
+            </button>
+        </li>
     <!-- /ko -->
-    <li>
-        <button data-bind="click: dynamicLoad">
-            <!-- ko i18n -->Load<!-- /ko -->
-        </button>
-    </li>
+    <li class="loading" afterRender="afterLoading"></li>
 </ul>
