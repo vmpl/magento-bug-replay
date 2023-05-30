@@ -1,8 +1,14 @@
+import ko from 'knockout';
+
 export default class Converter {
     protected constructor() {
     }
 
     static classToObject(data: any): Promise<any> {
+        if (ko.isObservable(data)) {
+            return Promise.resolve(data())
+        }
+
         switch (true) {
             case data instanceof Blob:
                 return Promise.resolve(data);

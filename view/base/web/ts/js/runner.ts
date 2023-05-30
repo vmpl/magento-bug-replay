@@ -24,6 +24,9 @@ class Runner {
 
         // @ts-ignore
         window.demo = {
+            startRecord: () => {
+                this.manager.startRecord()
+            },
             getSessionRecords: () => {
                 this.manager.paginator.forEach((item) => {
                     console.log(item)
@@ -46,12 +49,12 @@ class Runner {
                     .then(() => console.log('finished'));
             },
             deleteFirstSession: () => {
-                this.manager.deleteSession(0)
+                this.manager.deleteAt(0)
                     .then(() => console.log('deleted'));
             },
             deleteAllSessions: () => {
                 this.manager.paginator.forEach((item, index) => {
-                    this.manager.deleteSession(index);
+                    this.manager.deleteAt(index);
                 })
                     .then(() => console.log('deletedAll'))
             }

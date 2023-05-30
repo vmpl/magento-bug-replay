@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database", "VMPL_BugReplay/js/lib/worker/consumer", "axios"], function (_session, _database, _consumer, _axios) {
+define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database", "VMPL_BugReplay/js/lib/worker/consumer", "axios", "VMPL_BugReplay/js/lib/session/model/record-session"], function (_session, _database, _consumer, _axios, _recordSession) {
   "use strict";
 
   _database = _interopRequireDefault(_database);
@@ -30,12 +30,12 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
       if (offset === void 0) {
         offset = 0;
       }
-      return this.database.sessions.with({
-        events: 'events'
-      }).then(filter.match.bind(filter)).then(function (sessions) {
+      return this.database.sessions.orderBy('timestamp').reverse().toArray().then(filter.match.bind(filter)).then(function (sessions) {
         var count = sessions.length;
         return {
-          items: sessions.slice(offset, offset + limit),
+          items: sessions.slice(offset, offset + limit).map(function (it) {
+            return new _recordSession.RecordSession(it.title, it.href, it.timestamp, it.id, it.uploaded);
+          }),
           meta: {
             totalRecords: count
           }

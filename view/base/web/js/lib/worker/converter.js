@@ -1,11 +1,14 @@
 /*eslint-disable */
 /* jscs:disable */
-define([], function () {
+define(["knockout"], function (_knockout) {
   var Converter = /*#__PURE__*/function () {
     "use strict";
 
     function Converter() {}
     Converter.classToObject = function classToObject(data) {
+      if (_knockout.isObservable(data)) {
+        return Promise.resolve(data());
+      }
       switch (true) {
         case data instanceof Blob:
           return Promise.resolve(data);

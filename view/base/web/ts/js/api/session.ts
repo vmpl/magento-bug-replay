@@ -1,4 +1,5 @@
 import {IPaginatorFilter, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
+import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
 
 export enum EventType {
     DomContentLoaded = 0,
@@ -28,7 +29,7 @@ export interface IRecordSession {
 export interface SessionWorker {
     initInstance(instance: string): Promise<void>;
     post(event: IRecordEvent): Promise<number>;
-    sessions(offset: number, limit: number, filter: IPaginatorFilter<IRecordSession>): Promise<IPaginatorResponse<IRecordSession>>;
+    sessions(offset: number, limit: number, filter: IPaginatorFilter<IRecordSession>): Promise<IPaginatorResponse<RecordSession>>;
     events(sessions: IRecordSession[]): Promise<IPaginatorResponse<IRecordEvent>>;
     export(sessions: IRecordSession[]): Promise<number[]>;
     delete(sessions: IRecordSession[]): Promise<void>;

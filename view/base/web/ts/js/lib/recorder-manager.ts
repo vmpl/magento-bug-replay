@@ -3,10 +3,11 @@ import {ConfigWorkerContent} from "VMPL_BugReplay/js/api/response";
 import ItemPaginator from "VMPL_BugReplay/js/lib/items-paginator";
 import {IPaginatorFilter, IPaginatorLoader, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import {WorkerClient} from "VMPL_BugReplay/js/lib/worker/client";
+import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
 declare const rrweb: {record: Function};
 
 export default class RecorderManager implements IPaginatorLoader<IRecordSession> {
-    readonly paginator: ItemPaginator<IRecordSession, RecorderManager>;
+    readonly paginator: ItemPaginator<RecordSession, RecorderManager>;
     stopRecord: Function;
 
     protected constructor(
@@ -45,9 +46,13 @@ export default class RecorderManager implements IPaginatorLoader<IRecordSession>
             .then(() => this.paginator.clear())
     }
 
-    async deleteSession(at: number): Promise<void> {
+    deleteAt(at: number): Promise<void> {
         return this.paginator.fetch(at)
-            .then(session => this.sessionWorker.delete([session]))
+            .then(session => this.delete([session]));
+    }
+
+    delete(sessions: RecordSession[]): Promise<void> {
+        return this.sessionWorker.delete(sessions)
             .then(() => this.paginator.clear());
     }
 
@@ -55,7 +60,7 @@ export default class RecorderManager implements IPaginatorLoader<IRecordSession>
         offset: number,
         limit: number,
         filter: IPaginatorFilter<IRecordSession>,
-    ): Promise<IPaginatorResponse<IRecordSession>> {
+    ): Promise<IPaginatorResponse<RecordSession>> {
         return this.sessionWorker.sessions(offset, limit, filter);
     }
 }

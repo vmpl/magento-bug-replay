@@ -6,12 +6,88 @@
     width: 100%;
 
     .list {
-      padding-left: 0;
       list-style: none;
       position: relative;
+      padding-left: @border-width__base;
+      min-width: 320px;
+      background: linear-gradient(0.25turn, @theme__color__primary, fade(@theme__color__primary, 0.5) 70%, transparent);
+
+      li {
+        margin: 0;
+
+        > * {
+          background: @page__background-color;
+        }
+      }
+
+      & {
+        .expand {
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          z-index: @z-index-9;
+
+          button {
+            height: 100%;
+            border: none;
+
+            .lib-icon-font(
+              @icon-settings,
+              @_icon-font-size: @indent__base,
+              @_icon-font-line-height: @indent__base,
+              @_icon-font-color: @theme__color__primary,
+              @_icon-font-text-hide: true
+            );
+          }
+        }
+        &.open .expand {
+          display: none;
+        }
+      }
 
       .item {
-        transition: all 9s ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+          color: @theme__color__primary;
+        }
+
+        &.active {
+          font-weight: bold;
+        }
+
+        p {
+          margin: 0;
+          padding: @indent__s;
+
+          &.timeline {
+            margin-top: @border-width__base;
+            position: relative;
+
+            &:before {
+              content: ' ';
+              background: @page__background-color;
+              border: 1px solid @theme__color__primary;
+              border-radius: 50%;
+              width: @indent__s;
+              height: @indent__s;
+              position: absolute;
+              left: 0;
+              top: 0;
+              transform: translate(-50%, -50%);
+            }
+          }
+        }
+
+        .actions {
+          display: flex;
+          flex-flow: row wrap;
+          column-gap: @indent__s;
+          list-style: none;
+          padding-left: @indent__s;
+          padding-bottom: @indent__s;
+        }
       }
 
       &:not(.open) .item:not(.active) {
@@ -23,9 +99,9 @@
         background-position: 50%;
         background-repeat: no-repeat;
         background-size: @indent__m;
-        width: @indent__m;
+        width: 100%;
         height: @indent__m;
-        margin: @indent__s auto;
+        padding: @indent__xs 0;
       }
     }
 
@@ -46,8 +122,6 @@
     flex-flow: row nowrap;
 
     .list {
-      padding-left: 0;
-      list-style: none;
       max-height: 768px;
       overflow-y: scroll;
 

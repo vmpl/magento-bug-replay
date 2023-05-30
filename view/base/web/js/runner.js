@@ -24,6 +24,9 @@ define(["VMPL_BugReplay/js/lib/recorder-manager", "VMPL_BugReplay/js/lib/items-p
 
       // @ts-ignore
       window.demo = {
+        startRecord: function startRecord() {
+          _this.manager.startRecord();
+        },
         getSessionRecords: function getSessionRecords() {
           _this.manager.paginator.forEach(function (item) {
             console.log(item);
@@ -61,13 +64,13 @@ define(["VMPL_BugReplay/js/lib/recorder-manager", "VMPL_BugReplay/js/lib/items-p
           });
         },
         deleteFirstSession: function deleteFirstSession() {
-          _this.manager.deleteSession(0).then(function () {
+          _this.manager.deleteAt(0).then(function () {
             return console.log('deleted');
           });
         },
         deleteAllSessions: function deleteAllSessions() {
           _this.manager.paginator.forEach(function (item, index) {
-            _this.manager.deleteSession(index);
+            _this.manager.deleteAt(index);
           }).then(function () {
             return console.log('deletedAll');
           });

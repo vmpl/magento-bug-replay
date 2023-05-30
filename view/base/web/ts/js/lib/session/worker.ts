@@ -7,6 +7,7 @@ import SessionDatabase from "VMPL_BugReplay/js/lib/session/database";
 import {IPaginatorFilter, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import {WorkerConsumer} from "VMPL_BugReplay/js/lib/worker/consumer";
 import axios from "axios";
+import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
 
 @WorkerConsumer()
 class Worker implements SessionWorkerInterface {
@@ -35,14 +36,22 @@ class Worker implements SessionWorkerInterface {
     sessions(
         offset: number = 0,
         limit: number, filter: IPaginatorFilter<IRecordSession>
-    ): Promise<IPaginatorResponse<IRecordSession>> {
+    ): Promise<IPaginatorResponse<RecordSession>> {
         return this.database.sessions
-            .with({events: 'events'})
+            .orderBy('timestamp')
+            .reverse()
+            .toArray()
             .then(filter.match.bind(filter))
             .then(sessions => {
                 const count = sessions.length;
                 return {
-                    items: sessions.slice(offset, offset + limit),
+                    items: sessions.slice(offset, offset + limit).map(it => new RecordSession(
+                        it.title,
+                        it.href,
+                        it.timestamp,
+                        it.id,
+                        it.uploaded,
+                    )),
                     meta: {
                         totalRecords: count,
                     }
