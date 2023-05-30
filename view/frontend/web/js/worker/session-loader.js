@@ -1,5 +1,5 @@
 (async () => {
-    const content = await fetch('/vmpl-bug-report/config/worker')
+    const content = await fetch('/vmpl-bug-report/session/config')
         .then(response => response.json())
     require = {
         baseUrl: content.baseUrl,

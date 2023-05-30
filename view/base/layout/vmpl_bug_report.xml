@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+  <body>
+    <block class="VMPL\BugReplay\Block\Player" name="vmpl.bug-replay.player" template="VMPL_BugReplay::player.phtml">
+      <arguments>
+        <argument name="view_model" xsi:type="object">\VMPL\BugReplay\ViewModel\Player</argument>
+        <argument name="jsLayout" xsi:type="array">
+          <item name="components" xsi:type="array">
+            <item name="player" xsi:type="array">
+              <item name="component" xsi:type="string">uiComponent</item>
+              <item name="config" xsi:type="array">
+                <item name="template" xsi:type="string">VMPL_BugReplay/player</item>
+              </item>
+              <item name="children" xsi:type="array">
+                <item name="sidebar" xsi:type="array">
+                  <item name="component" xsi:type="string">uiComponent</item>
+                  <item name="displayArea" xsi:type="string">sidebar</item>
+                  <item name="children" xsi:type="array">
+                    <item name="list" xsi:type="array">
+                      <item name="component" xsi:type="string">VMPL_BugReplay/js/view/list</item>
+                      <item name="config" xsi:type="array">
+                        <item name="template" xsi:type="string">VMPL_BugReplay/player/list</item>
+                      </item>
+                    </item>
+                  </item>
+                </item>
+                <item name="main" xsi:type="array">
+                  <item name="component" xsi:type="string">uiComponent</item>
+                  <item name="displayArea" xsi:type="string">main</item>
+                  <item name="children" xsi:type="array">
+                    <item name="rrweb" xsi:type="array">
+                      <item name="component" xsi:type="string">VMPL_BugReplay/js/view/player</item>
+                      <item name="config" xsi:type="array">
+                        <item name="template" xsi:type="string">VMPL_BugReplay/player/rrweb</item>
+                      </item>
+                    </item>
+                  </item>
+                </item>
+              </item>
+            </item>
+          </item>
+        </argument>
+      </arguments>
+    </block>
+  </body>
+</page>
