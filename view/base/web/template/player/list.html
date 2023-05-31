@@ -2,26 +2,8 @@
     <li class="expand">
         <button click="function () { toggleOptionsActive() }"></button>
     </li>
-    <!-- ko foreach: {data: itemList, as: 'item'} -->
-        <li class="item"
-            css="active: $parent.idActive() === item.id"
-            click="$parent.onItemClick.bind($parent)"
-        >
-            <p ifnot="item.options" text="item.title"></p>
-            <ol class="actions" if="item.options" click="function () { item.options(false) }, clickBubble: false">
-                <li>
-                    <button click="$parent.deleteItem.bind($parent)">
-                        🗑️
-                    </button>
-                </li>
-                <li>
-                    <button click="$parent.setActiveItem.bind($parent)">
-                        ▶︎
-                    </button>
-                </li>
-            </ol>
-            <p class="timeline" text="item.date.toLocaleString()"></p>
-        </li>
+    <!-- ko foreach: itemComponents -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
     <!-- /ko -->
     <li class="loading" afterRender="afterLoading"></li>
 </ul>

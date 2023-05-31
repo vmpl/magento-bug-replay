@@ -36,7 +36,7 @@ export default class Converter {
                 return Promise.resolve(data);
             case data instanceof Array:
                 return Promise.all(data.map(this.objectToClass.bind(this)));
-            case data instanceof Object:
+            case data instanceof Object && !!Object.keys(data).length:
                 return Promise.all(Object.values(data).map(it => this.objectToClass(it)))
                     .then(values => {
                         let convertedObject = Object.keys(data)

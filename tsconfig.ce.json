@@ -2,7 +2,8 @@
   "compilerOptions": {
     "paths": {
       "VMPL_BugReplay/*": [
-        "view/base/web/ts/*"
+        "view/base/web/ts/*",
+        "view/frontend/web/ts/*",
       ],
     }
   },
