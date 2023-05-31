@@ -115,7 +115,6 @@ export default Component.extend({
         )
     },
     onItemClick(component: any, event: MouseEvent) {
-        const item = component.item;
         const isMobile = getComputedStyle(this.conteinerElement).flexDirection === 'column';
         switch (true) {
             case isMobile && !this.listOpen():
@@ -123,7 +122,7 @@ export default Component.extend({
                 break;
             case isMobile && this.listOpen():
             case !isMobile && event.detail > 1:
-                this.setActiveItem(item);
+                this.setActiveItem(component);
                 break;
             case !isMobile && event.detail === 1:
                 this.toggleOptionsActive(component);

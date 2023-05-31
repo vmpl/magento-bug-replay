@@ -106,7 +106,6 @@ define(["uiLayout", "uiRegistry", "uiComponent", "knockout", "VMPL_BugReplay/js/
       return !this.elementLoading.hidden && rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
     },
     onItemClick: function onItemClick(component, event) {
-      var item = component.item;
       var isMobile = getComputedStyle(this.conteinerElement).flexDirection === 'column';
       switch (true) {
         case isMobile && !this.listOpen():
@@ -114,7 +113,7 @@ define(["uiLayout", "uiRegistry", "uiComponent", "knockout", "VMPL_BugReplay/js/
           break;
         case isMobile && this.listOpen():
         case !isMobile && event.detail > 1:
-          this.setActiveItem(item);
+          this.setActiveItem(component);
           break;
         case !isMobile && event.detail === 1:
           this.toggleOptionsActive(component);
