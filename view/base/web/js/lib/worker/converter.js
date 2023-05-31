@@ -35,7 +35,7 @@ define(["knockout"], function (_knockout) {
           return Promise.resolve(data);
         case data instanceof Array:
           return Promise.all(data.map(this.objectToClass.bind(this)));
-        case data instanceof Object:
+        case data instanceof Object && !!Object.keys(data).length:
           return Promise.all(Object.values(data).map(function (it) {
             return _this.objectToClass(it);
           })).then(function (values) {

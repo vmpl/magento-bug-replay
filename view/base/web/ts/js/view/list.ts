@@ -1,12 +1,14 @@
+// @ts-ignore
+import layout from 'uiLayout';
+import registry from "uiRegistry";
 import Component from 'uiComponent';
 import ko from 'knockout';
 import Data from 'VMPL_BugReplay/js/model/data';
-import {IRecordSession} from "VMPL_BugReplay/js/api/session";
 import sessionReplay from "VMPL_BugReplay/js/action/session-replay";
 import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
 
 class ItemSession extends RecordSession {
-    public readonly options: KnockoutObservable<boolean> = ko.observable(false);
+    public readonly optionsVisible: KnockoutObservable<boolean> = ko.observable(false);
 
     static from(child: RecordSession): ItemSession {
         return new this(
@@ -21,35 +23,61 @@ class ItemSession extends RecordSession {
 }
 
 export default Component.extend({
+    defaults: {
+        template: 'VMPL_BugReplay/player/list',
+        itemConfig: {
+            component: 'VMPL_BugReplay/js/view/list-item',
+            config: {},
+            children: {
+                options: {
+                    component: 'uiComponent',
+                    displayArea: 'options',
+                    children: {
+                        delete: {
+                            component: 'VMPL_BugReplay/js/view/list-option-delete',
+                            config: {},
+                        }
+                    }
+                }
+            }
+        },
+    },
     listOpen: ko.observable(false),
-    itemList: ko.observableArray([]),
+    itemComponents: ko.observableArray([]),
     idActive: ko.observable(0),
     initialize(options: object) {
         this._super(options);
-        const listSubscribe = this.itemList.subscribe(() => {
-            this.setActiveItem(this.itemList.slice(0, 1).shift());
+        const listSubscribe = this.itemComponents.subscribe(() => {
+            this.setActiveItem(this.itemComponents.slice(0, 1).shift());
             listSubscribe.dispose()
         })
         return this;
     },
-    setActiveItem(session: ItemSession) {
+    setActiveItem(component: any) {
+        const session = component.item;
+
         this.idActive(session.id);
         this.listOpen(false);
         sessionReplay(session);
         return this;
     },
-    toggleOptionsActive(chosen?: ItemSession) {
-        const session = chosen ? chosen : this.itemList()
-            .find((it: ItemSession) => it.id === this.idActive())
-        session?.options(!session?.options());
+    toggleOptionsActive(component?: any) {
+        const session = component ? component : this.itemComponents()
+            .find((it: any) => it.item.id === this.idActive())
+        session?.item.optionsVisible(!session?.item.optionsVisible());
     },
     dynamicLoad(): Promise<void> {
         return Data.manager
             .then(manager => manager.paginator.getPage()
                 .then(sessions => {
+                    return Promise.all(
+                        sessions.map(it => ItemSession.from(it))
+                            .map(this.mapItemComponent.bind(this))
+                    )
+                })
+                .then(items => {
                     manager.paginator.page++
-                    const items = sessions.map(it => ItemSession.from(it));
-                    this.itemList.push(...items)
+                    this.itemComponents.push(...items)
                 })
                 .then(() => {
                     !this.isInViewport()
@@ -86,7 +114,8 @@ export default Component.extend({
             && rect.right <= (window.innerWidth || document.documentElement.clientWidth)
         )
     },
-    onItemClick(item: RecordSession, event: MouseEvent) {
+    onItemClick(component: any, event: MouseEvent) {
+        const item = component.item;
         const isMobile = getComputedStyle(this.conteinerElement).flexDirection === 'column';
         switch (true) {
             case isMobile && !this.listOpen():
@@ -97,20 +126,20 @@ export default Component.extend({
                 this.setActiveItem(item);
                 break;
             case !isMobile && event.detail === 1:
-                this.toggleOptionsActive(item);
+                this.toggleOptionsActive(component);
                 break;
         }
     },
-    formatDate(timestamp: number): string {
-        const date = new Date(timestamp);
-        return date.toLocaleString();
-    },
-    deleteItem(item: RecordSession) {
-        return Data.manager
-            .then(manager => manager.delete([item]))
-            .then(() => this.itemList.removeAll())
-            .then(() => {
-                this.elementLoading.hidden = false;
-            })
+    mapItemComponent(it: RecordSession) {
+        const componentConfig = structuredClone(this.itemConfig);
+        componentConfig.name = `${this.name}.${it.id}.item`;
+        componentConfig.config.item = it;
+        componentConfig.config.provider = this.name;
+        componentConfig.idActive = this.idActive;
+        componentConfig.onItemClick = this.onItemClick.bind(this);
+        componentConfig.setActiveItem = this.setActiveItem.bind(this);
+
+        layout([componentConfig]);
+        return registry.promise(componentConfig.name);
     }
 });
