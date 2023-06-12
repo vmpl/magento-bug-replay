@@ -8,7 +8,7 @@
         <argument name="jsLayout" xsi:type="array">
           <item name="components" xsi:type="array">
             <item name="uploadProvider" xsi:type="array">
-              <item name="component" xsi:type="array">VMPL_BugReplay/js/model/upload-provider</item>
+              <item name="component" xsi:type="string">VMPL_BugReplay/js/model/provider</item>
             </item>
             <item name="player" xsi:type="array">
               <item name="children" xsi:type="array">
@@ -21,8 +21,7 @@
                             <item name="options" xsi:type="array">
                               <item name="children" xsi:type="array">
                                 <item name="upload" xsi:type="array">
-                                  <item name="component" xsi:type="string">VMPL_BugReplay/js/view/list-option-upload
-                                  </item>
+                                  <item name="component" xsi:type="string">VMPL_BugReplay/js/view/list-option-upload</item>
                                   <item name="config" xsi:type="array">
                                     <item name="provider" xsi:type="string">uploadProvider</item>
                                   </item>

@@ -1,4 +1,4 @@
-<li class="item" css="active: idActive() === item.id" click="onItemClick">
+<li class="item" css="active: isActive" afterRender="afterRender">
     <p ifnot="item.optionsVisible" text="item.title"></p>
     <ol class="actions" if="item.optionsVisible" click="function () { item.optionsVisible(false) }, clickBubble: false">
         <!-- ko foreach: getRegion('options') -->
@@ -6,11 +6,6 @@
                 <!-- ko template: getTemplate() --><!-- /ko -->
             </li>
         <!-- /ko -->
-        <li>
-            <button click="setActiveItem">
-                ▶︎
-            </button>
-        </li>
     </ol>
     <p class="timeline" text="item.date.toLocaleString()"></p>
 </li>

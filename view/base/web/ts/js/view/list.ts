@@ -4,30 +4,23 @@ import registry from "uiRegistry";
 import Component from 'uiComponent';
 import ko from 'knockout';
 import Data from 'VMPL_BugReplay/js/model/data';
-import sessionReplay from "VMPL_BugReplay/js/action/session-replay";
-import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
-
-class ItemSession extends RecordSession {
-    public readonly optionsVisible: KnockoutObservable<boolean> = ko.observable(false);
-
-    static from(child: RecordSession): ItemSession {
-        return new this(
-            child.title,
-            child.href,
-            child.timestamp,
-            child.id,
-            child.uploaded,
-            child.events
-        );
-    }
-}
+import ItemSession, {ItemSessionFactory} from "VMPL_BugReplay/js/model/item-session";
+import {Exception as ItemPaginatorException} from "VMPL_BugReplay/js/lib/items-paginator";
 
 export default Component.extend({
+    listOpen: ko.observable(false),
+    sessions: ko.observableArray<ItemSession>([]),
+    itemComponents: ko.observableArray([]),
     defaults: {
         template: 'VMPL_BugReplay/player/list',
+        exports: {
+            sessions: '${ $.provider }:sessions',
+        },
         itemConfig: {
             component: 'VMPL_BugReplay/js/view/list-item',
-            config: {},
+            config: {
+                provider: '${ $.provider }',
+            },
             children: {
                 options: {
                     component: 'uiComponent',
@@ -42,23 +35,16 @@ export default Component.extend({
             }
         },
     },
-    listOpen: ko.observable(false),
-    itemComponents: ko.observableArray([]),
-    idActive: ko.observable(0),
-    initialize(options: object) {
-        this._super(options);
+    initObservable() {
+        this._super();
+
         const listSubscribe = this.itemComponents.subscribe(() => {
-            this.setActiveItem(this.itemComponents.slice(0, 1).shift());
+            const component = this.itemComponents.slice(0, 1).shift();
+            component.activeSession(component.item);
+
             listSubscribe.dispose()
         })
-        return this;
-    },
-    setActiveItem(component: any) {
-        const session = component.item;
 
-        this.idActive(session.id);
-        this.listOpen(false);
-        sessionReplay(session);
         return this;
     },
     toggleOptionsActive(component?: any) {
@@ -70,21 +56,26 @@ export default Component.extend({
         return Data.manager
             .then(manager => manager.paginator.getPage()
                 .then(sessions => {
-                    return Promise.all(
-                        sessions.map(it => ItemSession.from(it))
-                            .map(this.mapItemComponent.bind(this))
-                    )
+                    const itemSessions = sessions.map(it => ItemSessionFactory.create(it));
+                    this.sessions.push(...itemSessions);
+
+                    return Promise.all(itemSessions.map(this.mapItemComponent.bind(this)))
                 })
                 .then(items => {
                     manager.paginator.page++
-                    this.itemComponents.push(...items)
+                    this.itemComponents.push(...items);
                 })
                 .then(() => {
                     !this.isInViewport()
                         || this.dynamicLoad();
                 })
-                .catch((error) => {
-                    this.elementLoading.hidden = true;
+                .catch(error => {
+                    if (error instanceof ItemPaginatorException) {
+                        this.elementLoading.hidden = true;
+                        return;
+                    }
+
+                    throw error;
                 }))
 
     },
@@ -129,16 +120,12 @@ export default Component.extend({
                 break;
         }
     },
-    mapItemComponent(it: RecordSession) {
+    mapItemComponent(itemSession: ItemSession) {
         const componentConfig = structuredClone(this.itemConfig);
-        componentConfig.name = `${this.name}.${it.id}.item`;
-        componentConfig.config.item = it;
-        componentConfig.config.provider = this.name;
-        componentConfig.idActive = this.idActive;
-        componentConfig.onItemClick = this.onItemClick.bind(this);
-        componentConfig.setActiveItem = this.setActiveItem.bind(this);
+        componentConfig.name = `${this.name}.item_${itemSession.id}`;
+        componentConfig.itemIndex = this.sessions.indexOf(itemSession);
 
         layout([componentConfig]);
-        return registry.promise(componentConfig.name);
+        return registry.promise(componentConfig.name)
     }
 });

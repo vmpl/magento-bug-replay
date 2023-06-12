@@ -1,14 +1,26 @@
 import Component from 'uiComponent';
+import ko from 'knockout';
+import ItemSession from "VMPL_BugReplay/js/model/item-session";
 
 export default Component.extend({
+    activeSession: ko.observable<ItemSession>(),
     defaults: {
         template: 'VMPL_BugReplay/player/list/item',
-        // @bug for some reason it doesn't get set to the component, yet links works properly
-        // exports: {
-        //     onItemClick: '${ $.provider }:onItemClick'
-        // },
-        // links: {
-        //     idActive: '${ $.provider }:idActive',
-        // },
+        imports: {
+            item: '${ $.provider }:sessions.${ $.itemIndex }',
+        },
+        links: {
+            activeSession: '${ $.provider }:activeSession',
+        },
+    },
+    initObservable() {
+        this._super();
+        this.isActive = ko.pureComputed<boolean>(() => {
+            return this.activeSession().id === this.item.id;
+        }, this);
+        return this;
+    },
+    afterRender(element: HTMLElement) {
+        // @todo hammer manager
     }
 });

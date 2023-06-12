@@ -2,6 +2,9 @@
 /* jscs:disable */
 define(["VMPL_BugReplay/js/model/data"], function (_data) {
   function _default(session) {
+    if (!session.id) {
+      return Promise.resolve();
+    }
     return _data.manager.then(function (manager) {
       return manager.getEventsForSessionAt([session]);
     }).then(function (events) {
