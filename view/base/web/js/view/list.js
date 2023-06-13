@@ -35,7 +35,7 @@ define(["uiLayout", "uiRegistry", "uiComponent", "knockout", "VMPL_BugReplay/js/
       this._super();
       var listSubscribe = this.itemComponents.subscribe(function () {
         var component = _this.itemComponents.slice(0, 1).shift();
-        component.activeSession(component.item);
+        component.itemActive(component.item);
         listSubscribe.dispose();
       });
       return this;

@@ -2,7 +2,7 @@ var config = {
     config: {
         mixins: {
             'mage/utils/objects': {
-                'VMPL_BugReplay/mage/utils/objects-mixin': true,
+                'VMPL_BugReplay/js/mage/utils/objects-mixin': true,
             },
         },
     },

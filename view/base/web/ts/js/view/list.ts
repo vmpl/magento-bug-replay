@@ -40,7 +40,7 @@ export default Component.extend({
 
         const listSubscribe = this.itemComponents.subscribe(() => {
             const component = this.itemComponents.slice(0, 1).shift();
-            component.activeSession(component.item);
+            component.itemActive(component.item);
 
             listSubscribe.dispose()
         })

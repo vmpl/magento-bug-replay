@@ -1,4 +1,4 @@
-<li class="item" css="active: isActive" afterRender="afterRender">
+<li class="item" css="active: itemActive().id === item.id" afterRender="afterRender">
     <p ifnot="item.optionsVisible" text="item.title"></p>
     <ol class="actions" if="item.optionsVisible" click="function () { item.optionsVisible(false) }, clickBubble: false">
         <!-- ko foreach: getRegion('options') -->

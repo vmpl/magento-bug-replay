@@ -2,24 +2,56 @@
 /* jscs:disable */
 define(["uiComponent", "knockout"], function (_uiComponent, _knockout) {
   var _default = _uiComponent.extend({
-    activeSession: _knockout.observable(),
+    itemActive: _knockout.observable(),
     defaults: {
       template: 'VMPL_BugReplay/player/list/item',
       links: {
-        activeSession: '${ $.provider }:activeSession',
-        item: '${ $.provider }:sessions.${ $.itemIndex }'
+        item: '${ $.provider }:sessions.${ $.itemIndex }',
+        itemActive: '${ $.provider }:activeSession'
       }
     },
-    initObservable: function initObservable() {
-      var _this = this;
-      this._super();
-      this.isActive = _knockout.pureComputed(function () {
-        return _this.activeSession().id === _this.item.id;
-      }, this);
-      return this;
-    },
     afterRender: function afterRender(element) {
-      // @todo hammer manager
+      this.element = element;
+      element.addEventListener('mousedown', this.onEventFireGesture.bind(this, 'mousedown'), {
+        passive: true
+      });
+      element.addEventListener('mousemove', this.onEventFireGesture.bind(this, 'mousemove'), {
+        passive: true
+      });
+      element.addEventListener('mouseup', this.onEventFireGesture.bind(this, 'mouseup'), {
+        passive: true
+      });
+      element.addEventListener('touchstart', this.onEventFireGesture.bind(this, 'touchstart'), {
+        passive: true
+      });
+      element.addEventListener('touchmove', this.onEventFireGesture.bind(this, 'touchmove'), {
+        passive: true
+      });
+      element.addEventListener('touchend', this.onEventFireGesture.bind(this, 'touchend'), {
+        passive: true
+      });
+      element.addEventListener('tap', this.onTap.bind(this), {
+        passive: true
+      });
+    },
+    onEventFireGesture: function onEventFireGesture(type, event) {
+      switch (type) {
+        case 'mousedown':
+        case 'touchstart':
+          this.tapEvent = event;
+          break;
+        case 'mousemove':
+        case 'touchmove':
+          delete this.tapEvent;
+          break;
+        case 'mouseup':
+        case 'touchend':
+          !this.tapEvent || this.element.dispatchEvent(new MouseEvent('tap', event));
+          break;
+      }
+    },
+    onTap: function onTap(event) {
+      this.itemActive(this.item);
     }
   });
   return _default;

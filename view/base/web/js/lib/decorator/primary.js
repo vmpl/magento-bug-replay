@@ -17,7 +17,7 @@ define(["mageUtils"], function (_mageUtils) {
         var _proto = _class.prototype;
         _proto.$$primary = function $$primary() {
           var _mageUtils$nested;
-          return (_mageUtils$nested = _mageUtils.nested(path)) != null ? _mageUtils$nested : this;
+          return (_mageUtils$nested = _mageUtils.nested(this, path)) != null ? _mageUtils$nested : this;
         };
         return _class;
       }(target);

@@ -9,7 +9,7 @@ export default function (path: string) {
     return function <T extends IPrimary>(target: T) {
         return class extends target {
             $$primary(): any {
-                return utils.nested(path) ?? this;
+                return utils.nested(this, path) ?? this;
             }
         }
     }
