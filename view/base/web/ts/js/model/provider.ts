@@ -9,6 +9,9 @@ export default Component.extend({
             data: true
         }
     },
+    get(path: string) {
+        return this._super(path);
+    },
     set(path: string, value: any) {
         if (value instanceof Array) {
             for (let index in value) {

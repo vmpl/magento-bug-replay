@@ -1,4 +1,11 @@
 var config = {
+    config: {
+        mixins: {
+            'mage/utils/objects': {
+                'VMPL_BugReplay/mage/utils/objects-mixin': true,
+            },
+        },
+    },
     map: {
         '*': {
             'dexie': 'VMPL_BugReplay/js/lib/dexie',

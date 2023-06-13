@@ -6,11 +6,9 @@ export default Component.extend({
     activeSession: ko.observable<ItemSession>(),
     defaults: {
         template: 'VMPL_BugReplay/player/list/item',
-        imports: {
-            item: '${ $.provider }:sessions.${ $.itemIndex }',
-        },
         links: {
             activeSession: '${ $.provider }:activeSession',
+            item: '${ $.provider }:sessions.${ $.itemIndex }',
         },
     },
     initObservable() {

@@ -5,11 +5,9 @@ define(["uiComponent", "knockout"], function (_uiComponent, _knockout) {
     activeSession: _knockout.observable(),
     defaults: {
       template: 'VMPL_BugReplay/player/list/item',
-      imports: {
-        item: '${ $.provider }:sessions.${ $.itemIndex }'
-      },
       links: {
-        activeSession: '${ $.provider }:activeSession'
+        activeSession: '${ $.provider }:activeSession',
+        item: '${ $.provider }:sessions.${ $.itemIndex }'
       }
     },
     initObservable: function initObservable() {

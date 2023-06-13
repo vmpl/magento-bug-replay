@@ -8,6 +8,9 @@ define(["mageUtils", "underscore", "uiComponent"], function (_mageUtils, _unders
         data: true
       }
     },
+    get: function get(path) {
+      return this._super(path);
+    },
     set: function set(path, value) {
       if (value instanceof Array) {
         for (var index in value) {
