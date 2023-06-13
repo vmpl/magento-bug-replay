@@ -20,32 +20,34 @@ define(["uiLayout", "uiRegistry", "uiComponent", "knockout", "VMPL_BugReplay/js/
           options: {
             component: 'uiComponent',
             displayArea: 'options',
-            children: {
-              delete: {
-                component: 'VMPL_BugReplay/js/view/list-option-delete',
-                config: {}
-              }
-            }
+            children: {}
           }
         }
       }
     },
     initObservable: function initObservable() {
-      var _this = this;
       this._super();
+      this.loadFirst();
+      return this;
+    },
+    loadFirst: function loadFirst() {
+      var _this = this;
       var listSubscribe = this.itemComponents.subscribe(function () {
         var component = _this.itemComponents.slice(0, 1).shift();
         component.itemActive(component.item);
         listSubscribe.dispose();
       });
-      return this;
     },
-    toggleOptionsActive: function toggleOptionsActive(component) {
+    reload: function reload() {
       var _this2 = this;
-      var session = component ? component : this.itemComponents().find(function (it) {
-        return it.item.id === _this2.idActive();
+      this.sessions([]);
+      this.itemComponents([]);
+      this.loadFirst();
+      return _data.manager.then(function (manager) {
+        return manager.paginator.clear();
+      }).then(function () {
+        return _this2.elementLoading.hidden = false;
       });
-      session == null ? void 0 : session.item.optionsVisible(!(session != null && session.item.optionsVisible()));
     },
     dynamicLoad: function dynamicLoad() {
       var _this3 = this;
@@ -90,21 +92,6 @@ define(["uiLayout", "uiRegistry", "uiComponent", "knockout", "VMPL_BugReplay/js/
     isInViewport: function isInViewport() {
       var rect = this.elementLoading.getBoundingClientRect();
       return !this.elementLoading.hidden && rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
-    },
-    onItemClick: function onItemClick(component, event) {
-      var isMobile = getComputedStyle(this.conteinerElement).flexDirection === 'column';
-      switch (true) {
-        case isMobile && !this.listOpen():
-          this.listOpen(true);
-          break;
-        case isMobile && this.listOpen():
-        case !isMobile && event.detail > 1:
-          this.setActiveItem(component);
-          break;
-        case !isMobile && event.detail === 1:
-          this.toggleOptionsActive(component);
-          break;
-      }
     },
     mapItemComponent: function mapItemComponent(itemSession) {
       var componentConfig = structuredClone(this.itemConfig);

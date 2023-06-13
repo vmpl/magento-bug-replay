@@ -25,32 +25,32 @@ export default Component.extend({
                 options: {
                     component: 'uiComponent',
                     displayArea: 'options',
-                    children: {
-                        delete: {
-                            component: 'VMPL_BugReplay/js/view/list-option-delete',
-                            config: {},
-                        }
-                    }
+                    children: {}
                 }
             }
         },
     },
     initObservable() {
         this._super();
-
+        this.loadFirst();
+        return this;
+    },
+    loadFirst() {
         const listSubscribe = this.itemComponents.subscribe(() => {
             const component = this.itemComponents.slice(0, 1).shift();
             component.itemActive(component.item);
 
             listSubscribe.dispose()
-        })
-
-        return this;
+        });
     },
-    toggleOptionsActive(component?: any) {
-        const session = component ? component : this.itemComponents()
-            .find((it: any) => it.item.id === this.idActive())
-        session?.item.optionsVisible(!session?.item.optionsVisible());
+    reload() {
+        this.sessions([]);
+        this.itemComponents([]);
+        this.loadFirst();
+
+        return Data.manager
+            .then(manager => manager.paginator.clear())
+            .then(() => (this.elementLoading.hidden = false));
     },
     dynamicLoad(): Promise<void> {
         return Data.manager
@@ -104,21 +104,6 @@ export default Component.extend({
             && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
             && rect.right <= (window.innerWidth || document.documentElement.clientWidth)
         )
-    },
-    onItemClick(component: any, event: MouseEvent) {
-        const isMobile = getComputedStyle(this.conteinerElement).flexDirection === 'column';
-        switch (true) {
-            case isMobile && !this.listOpen():
-                this.listOpen(true);
-                break;
-            case isMobile && this.listOpen():
-            case !isMobile && event.detail > 1:
-                this.setActiveItem(component);
-                break;
-            case !isMobile && event.detail === 1:
-                this.toggleOptionsActive(component);
-                break;
-        }
     },
     mapItemComponent(itemSession: ItemSession) {
         const componentConfig = structuredClone(this.itemConfig);

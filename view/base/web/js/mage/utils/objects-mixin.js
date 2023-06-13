@@ -5,7 +5,7 @@ define([], function () {
     var originalCopy = objects.copy.bind(objects);
     objects.copy = function (data) {
       switch (true) {
-        case data.constructor.name === '_class':
+        case (data == null ? void 0 : data.constructor.name) === '_class':
           return data;
         default:
           return originalCopy(data);
