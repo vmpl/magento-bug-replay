@@ -1,22 +1,12 @@
-import Component from 'uiComponent';
-import registry from "uiRegistry";
 import ko from 'knockout';
+import ListItemOption from "VMPL_BugReplay/js/view/list-item-option";
 
-export default Component.extend({
+export default ListItemOption.extend({
     defaults: {
         template: 'VMPL_BugReplay/player/list/item/option-upload',
     },
-    checked: ko.observable<boolean>(false),
-    onClick() {
-        let parentName = this.parentName.split('.')
-        parentName.pop()
-        return Promise.all([
-            registry.promise(parentName.join('.')),
-            registry.promise(this.provider)
-        ])
-            .then(([listComponent, selectProvider]) => {
-                this.checked(!this.checked())
-                selectProvider.selectItem(listComponent.item, this.checked());
-            })
-    }
+    onClick(target: any, event: MouseEvent) {
+        event.stopPropagation();
+        this.item.upload(!this.item.upload());
+    },
 });

@@ -20,4 +20,5 @@ export const ItemSessionFactory = new Factory<ItemSession>()
 @Primary('id')
 export default class ItemSession extends RecordSession {
     public readonly optionsVisible: KnockoutObservable<boolean> = ko.observable(false);
+    public readonly upload: KnockoutObservable<boolean> = ko.observable(false);
 }

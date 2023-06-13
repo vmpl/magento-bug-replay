@@ -26,6 +26,7 @@ define(["VMPL_BugReplay/js/lib/session/model/record-session", "VMPL_BugReplay/js
       }
       _this = _recordSession$Record.call.apply(_recordSession$Record, [this].concat(args)) || this;
       _this.optionsVisible = _knockout.observable(false);
+      _this.upload = _knockout.observable(false);
       return _this;
     }
     return ItemSession;

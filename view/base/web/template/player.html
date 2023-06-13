@@ -1,8 +1,10 @@
 <div class="vmpl_session">
-    <!-- ko foreach: getRegion('sidebar') -->
-    <!-- ko template: getTemplate() --><!-- /ko -->
-    <!-- /ko -->
+    <div class="sidebar">
+        <!-- ko foreach: getRegion('sidebar') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- /ko -->
+    </div>
     <!-- ko foreach: getRegion('main') -->
-    <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
     <!-- /ko -->
 </div>

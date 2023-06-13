@@ -11,9 +11,14 @@ export default Component.extend({
     },
     set(path: string, value: any) {
         if (value instanceof Array) {
+            Object.keys(this.get(path) ?? {})
+                .filter(index => ~~index >= value.length)
+                .forEach(index => this.remove(`${path}.${index}`));
+
             for (let index in value) {
                 this.set(`${path}.${index}`, value[index]);
             }
+
             return this;
         }
 

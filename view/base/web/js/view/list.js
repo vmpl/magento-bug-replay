@@ -40,8 +40,11 @@ define(["uiLayout", "uiRegistry", "uiComponent", "knockout", "VMPL_BugReplay/js/
     },
     reload: function reload() {
       var _this2 = this;
-      this.sessions([]);
-      this.itemComponents([]);
+      this.itemComponents().forEach(function (it) {
+        return it.destroy();
+      });
+      this.sessions.removeAll();
+      this.itemComponents.removeAll();
       this.loadFirst();
       return _data.manager.then(function (manager) {
         return manager.paginator.clear();

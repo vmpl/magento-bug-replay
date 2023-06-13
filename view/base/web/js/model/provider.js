@@ -9,7 +9,14 @@ define(["mageUtils", "underscore", "uiComponent"], function (_mageUtils, _unders
       }
     },
     set: function set(path, value) {
+      var _this = this;
       if (value instanceof Array) {
+        var _this$get;
+        Object.keys((_this$get = this.get(path)) != null ? _this$get : {}).filter(function (index) {
+          return ~~index >= value.length;
+        }).forEach(function (index) {
+          return _this.remove(path + "." + index);
+        });
         for (var index in value) {
           this.set(path + "." + index, value[index]);
         }

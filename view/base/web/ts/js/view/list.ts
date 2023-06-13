@@ -44,8 +44,9 @@ export default Component.extend({
         });
     },
     reload() {
-        this.sessions([]);
-        this.itemComponents([]);
+        this.itemComponents().forEach((it: any) => it.destroy());
+        this.sessions.removeAll();
+        this.itemComponents.removeAll();
         this.loadFirst();
 
         return Data.manager
