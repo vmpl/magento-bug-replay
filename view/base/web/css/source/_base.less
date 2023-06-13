@@ -61,8 +61,8 @@
           margin: 0;
           padding: @indent__s;
 
-          &.timeline {
-            margin-top: @border-width__base;
+          &.title {
+            margin-bottom: @border-width__base;
             position: relative;
 
             &:before {
@@ -74,8 +74,8 @@
               height: @indent__s;
               position: absolute;
               left: 0;
-              top: 0;
-              transform: translate(-50%, -50%);
+              bottom: 0;
+              transform: translate(-50%, 50%);
             }
           }
         }
@@ -85,8 +85,13 @@
           flex-flow: row wrap;
           column-gap: @indent__s;
           list-style: none;
-          padding-left: @indent__s;
-          padding-bottom: @indent__s;
+          padding: @indent__s;
+
+          button {
+            &:hover {
+              box-shadow: @border-width__base @border-width__base @indent__xs @theme__color__primary;
+            }
+          }
         }
       }
 
