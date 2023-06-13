@@ -1,9 +1,17 @@
 import Component from 'uiComponent';
 import Data from "VMPL_BugReplay/js/model/data";
+import sessionReplay from 'VMPL_BugReplay/js/action/session-replay';
 
 declare var rrwebPlayer: any;
 
 export default Component.extend({
+    sessionReplay,
+    defaults: {
+        template: 'VMPL_BugReplay/player/rrweb',
+        listens: {
+            '${ $.provider }:activeSession': 'sessionReplay',
+        },
+    },
     afterRender(element: HTMLDivElement) {
         if (!this.element) {
             this.element = element;

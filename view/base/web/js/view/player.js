@@ -1,7 +1,14 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["uiComponent", "VMPL_BugReplay/js/model/data"], function (_uiComponent, _data) {
+define(["uiComponent", "VMPL_BugReplay/js/model/data", "VMPL_BugReplay/js/action/session-replay"], function (_uiComponent, _data, _sessionReplay) {
   var _default = _uiComponent.extend({
+    sessionReplay: _sessionReplay,
+    defaults: {
+      template: 'VMPL_BugReplay/player/rrweb',
+      listens: {
+        '${ $.provider }:activeSession': 'sessionReplay'
+      }
+    },
     afterRender: function afterRender(element) {
       if (!this.element) {
         this.element = element;

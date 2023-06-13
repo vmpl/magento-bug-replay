@@ -183,9 +183,15 @@ export default class<T extends Object, L extends IPaginatorLoader<T>> {
             .then(() => {
                 const items = this.items.slice(offset, limit);
                 if (!items.length) {
-                    throw new Error('None');
+                    throw Exception.Finish();
                 }
                 return items;
             })
+    }
+}
+
+export class Exception extends Error {
+    static Finish() {
+        return new this('Finish');
     }
 }

@@ -1,21 +1,13 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["uiComponent", "uiRegistry", "knockout"], function (_uiComponent, _uiRegistry, _knockout) {
-  var _default = _uiComponent.extend({
+define(["VMPL_BugReplay/js/view/list-item-option"], function (_listItemOption) {
+  var _default = _listItemOption.extend({
     defaults: {
       template: 'VMPL_BugReplay/player/list/item/option-upload'
     },
-    checked: _knockout.observable(false),
-    onClick: function onClick() {
-      var _this = this;
-      var parentName = this.parentName.split('.');
-      parentName.pop();
-      return Promise.all([_uiRegistry.promise(parentName.join('.')), _uiRegistry.promise(this.provider)]).then(function (_ref) {
-        var listComponent = _ref[0],
-          selectProvider = _ref[1];
-        _this.checked(!_this.checked());
-        selectProvider.selectItem(listComponent.item, _this.checked());
-      });
+    onClick: function onClick(target, event) {
+      event.stopPropagation();
+      this.item.upload(!this.item.upload());
     }
   });
   return _default;
