@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["uiLayout", "uiRegistry", "uiComponent", "knockout", "VMPL_BugReplay/js/model/data", "VMPL_BugReplay/js/model/item-session", "VMPL_BugReplay/js/lib/items-paginator"], function (_uiLayout, _uiRegistry, _uiComponent, _knockout, _data, _itemSession, _itemsPaginator) {
+define(["uiLayout", "uiRegistry", "uiComponent", "knockout", "VMPL_BugReplay/js/model/item-session", "VMPL_BugReplay/js/lib/items-paginator"], function (_uiLayout, _uiRegistry, _uiComponent, _knockout, _itemSession, _itemsPaginator) {
   // @ts-ignore
   var _default = _uiComponent.extend({
     listOpen: _knockout.observable(false),
@@ -8,6 +8,9 @@ define(["uiLayout", "uiRegistry", "uiComponent", "knockout", "VMPL_BugReplay/js/
     itemComponents: _knockout.observableArray([]),
     defaults: {
       template: 'VMPL_BugReplay/player/list',
+      imports: {
+        manager: '${ $.provider }:manager'
+      },
       exports: {
         sessions: '${ $.provider }:sessions'
       },
@@ -46,7 +49,8 @@ define(["uiLayout", "uiRegistry", "uiComponent", "knockout", "VMPL_BugReplay/js/
       this.sessions.removeAll();
       this.itemComponents.removeAll();
       this.loadFirst();
-      return _data.manager.then(function (manager) {
+      var thenManager = this.manager();
+      return thenManager.then(function (manager) {
         return manager.paginator.clear();
       }).then(function () {
         return _this2.elementLoading.hidden = false;
@@ -54,7 +58,8 @@ define(["uiLayout", "uiRegistry", "uiComponent", "knockout", "VMPL_BugReplay/js/
     },
     dynamicLoad: function dynamicLoad() {
       var _this3 = this;
-      return _data.manager.then(function (manager) {
+      var thenManager = this.manager();
+      return thenManager.then(function (manager) {
         return manager.paginator.getPage().then(function (sessions) {
           var _this3$sessions;
           var itemSessions = sessions.map(function (it) {

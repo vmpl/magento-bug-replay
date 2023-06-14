@@ -112,6 +112,11 @@ class Worker implements SessionWorkerInterface {
         })
     }
 
+    import(url: string): Promise<void> {
+        return axios.get(url, {responseType: 'blob'})
+            .then(response => this.database.import(response.data, {acceptNameDiff: true}))
+    }
+
     delete(sessions: IRecordSession[]): Promise<void> {
         const sessionIds = sessions.map(it => it.id).filter(it => !!it);
         return this.database.transaction('rw', [this.database.events, this.database.sessions], () => {

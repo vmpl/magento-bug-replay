@@ -2,12 +2,25 @@
 import utils from 'mageUtils';
 import _ from 'underscore';
 import Component from 'uiComponent';
+import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
 
 export default Component.extend({
     defaults: {
+        fileHash: 'BugReplay',
         ignoreTmpls: {
             data: true
         }
+    },
+    async initialize(options: object) {
+        this._super(options);
+
+        const manager = this._manager()
+        this._set('manager', () => manager)
+
+        return this;
+    },
+    _manager() {
+        return RecorderManager.init('/vmpl-bug-report/worker/loader', this.fileHash);
     },
     set(path: string, value: any) {
         if (value instanceof Array) {

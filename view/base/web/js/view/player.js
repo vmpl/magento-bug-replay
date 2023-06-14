@@ -1,13 +1,28 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["uiComponent", "VMPL_BugReplay/js/model/data", "VMPL_BugReplay/js/action/session-replay"], function (_uiComponent, _data, _sessionReplay) {
+define(["uiComponent", "knockout"], function (_uiComponent, _knockout) {
   var _default = _uiComponent.extend({
-    sessionReplay: _sessionReplay,
+    events: _knockout.observableArray([]),
     defaults: {
       template: 'VMPL_BugReplay/player/rrweb',
+      imports: {
+        manager: '${ $.provider }:manager'
+      },
       listens: {
         '${ $.provider }:activeSession': 'sessionReplay'
       }
+    },
+    sessionReplay: function sessionReplay(session) {
+      var _this = this;
+      if (!session.id) {
+        return Promise.resolve();
+      }
+      var thenManager = this.manager();
+      return thenManager.then(function (manager) {
+        return manager.getEventsForSessionAt([session]);
+      }).then(function (events) {
+        return _this.events(events);
+      });
     },
     afterRender: function afterRender(element) {
       if (!this.element) {
@@ -16,7 +31,7 @@ define(["uiComponent", "VMPL_BugReplay/js/model/data", "VMPL_BugReplay/js/action
           passive: true
         });
       }
-      _data.events.subscribe(this.bindPlayer.bind(this));
+      this.events.subscribe(this.bindPlayer.bind(this));
     },
     bindPlayer: function bindPlayer() {
       while (this.element.lastElementChild) {
@@ -24,7 +39,7 @@ define(["uiComponent", "VMPL_BugReplay/js/model/data", "VMPL_BugReplay/js/action
       }
       var width = this.element.clientWidth;
       var height = width * 656 / 1024;
-      var events = _data.events();
+      var events = this.events();
       this.player = new rrwebPlayer({
         target: this.element,
         props: {

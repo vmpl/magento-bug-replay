@@ -1,0 +1,25 @@
+<?php /** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+$workerFile = $block->getWorkerFile();
+$baseUrl = $block->getData('baseUrl');
+$requireWorker = $block->getData('requireWorker');
+$requirejs = $block->getData('requirejs');
+$requireMixins = $block->getData('requireMixins');
+$requireConfig = $block->getData('requireConfig');
+?>
+
+<?= <<<JS
+require = {
+    baseUrl: '{$baseUrl}'
+};
+
+importScripts(
+    '{$requirejs}',
+    '{$requireWorker}',
+    '{$requireMixins}',
+    '{$requireConfig}',
+);
+
+require(['{$workerFile}']);
+JS; ?>
+

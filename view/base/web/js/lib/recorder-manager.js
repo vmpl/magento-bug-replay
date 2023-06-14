@@ -19,18 +19,22 @@ define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/c
         });
       })(this);
     };
-    RecorderManager.init = function init(instance) {
+    RecorderManager.init = function init(endpoint, instance) {
       if (instance === void 0) {
         instance = 'BugReplay';
       }
-      return fetch('/vmpl-bug-report/session/config').then(function (response) {
-        return response.json();
-      }).then(function (content) {
-        return (0, _client.WorkerClient)(content.assetUrl.sessionLoader);
-      }).then(function (sessionWorker) {
+      var urlWorker = new URL(location.origin);
+      urlWorker.pathname = endpoint + "/VMPL_BugReplay/js/lib/session/worker";
+      return (0, _client.WorkerClient)(urlWorker.toString()).then(function (sessionWorker) {
         return sessionWorker.initInstance(instance).then(function () {
           return new RecorderManager(sessionWorker);
         });
+      });
+    };
+    _proto.downloadImport = function downloadImport(request) {
+      var _this = this;
+      return this.sessionWorker.import(request.toString()).then(function () {
+        return _this;
       });
     };
     _proto.getEventsForSessionAt = function getEventsForSessionAt(sessions) {
@@ -39,21 +43,21 @@ define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/c
       });
     };
     _proto.uploadSessions = function uploadSessions(sessions) {
-      var _this = this;
+      var _this2 = this;
       return this.sessionWorker.export(sessions).then(function () {
-        return _this.paginator.clear();
+        return _this2.paginator.clear();
       });
     };
     _proto.deleteAt = function deleteAt(at) {
-      var _this2 = this;
+      var _this3 = this;
       return this.paginator.fetch(at).then(function (session) {
-        return _this2.delete([session]);
+        return _this3.delete([session]);
       });
     };
     _proto.delete = function _delete(sessions) {
-      var _this3 = this;
+      var _this4 = this;
       return this.sessionWorker.delete(sessions).then(function () {
-        return _this3.paginator.clear();
+        return _this4.paginator.clear();
       });
     };
     _proto.loadPaginatorItems = function loadPaginatorItems(offset, limit, filter) {

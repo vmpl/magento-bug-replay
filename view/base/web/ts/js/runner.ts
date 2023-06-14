@@ -60,6 +60,6 @@ class Runner {
         }
     }
 }
-const runner = RecorderManager.init()
+const runner = RecorderManager.init('/vmpl-bug-report/worker/loader')
     .then(manager => new Runner(manager));
 export default runner;

@@ -79,7 +79,7 @@ define(["VMPL_BugReplay/js/lib/recorder-manager", "VMPL_BugReplay/js/lib/items-p
     };
     return Runner;
   }();
-  var runner = _recorderManager.init().then(function (manager) {
+  var runner = _recorderManager.init('/vmpl-bug-report/worker/loader').then(function (manager) {
     return new Runner(manager);
   });
   var _default = runner;

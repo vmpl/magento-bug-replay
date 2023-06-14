@@ -1,12 +1,16 @@
 import ListItemOption from "VMPL_BugReplay/js/view/list-item-option";
-import Data from 'VMPL_BugReplay/js/model/data';
+import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
 
 export default ListItemOption.extend({
     defaults: {
         text: '🗑',
+        imports: {
+            manager: '${ $.provider }:manager',
+        },
     },
     onClick() {
-        return Data.manager
+        const thenManager: Promise<RecorderManager> = this.manager();
+        return thenManager
             .then(manager => manager.delete([this.item]))
             .then(() => this.source.reload())
     }

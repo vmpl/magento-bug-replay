@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["uiComponent", "knockout", "mage/translate", "VMPL_BugReplay/js/model/data"], function (_uiComponent, _knockout, _translate, _data) {
+define(["uiComponent", "knockout", "mage/translate"], function (_uiComponent, _knockout, _translate) {
   var _default = _uiComponent.extend({
     visibility: _knockout.observable(false),
     sessions: _knockout.observableArray(),
@@ -11,7 +11,8 @@ define(["uiComponent", "knockout", "mage/translate", "VMPL_BugReplay/js/model/da
         list: 'player.sidebar.list'
       },
       imports: {
-        sessions: '${ $.provider }:sessions'
+        sessions: '${ $.provider }:sessions',
+        manager: '${ $.provider }:manager'
       }
     },
     initObservable: function initObservable() {
@@ -34,10 +35,11 @@ define(["uiComponent", "knockout", "mage/translate", "VMPL_BugReplay/js/model/da
     onSubmit: function onSubmit(target, event) {
       var _this2 = this;
       event.stopPropagation();
+      var thenManager = this.manager();
       var sessions = Object.values(this.sessions()).filter(function (it) {
         return it.upload();
       });
-      _data.manager.then(function (manager) {
+      thenManager.then(function (manager) {
         return manager.uploadSessions(sessions);
       }).then(function () {
         _this2.onCancel();

@@ -59,7 +59,7 @@
         <label translate="true">Modified</label>
       </settings>
     </column>
-    <actionsColumn name="actions">
+    <actionsColumn name="actions" class="\VMPL\BugReplay\Ui\Component\Listing\Column\UploadSessionActions">
       <settings>
         <indexField>hash</indexField>
       </settings>

@@ -1,5 +1,5 @@
 import {Dexie} from "dexie";
-import {exportDB, ExportOptions} from "dexie-export-import";
+import {exportDB, importInto, ExportOptions, ImportOptions} from "dexie-export-import";
 import relationships from "dexie-relationships";
 import {IRecordEvent, IRecordSession} from "VMPL_BugReplay/js/api/session";
 import {RecordEvent} from "VMPL_BugReplay/js/lib/session/model/record-event";
@@ -21,6 +21,10 @@ export default class Database extends Dexie {
 
     export(options?: ExportOptions): Promise<Blob> {
         return exportDB(this, options);
+    }
+
+    import(blob: Blob, options?: ImportOptions): Promise<void> {
+        return importInto(this, blob, options);
     }
 
     private initial() {

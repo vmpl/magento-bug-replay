@@ -2,7 +2,7 @@ import Component from "uiComponent";
 import ko from 'knockout';
 import ItemSession from "VMPL_BugReplay/js/model/item-session";
 import $t from 'mage/translate';
-import Data from "VMPL_BugReplay/js/model/data";
+import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
 
 export default Component.extend({
     visibility: ko.observable<boolean>(false),
@@ -15,6 +15,7 @@ export default Component.extend({
         },
         imports: {
             sessions: '${ $.provider }:sessions',
+            manager: '${ $.provider }:manager',
         },
     },
     initObservable() {
@@ -37,8 +38,9 @@ export default Component.extend({
     onSubmit(target: any, event: MouseEvent) {
         event.stopPropagation();
 
+        const thenManager: Promise<RecorderManager> = this.manager();
         const sessions = Object.values<ItemSession>(this.sessions()).filter((it: ItemSession) => it.upload());
-        Data.manager
+        thenManager
             .then(manager => manager.uploadSessions(sessions))
             .then(() => {
                 this.onCancel();
