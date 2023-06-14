@@ -1,13 +1,17 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["VMPL_BugReplay/js/view/list-item-option", "VMPL_BugReplay/js/model/data"], function (_listItemOption, _data) {
+define(["VMPL_BugReplay/js/view/list-item-option"], function (_listItemOption) {
   var _default = _listItemOption.extend({
     defaults: {
-      text: '🗑'
+      text: '🗑',
+      imports: {
+        manager: '${ $.provider }:manager'
+      }
     },
     onClick: function onClick() {
       var _this = this;
-      return _data.manager.then(function (manager) {
+      var thenManager = this.manager();
+      return thenManager.then(function (manager) {
         return manager.delete([_this.item]);
       }).then(function () {
         return _this.source.reload();

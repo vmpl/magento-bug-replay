@@ -3,9 +3,9 @@ import layout from 'uiLayout';
 import registry from "uiRegistry";
 import Component from 'uiComponent';
 import ko from 'knockout';
-import Data from 'VMPL_BugReplay/js/model/data';
 import ItemSession, {ItemSessionFactory} from "VMPL_BugReplay/js/model/item-session";
 import {Exception as ItemPaginatorException} from "VMPL_BugReplay/js/lib/items-paginator";
+import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
 
 export default Component.extend({
     listOpen: ko.observable(false),
@@ -13,6 +13,9 @@ export default Component.extend({
     itemComponents: ko.observableArray([]),
     defaults: {
         template: 'VMPL_BugReplay/player/list',
+        imports: {
+            manager: '${ $.provider }:manager'
+        },
         exports: {
             sessions: '${ $.provider }:sessions',
         },
@@ -49,36 +52,37 @@ export default Component.extend({
         this.itemComponents.removeAll();
         this.loadFirst();
 
-        return Data.manager
+        const thenManager: Promise<RecorderManager> = this.manager()
+        return thenManager
             .then(manager => manager.paginator.clear())
             .then(() => (this.elementLoading.hidden = false));
     },
     dynamicLoad(): Promise<void> {
-        return Data.manager
+        const thenManager: Promise<RecorderManager> = this.manager()
+        return thenManager
             .then(manager => manager.paginator.getPage()
                 .then(sessions => {
                     const itemSessions = sessions.map(it => ItemSessionFactory.create(it));
                     this.sessions.push(...itemSessions);
 
-                    return Promise.all(itemSessions.map(this.mapItemComponent.bind(this)))
-                })
-                .then(items => {
-                    manager.paginator.page++
-                    this.itemComponents.push(...items);
-                })
-                .then(() => {
-                    !this.isInViewport()
-                        || this.dynamicLoad();
-                })
-                .catch(error => {
-                    if (error instanceof ItemPaginatorException) {
-                        this.elementLoading.hidden = true;
-                        return;
-                    }
+                return Promise.all(itemSessions.map(this.mapItemComponent.bind(this)))
+            })
+            .then(items => {
+                manager.paginator.page++
+                this.itemComponents.push(...items);
+            })
+            .then(() => {
+                !this.isInViewport()
+                || this.dynamicLoad();
+            })
+            .catch(error => {
+                if (error instanceof ItemPaginatorException) {
+                    this.elementLoading.hidden = true;
+                    return;
+                }
 
-                    throw error;
-                }))
-
+                throw error;
+            }));
     },
     afterLoading(element: HTMLUListElement) {
         if (!this.elementLoading) {

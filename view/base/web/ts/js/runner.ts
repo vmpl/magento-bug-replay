@@ -1,6 +1,5 @@
 import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
 import {PaginatorFilter} from "VMPL_BugReplay/js/lib/items-paginator";
-import {IRecordSession} from "VMPL_BugReplay/js/api/session";
 
 class Runner {
     constructor(
@@ -61,6 +60,6 @@ class Runner {
         }
     }
 }
-const runner = RecorderManager.init()
+const runner = RecorderManager.init('/vmpl-bug-report/worker/loader')
     .then(manager => new Runner(manager));
 export default runner;

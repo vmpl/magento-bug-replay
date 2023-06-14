@@ -1,16 +1,31 @@
 import Component from 'uiComponent';
-import Data from "VMPL_BugReplay/js/model/data";
-import sessionReplay from 'VMPL_BugReplay/js/action/session-replay';
+import ko from 'knockout';
+import ItemSession from "VMPL_BugReplay/js/model/item-session";
+import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
+import {RecordEvent} from "VMPL_BugReplay/js/lib/session/model/record-event";
 
 declare var rrwebPlayer: any;
 
 export default Component.extend({
-    sessionReplay,
+    events: ko.observableArray<RecordEvent>([]),
     defaults: {
         template: 'VMPL_BugReplay/player/rrweb',
+        imports: {
+            manager: '${ $.provider }:manager',
+        },
         listens: {
             '${ $.provider }:activeSession': 'sessionReplay',
         },
+    },
+    sessionReplay(session: ItemSession) {
+        if (!session.id) {
+            return Promise.resolve();
+        }
+
+        const thenManager: Promise<RecorderManager> = this.manager()
+        return thenManager
+            .then(manager => manager.getEventsForSessionAt([session]))
+            .then(events => this.events(events))
     },
     afterRender(element: HTMLDivElement) {
         if (!this.element) {
@@ -22,7 +37,7 @@ export default Component.extend({
             )
         }
 
-        Data.events.subscribe(this.bindPlayer.bind(this))
+        this.events.subscribe(this.bindPlayer.bind(this))
     },
     bindPlayer() {
         while (this.element.lastElementChild) {
@@ -31,7 +46,7 @@ export default Component.extend({
 
         const width = this.element.clientWidth;
         const height = width * 656 / 1024;
-        const events = Data.events();
+        const events = this.events();
 
         this.player = new rrwebPlayer({
             target: this.element,

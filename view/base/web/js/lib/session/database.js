@@ -23,6 +23,9 @@ define(["dexie", "dexie-export-import", "dexie-relationships", "VMPL_BugReplay/j
     _proto.export = function _export(options) {
       return (0, _dexieExportImport.exportDB)(this, options);
     };
+    _proto.import = function _import(blob, options) {
+      return (0, _dexieExportImport.importInto)(this, blob, options);
+    };
     _proto.initial = function initial() {
       this.version(1).stores({
         sessions: '++id,&timestamp,href,title',
