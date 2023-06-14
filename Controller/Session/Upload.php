@@ -8,6 +8,7 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\ResultFactory;
+use VMPL\BugReplay\Model\UploadedSession;
 
 class Upload implements HttpPostActionInterface, CsrfAwareActionInterface
 {
@@ -18,6 +19,7 @@ class Upload implements HttpPostActionInterface, CsrfAwareActionInterface
         protected readonly RequestInterface $request,
         protected readonly ResultFactory $resultFactory,
         protected readonly \Magento\Framework\Filesystem $filesystem,
+        protected readonly \VMPL\BugReplay\Model\ResourceModel\UploadedSession\CollectionFactory $collectionFactory,
     ) {
     }
 
@@ -29,13 +31,20 @@ class Upload implements HttpPostActionInterface, CsrfAwareActionInterface
 
         do {
             $path = 'bug-replay/';
-            $path .= $fileName = static::randomString();
+            $path .= $fileHash = static::randomString();
             $path .= '.json';
         } while($directoryVar->isExist($path));
-
         $directoryVar->writeFile($path, $directoryTmp->readFile($database['tmp_name']));
+
+        /** @var \VMPL\BugReplay\Model\ResourceModel\UploadedSession\Collection $collection */
+        /** @var UploadedSession $model */
+        $collection = $this->collectionFactory->create();
+        $model = $collection->getNewEmptyItem();
+        $model->setHash($fileHash);
+        $collection->getResource()->save($model);
+
         $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-        return $result->setData(['success' => true, 'fileName' => $fileName]);
+        return $result->setData(['success' => true, 'fileName' => $fileHash]);
     }
 
     protected static function randomString(int $length = 64): string {

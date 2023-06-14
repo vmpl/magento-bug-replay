@@ -11,10 +11,11 @@ define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/c
     var _proto = RecorderManager.prototype;
     _proto.startRecord = function startRecord() {
       (function (self) {
-        self.stopRecord = rrweb.record({
+        self.stopRecord = rrwebRecord({
           emit: function emit(event) {
             self.sessionWorker.post(event);
-          }
+          },
+          plugins: [rrwebConsoleRecord.getRecordConsolePlugin()]
         });
       })(this);
     };
