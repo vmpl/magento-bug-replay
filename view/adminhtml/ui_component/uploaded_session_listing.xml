@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+  <argument name="data" xsi:type="array">
+    <item name="js_config" xsi:type="array">
+      <item name="provider" xsi:type="string">uploaded_session_listing.uploaded_session_listing_data_source</item>
+    </item>
+  </argument>
+  <settings>
+    <spinner>uploaded_session_columns</spinner>
+    <deps>
+      <dep>uploaded_session_listing.uploaded_session_listing_data_source</dep>
+    </deps>
+  </settings>
+  <dataSource name="uploaded_session_listing_data_source" component="Magento_Ui/js/grid/provider">
+    <settings>
+      <storageConfig>
+        <param name="indexField" xsi:type="string">hash</param>
+      </storageConfig>
+      <updateUrl path="mui/index/render"/>
+    </settings>
+    <aclResource>VMPL_BugReplay::sessions</aclResource>
+    <dataProvider class="Magento\Cms\Ui\Component\DataProvider" name="uploaded_session_listing_data_source">
+      <settings>
+        <requestFieldName>id</requestFieldName>
+        <primaryFieldName>hash</primaryFieldName>
+      </settings>
+    </dataProvider>
+  </dataSource>
+  <listingToolbar name="listing_top">
+    <settings>
+      <sticky>true</sticky>
+    </settings>
+    <bookmark name="bookmarks"/>
+    <columnsControls name="columns_controls"/>
+    <paging name="listing_paging"/>
+  </listingToolbar>
+  <columns name="uploaded_session_columns">
+    <column name="hash">
+      <settings>
+        <filter>textRange</filter>
+        <label translate="true">Hash</label>
+      </settings>
+    </column>
+    <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date"
+            component="Magento_Ui/js/grid/columns/date">
+      <settings>
+        <filter>dateRange</filter>
+        <dataType>date</dataType>
+        <label translate="true">Created</label>
+        <sorting>desc</sorting>
+      </settings>
+    </column>
+    <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date"
+            component="Magento_Ui/js/grid/columns/date">
+      <settings>
+        <filter>dateRange</filter>
+        <dataType>date</dataType>
+        <label translate="true">Modified</label>
+      </settings>
+    </column>
+    <actionsColumn name="actions">
+      <settings>
+        <indexField>hash</indexField>
+      </settings>
+    </actionsColumn>
+  </columns>
+</listing>
