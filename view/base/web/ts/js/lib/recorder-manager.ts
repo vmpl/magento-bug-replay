@@ -1,5 +1,4 @@
 import {IRecordEvent, IRecordSession, SessionWorker} from "VMPL_BugReplay/js/api/session";
-import {ConfigWorkerContent} from "VMPL_BugReplay/js/api/response";
 import ItemPaginator from "VMPL_BugReplay/js/lib/items-paginator";
 import {IPaginatorFilter, IPaginatorLoader, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import {WorkerClient} from "VMPL_BugReplay/js/lib/worker/client";
@@ -7,6 +6,22 @@ import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session"
 
 declare const rrwebRecord: Function;
 declare const rrwebConsoleRecord: { getRecordConsolePlugin: Function };
+
+export class DataEvent extends Event {
+    data: any;
+
+    static get Types() {
+        return  {
+            NewSessionWithError: 'vmpl-new-session-with-error',
+        }
+    }
+
+    static NewSessionWithError(sessionId: number): DataEvent {
+        const instance = new this(DataEvent.Types.NewSessionWithError, {bubbles: false, cancelable: false});
+        instance.data = sessionId;
+        return instance;
+    }
+}
 
 export default class RecorderManager implements IPaginatorLoader<IRecordSession> {
     readonly paginator: ItemPaginator<RecordSession, RecorderManager>;
@@ -22,7 +37,14 @@ export default class RecorderManager implements IPaginatorLoader<IRecordSession>
         ((self) => {
             self.stopRecord = rrwebRecord({
                 emit(event: IRecordEvent) {
-                    self.sessionWorker.post(event);
+                    self.sessionWorker.post(event)
+                        .then(sessionId => {
+                            if (sessionId === 0) {
+                                return;
+                            }
+
+                            window.dispatchEvent(DataEvent.NewSessionWithError(sessionId));
+                        })
                 },
                 plugins: [rrwebConsoleRecord.getRecordConsolePlugin()]
             })

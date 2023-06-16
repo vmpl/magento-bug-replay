@@ -1,0 +1,15 @@
+& when (@media-common = true) {
+  .dialog-component {
+    z-index: @z-index-10;
+    border-radius: @indent__l;
+    border-color: transparent;
+    box-shadow: @indent__xs @indent__xs @indent__xs fade(@color-black, 30);
+
+    &.left-bottom {
+      position: absolute;
+      margin-bottom: @indent__m;
+      margin-left: @indent__m;
+      bottom: 0;
+    }
+  }
+}

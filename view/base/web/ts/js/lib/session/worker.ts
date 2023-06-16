@@ -8,6 +8,7 @@ import {IPaginatorFilter, IPaginatorResponse} from "VMPL_BugReplay/js/api/pagina
 import {WorkerConsumer} from "VMPL_BugReplay/js/lib/worker/consumer";
 import axios from "axios";
 import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
+import {error} from "consoleLogger";
 
 @WorkerConsumer()
 class Worker implements SessionWorkerInterface {
@@ -25,12 +26,14 @@ class Worker implements SessionWorkerInterface {
         ])
             .then(([metaCount, snapshotCount]) => {
                 return metaCount === snapshotCount && snapshotCount === 0
-                    ? Promise.resolve()
+                    ? Promise.resolve(0)
                     : this.flushBuffer()
             })
-            .then(() => this.database.buffer.put(event).catch(error => {
+            .then(sessionId => this.database.buffer.put(event)
+                .then(() => sessionId)
+                .catch(error => {
                 throw error;
-            }));
+            }))
     }
 
     sessions(
@@ -128,7 +131,11 @@ class Worker implements SessionWorkerInterface {
         });
     }
 
-    private flushBuffer() {
+    /**
+     * @private
+     * @return number when buffer has event with error in the console otherwise zero
+     */
+    private flushBuffer(): Promise<number> {
         return Promise.all([
             this.database.buffer.where('type').equals(EventType.Meta).first(),
             this.database.buffer.where('type').equals(EventType.FullSnapshot).first(),
@@ -147,16 +154,26 @@ class Worker implements SessionWorkerInterface {
                     throw error;
                 }).then(sessionId => {
                     return this.database.buffer
-                        .toArray()
-                        .then(events => events.map(it => {
-                            it.sessionId = sessionId;
-                            return it;
-                        }))
-                        .then(events => this.database.events.bulkPut(events))
-                        .then(() => this.database.buffer.clear())
+                        .where('type').equals(6)
+                        .and(it => {
+                            return it.data.plugin.startsWith('rrweb/console')
+                                && it.data.payload.level === 'error';
+                        })
+                        .first()
+                        .then(errorEvent => {
+                            return this.database.buffer
+                                .toArray()
+                                .then(events => events.map(it => {
+                                    it.sessionId = sessionId;
+                                    return it;
+                                }))
+                                .then(events => this.database.events.bulkPut(events))
+                                .then(() => this.database.buffer.clear())
+                                .then(() => errorEvent === undefined ? 0 : sessionId);
+                        })
                 })
             })
-        }).then(() => {})
+        })
     }
 }
 

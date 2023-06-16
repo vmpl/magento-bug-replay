@@ -3,18 +3,30 @@ import utils from 'mageUtils';
 import _ from 'underscore';
 import Component from 'uiComponent';
 import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
+import {PaginatorFilter} from "VMPL_BugReplay/js/lib/items-paginator";
 
 export default Component.extend({
     defaults: {
         fileHash: 'BugReplay',
         ignoreTmpls: {
             data: true
-        }
+        },
+        modules: {
+            player: 'player',
+        },
     },
-    async initialize(options: object) {
+    initialize(options: object) {
         this._super(options);
 
         const manager = this._manager()
+            .then((manager: RecorderManager) => {
+                if (!this.player()) {
+                    manager.startRecord();
+                }
+                this.exposeDemoActions(manager);
+
+                return manager;
+            })
         this._set('manager', () => manager)
 
         return this;
@@ -68,6 +80,53 @@ export default Component.extend({
             parent[lastPathComponent](value);
         } else {
             parent[lastPathComponent] = value;
+        }
+    },
+    exposeDemoActions(manager: RecorderManager) {
+        const range = (from: number, to: number) => {
+            const range = [];
+            for (let i = from; i < to; i++) {
+                range.push(i);
+            }
+            return range;
+        }
+
+        // @ts-ignore
+        window.demo = {
+            startRecord: () => {
+                manager.startRecord()
+            },
+            getSessionRecords: () => {
+                manager.paginator.forEach((item) => {
+                    console.log(item)
+                });
+            },
+            goForPage: (value: number) => (manager.paginator.page = value),
+            addFilterWithTitle: (title: string = 'Jackets - Tops - Women') => {
+                manager.paginator.filter = new PaginatorFilter('title', title);
+            },
+            getTwoFirstSessionEvents: (from: number = 0, to: number = 2) => {
+                Promise.all(range(from, to).map(it => manager.paginator.fetch(it)))
+                    .then(sessions => manager.getEventsForSessionAt(sessions))
+                    .then(events => console.log(events))
+            },
+            uploadSessions: () => {
+                manager.paginator.all()
+                    .then(sessions => {
+                        return manager.uploadSessions(sessions);
+                    })
+                    .then(() => console.log('finished'));
+            },
+            deleteFirstSession: () => {
+                manager.deleteAt(0)
+                    .then(() => console.log('deleted'));
+            },
+            deleteAllSessions: () => {
+                manager.paginator.forEach((item, index) => {
+                    manager.deleteAt(index);
+                })
+                    .then(() => console.log('deletedAll'))
+            }
         }
     }
 })

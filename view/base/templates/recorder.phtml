@@ -1,0 +1,13 @@
+<?php /** @var \VMPL\BugReplay\Block\Player $block */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+?>
+<div id="vmpl_bug-replay_recorder" data-bind="scope:'recorder'">
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <script type="text/x-magento-init">
+        {
+            "#vmpl_bug-replay_recorder": {
+                "Magento_Ui/js/core/app": <?= /* @noEscape */ $block->getJsLayout() ?>
+            }
+        }
+    </script>
+</div>

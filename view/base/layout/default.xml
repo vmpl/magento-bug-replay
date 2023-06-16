@@ -5,4 +5,33 @@
     <script src="VMPL_BugReplay::rrweb/record/rrweb-record.min.js"/>
     <script src="VMPL_BugReplay::rrweb/plugins/console-record.min.js"/>
   </head>
+  <body>
+    <referenceContainer name="after.body.start">
+      <block name="vmpl.bug-replay.recorder" template="VMPL_BugReplay::recorder.phtml">
+        <arguments>
+          <argument name="jsLayout" xsi:type="array">
+            <item name="components" xsi:type="array">
+              <item name="replayProvider" xsi:type="array">
+                <item name="component" xsi:type="string">VMPL_BugReplay/js/model/provider</item>
+              </item>
+              <item name="recorder" xsi:type="array">
+                <item name="component" xsi:type="string">uiComponent</item>
+                <item name="children" xsi:type="array">
+                  <item name="catchErrorDialog" xsi:type="array">
+                    <item name="component" xsi:type="string">VMPL_BugReplay/js/view/dialog-catch-error</item>
+                    <item name="config" xsi:type="array">
+                      <item name="provider" xsi:type="string">replayProvider</item>
+                      <item name="deps" xsi:type="array">
+                        <item name="0" xsi:type="string">replayProvider</item>
+                      </item>
+                    </item>
+                  </item>
+                </item>
+              </item>
+            </item>
+          </argument>
+        </arguments>
+      </block>
+    </referenceContainer>
+  </body>
 </page>
