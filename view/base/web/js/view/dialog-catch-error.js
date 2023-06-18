@@ -7,10 +7,12 @@ define(["VMPL_BugReplay/js/view/dialog", "VMPL_BugReplay/js/lib/recorder-manager
       content: {
         title: 'Error Detected.',
         message: 'In previos sessions error was caught, the recording was saved on your browser memory.',
-        upload: 'Upload'
+        preview: 'Preview',
+        upload: 'Upload',
+        close: 'Close'
       },
       elementConfig: {
-        class: _knockout.observable('message error left-bottom')
+        class: _knockout.observable('message info left-bottom')
       },
       imports: {
         manager: '${ $.provider }:manager'
@@ -33,6 +35,16 @@ define(["VMPL_BugReplay/js/view/dialog", "VMPL_BugReplay/js/lib/recorder-manager
         }).then(function () {
           return _this.show(false);
         });
+      });
+    },
+    modalPreview: function modalPreview() {
+      var _this2 = this;
+      this.manager().then(function (manager) {
+        return manager.session(_this2.sessionId);
+      }).then(function (session) {
+        _this2.elementConfig.class('message info full-center');
+        var previewPlayer = _this2.getChild('previewPlayer');
+        previewPlayer.sessionReplay(session);
       });
     }
   });

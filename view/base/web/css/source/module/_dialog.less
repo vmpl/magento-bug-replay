@@ -17,10 +17,26 @@
       bottom: 0;
     }
 
+    &.full-center {
+      position: absolute;
+      box-sizing: border-box;
+      width: ~"calc(100% - 2 * @{indent__l})";
+      margin: @indent__l;
+    }
+
     button {
-      color: @color-red11;
-      background-color: @color-pink1;
-      border-color: @color-red11;
+      color: @color-brownie-light1;
+      background-color: @color-yellow-light1;
+      border-color: @color-brownie-light1;
+    }
+
+    ol {
+      display: flex;
+      flex-flow: row nowrap;
+      column-gap: @indent__m;
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0;
     }
   }
 }

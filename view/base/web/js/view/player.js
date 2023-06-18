@@ -7,9 +7,6 @@ define(["uiComponent", "knockout"], function (_uiComponent, _knockout) {
       template: 'VMPL_BugReplay/player/rrweb',
       imports: {
         manager: '${ $.provider }:manager'
-      },
-      listens: {
-        '${ $.provider }:activeSession': 'sessionReplay'
       }
     },
     sessionReplay: function sessionReplay(session) {

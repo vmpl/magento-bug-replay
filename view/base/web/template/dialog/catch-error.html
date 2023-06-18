@@ -1,3 +1,10 @@
 <strong translate="content.title"></strong>
 <p translate="content.message"></p>
-<button click="() => uploadSession()" translate="content.upload"></button>
+<ol>
+    <li><button click="() => show(false)" translate="content.close"></button></li>
+    <li><button click="() => modalPreview()" translate="content.preview"></button></li>
+    <li><button click="() => uploadSession()" translate="content.upload"></button></li>
+</ol>
+<!-- ko with: getChild('previewPlayer') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+<!-- /ko -->

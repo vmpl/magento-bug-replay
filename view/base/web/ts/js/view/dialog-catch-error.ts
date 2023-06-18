@@ -8,10 +8,12 @@ export default Dialog.extend({
         content: {
             title: 'Error Detected.',
             message: 'In previos sessions error was caught, the recording was saved on your browser memory.',
+            preview: 'Preview',
             upload: 'Upload',
+            close: 'Close',
         },
         elementConfig: {
-            class: ko.observable<string>('message error left-bottom'),
+            class: ko.observable<string>('message info left-bottom'),
         },
         imports: {
             manager: '${ $.provider }:manager',
@@ -37,4 +39,14 @@ export default Dialog.extend({
                     .then(() => this.show(false));
             })
     },
+    modalPreview() {
+        (<Promise<RecorderManager>>this.manager())
+            .then(manager => manager.session(this.sessionId))
+            .then(session => {
+                this.elementConfig.class('message info full-center');
+
+                const previewPlayer = this.getChild('previewPlayer')
+                previewPlayer.sessionReplay(session);
+            })
+    }
 });

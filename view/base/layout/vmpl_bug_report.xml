@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-  <head>
-    <link rel="stylesheet" src="VMPL_BugReplay::rrweb-player/style.css"/>
-    <script src="VMPL_BugReplay::rrweb-player/index.js"/>
-  </head>
   <body>
     <block class="VMPL\BugReplay\Block\Player" name="vmpl.bug-replay.player" template="VMPL_BugReplay::player.phtml">
       <arguments>
@@ -42,6 +38,9 @@
                         <item name="provider" xsi:type="string">replayProvider</item>
                         <item name="deps" xsi:type="array">
                           <item name="0" xsi:type="string">replayProvider</item>
+                        </item>
+                        <item name="listens" xsi:type="array">
+                          <item name="${ $.provider }:activeSession" xsi:type="string">sessionReplay</item>
                         </item>
                       </item>
                     </item>

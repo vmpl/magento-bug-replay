@@ -2,8 +2,10 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
   <head>
+    <link rel="stylesheet" src="VMPL_BugReplay::rrweb-player/style.css"/>
     <script src="VMPL_BugReplay::rrweb/record/rrweb-record.min.js"/>
     <script src="VMPL_BugReplay::rrweb/plugins/console-record.min.js"/>
+    <script src="VMPL_BugReplay::rrweb-player/index.js"/>
   </head>
   <body>
     <referenceContainer name="after.body.start">
@@ -23,6 +25,16 @@
                       <item name="provider" xsi:type="string">replayProvider</item>
                       <item name="deps" xsi:type="array">
                         <item name="0" xsi:type="string">replayProvider</item>
+                      </item>
+                    </item>
+                    <item name="children" xsi:type="array">
+                      <item name="previewPlayer" xsi:type="array">
+                        <item name="component" xsi:type="string">VMPL_BugReplay/js/view/player</item><item name="config" xsi:type="array">
+                        <item name="provider" xsi:type="string">replayProvider</item>
+                        <item name="deps" xsi:type="array">
+                          <item name="0" xsi:type="string">replayProvider</item>
+                        </item>
+                      </item>
                       </item>
                     </item>
                   </item>
