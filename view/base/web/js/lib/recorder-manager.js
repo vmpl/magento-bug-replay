@@ -12,6 +12,7 @@ function _isNativeFunction(fn) { return Function.toString.call(fn).indexOf("[nat
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/client"], function (_itemsPaginator, _client) {
+  function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
   var DataEvent = /*#__PURE__*/function (_Event) {
     "use strict";
 
@@ -27,11 +28,20 @@ define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/c
       instance.data = sessionId;
       return instance;
     };
+    DataEvent.UploadSessionFinished = function UploadSessionFinished(sessions) {
+      var instance = new this(DataEvent.Types.UploadSessionFinished, {
+        bubbles: false,
+        cancelable: false
+      });
+      instance.data = sessions;
+      return instance;
+    };
     _createClass(DataEvent, null, [{
       key: "Types",
       get: function get() {
         return {
-          NewSessionWithError: 'vmpl-new-session-with-error'
+          NewSessionWithError: 'vmpl-new-session-with-error',
+          UploadSessionFinished: 'vmpl-upload-session-finished'
         };
       }
     }]);
@@ -87,7 +97,9 @@ define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/c
       var _this2 = this;
       return this.sessionWorker.export(sessions).then(function () {
         return _this2.paginator.clear();
-      });
+      }).then(function () {
+        return window.dispatchEvent(DataEvent.UploadSessionFinished(sessions));
+      }).then();
     };
     _proto.deleteAt = function deleteAt(at) {
       var _this3 = this;
@@ -103,6 +115,13 @@ define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/c
     };
     _proto.loadPaginatorItems = function loadPaginatorItems(offset, limit, filter) {
       return this.sessionWorker.sessions(offset, limit, filter);
+    };
+    _proto.session = function session(sessionId) {
+      var filter = new _itemsPaginator.PaginatorFilter();
+      filter.append(new _itemsPaginator.PaginatorFilter('id', sessionId));
+      return this.sessionWorker.sessions(0, 1, filter).then(function (items) {
+        return items.items.pop();
+      });
     };
     return RecorderManager;
   }();

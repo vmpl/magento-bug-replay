@@ -1,7 +1,12 @@
 & when (@media-common = true) {
   .dialog-component {
+    display: none !important;
+    &[open] {
+      display: block !important;
+    }
+
     z-index: @z-index-10;
-    border-radius: @indent__l;
+    border-radius: @indent__s;
     border-color: transparent;
     box-shadow: @indent__xs @indent__xs @indent__xs fade(@color-black, 30);
 
@@ -10,6 +15,12 @@
       margin-bottom: @indent__m;
       margin-left: @indent__m;
       bottom: 0;
+    }
+
+    button {
+      color: @color-red11;
+      background-color: @color-pink1;
+      border-color: @color-red11;
     }
   }
 }

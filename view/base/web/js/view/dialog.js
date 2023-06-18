@@ -2,29 +2,27 @@
 /* jscs:disable */
 define(["uiComponent", "knockout"], function (_uiComponent, _knockout) {
   var _default = _uiComponent.extend({
-    show: _knockout.observable(false),
-    modal: false,
     defaults: {
       dialogTemplate: 'VMPL_BugReplay/dialog-wrapper',
       contentTemplate: undefined,
       elementConfig: {
         class: _knockout.observable('left-bottom')
+      },
+      modal: false,
+      show: false,
+      listens: {
+        show: 'onShow'
       }
     },
     initialize: function initialize(options) {
-      var _this = this;
       !!this.constructor.defaults.contentTemplate || (this.constructor.defaults.contentTemplate = this.constructor.defaults.template);
       this.constructor.defaults.template = this.constructor.defaults.dialogTemplate;
       this._super(options);
-      this.show.subscribe(function (shown) {
-        if (_this.dialogElement.open !== shown) {
-          if (!shown) {
-            _this.dialogElement.close();
-          } else {
-            _this.modal ? _this.dialogElement.showModal() : _this.dialogElement.show();
-          }
-        }
-      });
+      return this;
+    },
+    initObservable: function initObservable() {
+      this._super();
+      this.observe(['show']);
       return this;
     },
     afterRenderDialog: function afterRenderDialog(element) {
@@ -34,6 +32,15 @@ define(["uiComponent", "knockout"], function (_uiComponent, _knockout) {
     },
     getContentTemplate: function getContentTemplate() {
       return this.contentTemplate;
+    },
+    onShow: function onShow(shown) {
+      if (this.dialogElement.open !== shown) {
+        if (!shown) {
+          this.dialogElement.close();
+        } else {
+          this.modal ? this.dialogElement.showModal() : this.dialogElement.show();
+        }
+      }
     },
     onCancel: function onCancel(event) {
       if (!event.defaultPrevented) {
