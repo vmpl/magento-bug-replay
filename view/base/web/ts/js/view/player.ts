@@ -1,8 +1,8 @@
 import Component from 'uiComponent';
 import ko from 'knockout';
-import ItemSession from "VMPL_BugReplay/js/model/item-session";
 import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
 import {RecordEvent} from "VMPL_BugReplay/js/lib/session/model/record-event";
+import {IRecordSession} from "VMPL_BugReplay/js/api/session";
 
 declare var rrwebPlayer: any;
 
@@ -13,11 +13,8 @@ export default Component.extend({
         imports: {
             manager: '${ $.provider }:manager',
         },
-        listens: {
-            '${ $.provider }:activeSession': 'sessionReplay',
-        },
     },
-    sessionReplay(session: ItemSession) {
+    sessionReplay(session: IRecordSession) {
         if (!session.id) {
             return Promise.resolve();
         }

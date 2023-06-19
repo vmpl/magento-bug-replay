@@ -19,9 +19,11 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
       return Promise.all([this.database.buffer.where('type').equals(_session.EventType.Meta).count(), this.database.buffer.where('type').equals(_session.EventType.FullSnapshot).count()]).then(function (_ref) {
         var metaCount = _ref[0],
           snapshotCount = _ref[1];
-        return metaCount === snapshotCount && snapshotCount === 0 ? Promise.resolve() : _this.flushBuffer();
-      }).then(function () {
-        return _this.database.buffer.put(event).catch(function (error) {
+        return metaCount === snapshotCount && snapshotCount === 0 ? Promise.resolve(0) : _this.flushBuffer();
+      }).then(function (sessionId) {
+        return _this.database.buffer.put(event).then(function () {
+          return sessionId;
+        }).catch(function (error) {
           throw error;
         });
       });
@@ -117,7 +119,12 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
           return _this4.database.sessions.bulkDelete(sessionIds);
         });
       });
-    };
+    }
+
+    /**
+     * @private
+     * @return number when buffer has event with error in the console otherwise zero
+     */;
     _proto.flushBuffer = function flushBuffer() {
       var _this5 = this;
       return Promise.all([this.database.buffer.where('type').equals(_session.EventType.Meta).first(), this.database.buffer.where('type').equals(_session.EventType.FullSnapshot).first()]).then(function (_ref3) {
@@ -140,19 +147,25 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
           }).catch(function (error) {
             throw error;
           }).then(function (sessionId) {
-            return _this5.database.buffer.toArray().then(function (events) {
-              return events.map(function (it) {
-                it.sessionId = sessionId;
-                return it;
+            return _this5.database.buffer.where('type').equals(6).and(function (it) {
+              return it.data.plugin.startsWith('rrweb/console') && it.data.payload.level === 'error';
+            }).first().then(function (errorEvent) {
+              return _this5.database.buffer.toArray().then(function (events) {
+                return events.map(function (it) {
+                  it.sessionId = sessionId;
+                  return it;
+                });
+              }).then(function (events) {
+                return _this5.database.events.bulkPut(events);
+              }).then(function () {
+                return _this5.database.buffer.clear();
+              }).then(function () {
+                return errorEvent === undefined ? 0 : sessionId;
               });
-            }).then(function (events) {
-              return _this5.database.events.bulkPut(events);
-            }).then(function () {
-              return _this5.database.buffer.clear();
             });
           });
         });
-      }).then(function () {});
+      });
     };
     return Worker;
   }()) || _class);

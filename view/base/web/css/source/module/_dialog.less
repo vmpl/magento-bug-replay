@@ -1,0 +1,42 @@
+& when (@media-common = true) {
+  .dialog-component {
+    display: none !important;
+    &[open] {
+      display: block !important;
+    }
+
+    z-index: @z-index-10;
+    border-radius: @indent__s;
+    border-color: transparent;
+    box-shadow: @indent__xs @indent__xs @indent__xs fade(@color-black, 30);
+
+    &.left-bottom {
+      position: absolute;
+      margin-bottom: @indent__m;
+      margin-left: @indent__m;
+      bottom: 0;
+    }
+
+    &.full-center {
+      position: absolute;
+      box-sizing: border-box;
+      width: ~"calc(100% - 2 * @{indent__l})";
+      margin: @indent__l;
+    }
+
+    button {
+      color: @color-brownie-light1;
+      background-color: @color-yellow-light1;
+      border-color: @color-brownie-light1;
+    }
+
+    ol {
+      display: flex;
+      flex-flow: row nowrap;
+      column-gap: @indent__m;
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0;
+    }
+  }
+}

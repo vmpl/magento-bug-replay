@@ -1,12 +1,34 @@
 import {IRecordEvent, IRecordSession, SessionWorker} from "VMPL_BugReplay/js/api/session";
-import {ConfigWorkerContent} from "VMPL_BugReplay/js/api/response";
-import ItemPaginator from "VMPL_BugReplay/js/lib/items-paginator";
+import ItemPaginator, {PaginatorFilter} from "VMPL_BugReplay/js/lib/items-paginator";
 import {IPaginatorFilter, IPaginatorLoader, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import {WorkerClient} from "VMPL_BugReplay/js/lib/worker/client";
 import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
 
 declare const rrwebRecord: Function;
 declare const rrwebConsoleRecord: { getRecordConsolePlugin: Function };
+
+export class DataEvent extends Event {
+    data: any;
+
+    static get Types() {
+        return  {
+            NewSessionWithError: 'vmpl-new-session-with-error',
+            UploadSessionFinished: 'vmpl-upload-session-finished',
+        }
+    }
+
+    static NewSessionWithError(sessionId: number): DataEvent {
+        const instance = new this(DataEvent.Types.NewSessionWithError, {bubbles: false, cancelable: false});
+        instance.data = sessionId;
+        return instance;
+    }
+
+    static UploadSessionFinished(sessions: IRecordSession[]): DataEvent {
+        const instance = new this(DataEvent.Types.UploadSessionFinished, {bubbles: false, cancelable: false});
+        instance.data = sessions;
+        return instance;
+    }
+}
 
 export default class RecorderManager implements IPaginatorLoader<IRecordSession> {
     readonly paginator: ItemPaginator<RecordSession, RecorderManager>;
@@ -22,7 +44,14 @@ export default class RecorderManager implements IPaginatorLoader<IRecordSession>
         ((self) => {
             self.stopRecord = rrwebRecord({
                 emit(event: IRecordEvent) {
-                    self.sessionWorker.post(event);
+                    self.sessionWorker.post(event)
+                        .then(sessionId => {
+                            if (sessionId === 0) {
+                                return;
+                            }
+
+                            window.dispatchEvent(DataEvent.NewSessionWithError(sessionId));
+                        })
                 },
                 plugins: [rrwebConsoleRecord.getRecordConsolePlugin()]
             })
@@ -53,6 +82,8 @@ export default class RecorderManager implements IPaginatorLoader<IRecordSession>
     uploadSessions(sessions: IRecordSession[]): Promise<void> {
         return this.sessionWorker.export(sessions)
             .then(() => this.paginator.clear())
+            .then(() => window.dispatchEvent(DataEvent.UploadSessionFinished(sessions)))
+            .then();
     }
 
     deleteAt(at: number): Promise<void> {
@@ -71,5 +102,13 @@ export default class RecorderManager implements IPaginatorLoader<IRecordSession>
         filter: IPaginatorFilter<IRecordSession>,
     ): Promise<IPaginatorResponse<RecordSession>> {
         return this.sessionWorker.sessions(offset, limit, filter);
+    }
+
+    session(sessionId: number): Promise<IRecordSession> {
+        const filter = new PaginatorFilter<IRecordSession>();
+        filter.append(new PaginatorFilter<IRecordSession>('id', sessionId));
+
+        return this.sessionWorker.sessions(0, 1, filter)
+            .then(items => items.items.pop());
     }
 }
