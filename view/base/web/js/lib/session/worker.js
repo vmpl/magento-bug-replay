@@ -148,17 +148,22 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
             href: meta.data.href,
             title: (_tagMetaTitle$attribu = tagMetaTitle == null ? void 0 : (_tagMetaTitle$attribu2 = tagMetaTitle.attributes) == null ? void 0 : _tagMetaTitle$attribu2.content) != null ? _tagMetaTitle$attribu : 'Unknown',
             timestamp: meta.timestamp
-          }), _this5.database.errors.bulkPut(errorConsoles.map(function (it) {
-            return {
-              digest: it.digest,
-              message: it.message
-            };
+          }), _this5.database.errors.bulkPut(errorConsoles.filter(function (it) {
+            return !it.id;
           }), {
             allKeys: true
           })]).then(function (_ref4) {
             var sessionId = _ref4[0],
-              errorIds = _ref4[1];
-            return Promise.all([sessionError.bulkPut(errorIds.map(function (errorId) {
+              errorKeys = _ref4[1];
+            var errorIds = errorKeys.map(function (it) {
+              return ~~it;
+            });
+            errorIds.push.apply(errorIds, errorConsoles.filter(function (it) {
+              return !!it.id;
+            }).map(function (it) {
+              return it.id;
+            }));
+            return Promise.all([sessionError.bulkAdd(errorIds.map(function (errorId) {
               return {
                 sessionId: sessionId,
                 errorId: errorId
@@ -173,7 +178,7 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
             })]).then(function () {
               return _this5.database.buffer.clear();
             }).then(function () {
-              return !errorIds.length ? 0 : sessionId;
+              return !errorConsoles.length ? 0 : sessionId;
             });
           });
         });
@@ -198,41 +203,38 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
         });
         return errorMap;
       }).then(function (digests) {
-        return _this6.database.errors.where('digest').anyOf(Array.from(digests.keys())).toArray().then(function (errors) {
-          return _this6.database.table('sessionError').where('errorId').anyOf(errors.map(function (it) {
-            return it.id;
-          })).toArray().then(function (items) {
-            return _this6.database.sessions.where('id').anyOf(items.map(function (it) {
-              return it.sessionId;
-            })).and(function (it) {
-              var _it$uploaded;
-              return !!((_it$uploaded = it.uploaded) != null && _it$uploaded.length);
-            }).toArray().then(function (sessions) {
-              var sessionIds = sessions.map(function (it) {
-                return it.id;
+        return _this6.database.errors.where('digest').anyOf(Array.from(digests.keys())).toArray().then(function (consoleErrors) {
+          digests.forEach(function (event, digest) {
+            if (!consoleErrors.some(function (it) {
+              return it.digest === digest;
+            })) {
+              consoleErrors.push(new _errorConsole.default(digest, event.data.payload.payload.shift()));
+            }
+          });
+          return consoleErrors;
+        });
+      }).then(function (consoleErrors) {
+        return _this6.database.table('sessionError').where('errorId').anyOf(consoleErrors.map(function (it) {
+          return it.id;
+        })).toArray().then(function (items) {
+          return _this6.database.sessions.where('id').anyOf(items.map(function (it) {
+            return it.sessionId;
+          })).and(function (it) {
+            return !!(it.uploaded && it.uploaded.length);
+          }).toArray().then(function (sessions) {
+            return items.filter(function (it) {
+              return sessions.some(function (session) {
+                return session.id == it.sessionId;
               });
-              var errorIds = items.filter(function (it) {
-                return sessionIds.includes(it.sessionId);
-              }).map(function (it) {
-                return it.errorId;
-              });
-              return errors.filter(function (it) {
-                return errorIds.includes(it.id);
-              });
+            }).map(function (it) {
+              return it.errorId;
             });
           });
-        }).then(function (errors) {
-          errors.forEach(function (it) {
-            return digests.delete(it.digest);
+        }).then(function (items) {
+          return consoleErrors.filter(function (it) {
+            return !items.includes(it.id);
           });
-          return digests;
         });
-      }).then(function (digests) {
-        var consoleErrors = [];
-        digests.forEach(function (value, key) {
-          consoleErrors.push(new _errorConsole.default(key, value.data.payload.payload.shift()));
-        });
-        return consoleErrors;
       });
     };
     return Worker;

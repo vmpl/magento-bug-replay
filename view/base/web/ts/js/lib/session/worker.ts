@@ -177,12 +177,13 @@ class Worker implements SessionWorkerInterface {
                         title: tagMetaTitle?.attributes?.content ?? 'Unknown',
                         timestamp: meta.timestamp,
                     }),
-                    this.database.errors.bulkPut(errorConsoles.map<IErrorConsole>(it => {
-                        return {digest: it.digest, message: it.message}
-                    }), {allKeys: true}),
-                ]).then(([sessionId, errorIds]) => {
+                    this.database.errors.bulkPut(errorConsoles.filter(it => !it.id), {allKeys: true}),
+                ]).then(([sessionId, errorKeys]) => {
+                    const errorIds =  errorKeys.map(it => ~~it);
+                    errorIds.push(...errorConsoles.filter(it => !!it.id).map(it => it.id))
+
                     return Promise.all([
-                        sessionError.bulkPut(errorIds
+                        sessionError.bulkAdd(errorIds
                             .map(errorId => { return {sessionId, errorId} })),
                         this.database.buffer
                             .toArray()
@@ -193,7 +194,7 @@ class Worker implements SessionWorkerInterface {
                             .then(events => this.database.events.bulkPut(events)),
                     ])
                         .then(() => this.database.buffer.clear())
-                        .then(() => !errorIds.length ? 0 : sessionId);
+                        .then(() => !errorConsoles.length ? 0 : sessionId);
                 })
             })
         })
@@ -221,37 +222,33 @@ class Worker implements SessionWorkerInterface {
                     return errorMap;
                 })
                 .then(digests => {
-                    return this.database.errors
-                        .where('digest').anyOf(Array.from(digests.keys()))
-                        .toArray()
-                            .then(errors => {
-                                return this.database.table('sessionError')
-                                    .where('errorId').anyOf(errors.map(it => it.id))
-                                    .toArray()
-                                    .then((items: {sessionId: number, errorId: number}[]) => {
-                                        return this.database.sessions.where('id').anyOf(items.map(it => it.sessionId))
-                                            .and(it => !!it.uploaded?.length)
-                                            .toArray()
-                                            .then(sessions => {
-                                                const sessionIds = sessions.map(it => it.id);
-                                                const errorIds = items
-                                                    .filter(it => sessionIds.includes(it.sessionId))
-                                                    .map(it => it.errorId);
-                                                return errors.filter(it => errorIds.includes(it.id))
-                                            })
-                                    })
+                    return this.database.errors.where('digest').anyOf(Array.from(digests.keys())).toArray()
+                        .then(consoleErrors => {
+                            digests.forEach((event, digest) => {
+                                if (!consoleErrors.some(it => it.digest === digest)) {
+                                    consoleErrors.push(new ErrorConsole(digest, event.data.payload.payload.shift()))
+                                }
                             })
-                            .then(errors => {
-                                errors.forEach(it => digests.delete(it.digest))
-                                return digests;
-                            })
+                            return consoleErrors;
+                        })
                 })
-                .then(digests => {
-                    const consoleErrors: IErrorConsole[] = [];
-                    digests.forEach((value, key) => {
-                        consoleErrors.push(new ErrorConsole(key, value.data.payload.payload.shift()))
-                    })
-                    return consoleErrors;
+                .then(consoleErrors => {
+                    return this.database.table('sessionError')
+                        .where('errorId')
+                        .anyOf(consoleErrors.map(it => it.id))
+                        .toArray()
+                        .then((items: {sessionId: number, errorId: number}[]) => {
+                            return this.database.sessions
+                                .where('id')
+                                .anyOf(items.map(it => it.sessionId))
+                                .and(it => !!(it.uploaded && it.uploaded.length))
+                                .toArray()
+                                .then(sessions => items
+                                    .filter(it => sessions
+                                        .some(session => session.id == it.sessionId))
+                                            .map(it => it.errorId))
+                        })
+                        .then(items => consoleErrors.filter(it => !items.includes(it.id)))
                 })
     }
 }
