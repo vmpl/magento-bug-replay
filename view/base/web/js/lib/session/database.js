@@ -2,21 +2,19 @@
 /* jscs:disable */
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; _setPrototypeOf(subClass, superClass); }
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-define(["dexie", "dexie-export-import", "dexie-relationships", "VMPL_BugReplay/js/lib/session/model/record-event", "VMPL_BugReplay/js/lib/session/model/record-session"], function (_dexie, _dexieExportImport, _dexieRelationships, _recordEvent, _recordSession) {
+define(["dexie", "dexie-export-import", "VMPL_BugReplay/js/lib/session/model/record-event", "VMPL_BugReplay/js/lib/session/model/record-session", "VMPL_BugReplay/js/lib/session/model/error-console"], function (_dexie, _dexieExportImport, _recordEvent, _recordSession, _errorConsole) {
   var Database = /*#__PURE__*/function (_dexie$Dexie) {
     "use strict";
 
     _inheritsLoose(Database, _dexie$Dexie);
     function Database(databaseName) {
       var _this;
-      _this = _dexie$Dexie.call(this, databaseName, {
-        addons: [_dexieRelationships]
-      }) || this;
+      _this = _dexie$Dexie.call(this, databaseName) || this;
       _this.initial();
-      _this.addingUploadFlag();
       _this.sessions.mapToClass(_recordSession.RecordSession);
       _this.events.mapToClass(_recordEvent.RecordEvent);
       _this.buffer.mapToClass(_recordEvent.RecordEvent);
+      _this.errors.mapToClass(_errorConsole);
       return _this;
     }
     var _proto = Database.prototype;
@@ -28,16 +26,11 @@ define(["dexie", "dexie-export-import", "dexie-relationships", "VMPL_BugReplay/j
     };
     _proto.initial = function initial() {
       this.version(1).stores({
-        sessions: '++id,&timestamp,href,title',
-        events: '&timestamp,*type,data,sessionId -> sessions.id',
-        buffer: '&timestamp,*type,data'
-      });
-    };
-    _proto.addingUploadFlag = function addingUploadFlag() {
-      this.version(2).stores({
         sessions: '++id,&timestamp,href,title,*uploaded',
-        events: '&timestamp,*type,data,sessionId -> sessions.id',
-        buffer: '&timestamp,*type,data'
+        events: '&timestamp,*type,data,sessionId',
+        buffer: '&timestamp,*type,data',
+        errors: '++id,&digest,message',
+        sessionError: '[sessionId+errorId],*sessionId,*errorId'
       });
     };
     return Database;

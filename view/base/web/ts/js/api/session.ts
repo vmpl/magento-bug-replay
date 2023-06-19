@@ -26,6 +26,12 @@ export interface IRecordSession {
     readonly uploaded?: string;
 }
 
+export interface IErrorConsole {
+    id?: number,
+    readonly message: string;
+    readonly digest: string;
+}
+
 export interface SessionWorker {
     initInstance(instance: string): Promise<void>;
     post(event: IRecordEvent): Promise<number>;

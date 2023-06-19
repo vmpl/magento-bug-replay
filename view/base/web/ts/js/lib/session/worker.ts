@@ -1,5 +1,5 @@
 import {
-    EventType,
+    EventType, IErrorConsole,
     IRecordEvent, IRecordSession,
     SessionWorker as SessionWorkerInterface,
 } from 'VMPL_BugReplay/js/api/session'
@@ -9,6 +9,7 @@ import {WorkerConsumer} from "VMPL_BugReplay/js/lib/worker/consumer";
 import axios from "axios";
 import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
 import {error} from "consoleLogger";
+import ErrorConsole from "VMPL_BugReplay/js/lib/session/model/error-console";
 
 @WorkerConsumer()
 class Worker implements SessionWorkerInterface {
@@ -66,6 +67,7 @@ class Worker implements SessionWorkerInterface {
         const sessionsIds = sessions
             .map(it => it.id)
             .filter(it => Number.isInteger(it))
+
         return this.database.events
             .where('sessionId')
             .anyOf(sessionsIds)
@@ -122,12 +124,27 @@ class Worker implements SessionWorkerInterface {
 
     delete(sessions: IRecordSession[]): Promise<void> {
         const sessionIds = sessions.map(it => it.id).filter(it => !!it);
-        return this.database.transaction('rw', [this.database.events, this.database.sessions], () => {
-            return this.database.events
-                .where('sessionId')
-                .anyOf(sessionIds)
-                .eachPrimaryKey(it => this.database.events.delete(it))
-                .then(() => this.database.sessions.bulkDelete(sessionIds))
+
+        const sessionError = this.database.table('sessionError');
+        return this.database.transaction('rw', [
+            this.database.events,
+            this.database.sessions,
+            this.database.errors,
+            sessionError,
+        ], () => {
+            return sessionError.where('sessionId').anyOf(sessionIds).toArray()
+                .then((items: {errorId: string}[]) => {
+                    return Promise.all([
+                        this.database.sessions.bulkDelete(sessionIds),
+                        this.database.events
+                            .where('sessionId')
+                            .anyOf(sessionIds)
+                            .delete(),
+                        this.database.errors.bulkDelete(items.map(it => it.errorId)),
+                        sessionError.where('sessionId').anyOf(sessionIds).delete(),
+                    ])
+                })
+                .then()
         });
     }
 
@@ -139,41 +156,103 @@ class Worker implements SessionWorkerInterface {
         return Promise.all([
             this.database.buffer.where('type').equals(EventType.Meta).first(),
             this.database.buffer.where('type').equals(EventType.FullSnapshot).first(),
-        ]).then(([meta, snapshot]) => {
+            this.createBufferErrorDigests(),
+        ]).then(([meta, snapshot, errorConsoles]) => {
             const tagMetaTitle = snapshot?.data.node
                 .childNodes.find((it: any) => it?.tagName === 'html')
                 .childNodes.find((it: any) => it?.tagName === 'head')
                 .childNodes.find((it: any) => it?.attributes?.name === 'title')
 
-            return this.database.transaction('rw', [this.database.buffer, this.database.events, this.database.sessions], () => {
-                return this.database.sessions.put({
-                    href: meta.data.href,
-                    title: tagMetaTitle?.attributes?.content ?? 'Unknown',
-                    timestamp: meta.timestamp,
-                }).catch(error => {
-                    throw error;
-                }).then(sessionId => {
-                    return this.database.buffer
-                        .where('type').equals(6)
-                        .and(it => {
-                            return it.data.plugin.startsWith('rrweb/console')
-                                && it.data.payload.level === 'error';
-                        })
-                        .first()
-                        .then(errorEvent => {
-                            return this.database.buffer
-                                .toArray()
-                                .then(events => events.map(it => {
-                                    it.sessionId = sessionId;
-                                    return it;
-                                }))
-                                .then(events => this.database.events.bulkPut(events))
-                                .then(() => this.database.buffer.clear())
-                                .then(() => errorEvent === undefined ? 0 : sessionId);
-                        })
+            const sessionError = this.database.table('sessionError');
+            return this.database.transaction('rw', [
+                this.database.buffer,
+                this.database.events,
+                this.database.sessions,
+                this.database.errors,
+                sessionError,
+            ], () => {
+                return Promise.all([
+                    this.database.sessions.put({
+                        href: meta.data.href,
+                        title: tagMetaTitle?.attributes?.content ?? 'Unknown',
+                        timestamp: meta.timestamp,
+                    }),
+                    this.database.errors.bulkPut(errorConsoles.map<IErrorConsole>(it => {
+                        return {digest: it.digest, message: it.message}
+                    }), {allKeys: true}),
+                ]).then(([sessionId, errorIds]) => {
+                    return Promise.all([
+                        sessionError.bulkPut(errorIds
+                            .map(errorId => { return {sessionId, errorId} })),
+                        this.database.buffer
+                            .toArray()
+                            .then(events => events.map(it => {
+                                it.sessionId = sessionId;
+                                return it;
+                            }))
+                            .then(events => this.database.events.bulkPut(events)),
+                    ])
+                        .then(() => this.database.buffer.clear())
+                        .then(() => !errorIds.length ? 0 : sessionId);
                 })
             })
         })
+    }
+
+    private createBufferErrorDigests(): Promise<ErrorConsole[]> {
+        const textEncoder = new TextEncoder();
+        const textDecoder = new TextDecoder();
+
+        return this.database.buffer
+            .where('type').equals(6)
+            .and(it => {
+                return it.data.plugin.startsWith('rrweb/console')
+                    && it.data.payload.level === 'error';
+            }).toArray()
+                .then(errorEvents => Promise.all(errorEvents
+                        .map(event => Promise.all([event,
+                            crypto.subtle.digest('SHA-1', textEncoder.encode(JSON.stringify(event.data.payload)))])))
+                )
+                .then(results => {
+                    const errorMap = new Map<string, IRecordEvent>();
+                    results.forEach(([event, digest]) => {
+                        errorMap.set(textDecoder.decode(digest), event)
+                    });
+                    return errorMap;
+                })
+                .then(digests => {
+                    return this.database.errors
+                        .where('digest').anyOf(Array.from(digests.keys()))
+                        .toArray()
+                            .then(errors => {
+                                return this.database.table('sessionError')
+                                    .where('errorId').anyOf(errors.map(it => it.id))
+                                    .toArray()
+                                    .then((items: {sessionId: number, errorId: number}[]) => {
+                                        return this.database.sessions.where('id').anyOf(items.map(it => it.sessionId))
+                                            .and(it => !!it.uploaded?.length)
+                                            .toArray()
+                                            .then(sessions => {
+                                                const sessionIds = sessions.map(it => it.id);
+                                                const errorIds = items
+                                                    .filter(it => sessionIds.includes(it.sessionId))
+                                                    .map(it => it.errorId);
+                                                return errors.filter(it => errorIds.includes(it.id))
+                                            })
+                                    })
+                            })
+                            .then(errors => {
+                                errors.forEach(it => digests.delete(it.digest))
+                                return digests;
+                            })
+                })
+                .then(digests => {
+                    const consoleErrors: IErrorConsole[] = [];
+                    digests.forEach((value, key) => {
+                        consoleErrors.push(new ErrorConsole(key, value.data.payload.payload.shift()))
+                    })
+                    return consoleErrors;
+                })
     }
 }
 
