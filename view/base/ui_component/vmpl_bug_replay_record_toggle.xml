@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd"
+           provider="uploaded_session_listing.uploaded_session_listing_data_source">
+  <argument name="data" xsi:type="array">
+    <item name="template" xsi:type="string">templates/container/root</item>
+  </argument>
+  <dataSource name="uploaded_session_listing_data_source">
+    <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider"
+                  name="uploaded_session_listing_data_source">
+      <settings>
+        <primaryFieldName>should_record</primaryFieldName>
+        <requestFieldName>should_record</requestFieldName>
+      </settings>
+    </dataProvider>
+  </dataSource>
+  <checkbox name="recordToggle" provider="replayProvider">
+    <settings>
+      <additionalClasses>
+        <class name="flex-inline">true</class>
+      </additionalClasses>
+      <label translate="true">Bug Replay - record enable</label>
+      <prefer>toggle</prefer>
+      <valueMap>
+        <map name="false" xsi:type="string">0</map>
+        <map name="true" xsi:type="string">1</map>
+      </valueMap>
+      <deps>
+        <dep>replayProvider</dep>
+      </deps>
+      <links>
+        <link name="value">${ $.provider }:$recordEnable</link>
+      </links>
+    </settings>
+  </checkbox>
+</container>

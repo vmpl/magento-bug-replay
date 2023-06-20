@@ -20,7 +20,7 @@ class Session extends DataObject implements ArgumentInterface
 
     final public function getHash(): string
     {
-        return $this->getData('hash');
+        return $this->getData('hash') ?? 'AdminReplay';
     }
 
     final public function getFileRequestUrl(): string
