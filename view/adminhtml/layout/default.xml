@@ -18,5 +18,9 @@
         </argument>
       </arguments>
     </referenceBlock>
+    <referenceContainer name="footer">
+      <uiComponent name="vmpl_bug_replay_record_toggle" before="-"/>
+    </referenceContainer>
+    <move element="vmpl.bug-replay.recorder" destination="content"/>
   </body>
 </page>

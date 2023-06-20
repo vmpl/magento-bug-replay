@@ -127,6 +127,18 @@
       float: unset;
     }
   }
+
+  .admin__field, .field {
+    &.flex-inline {
+      display: flex;
+      flex-flow: row nowrap;
+      column-gap: @indent__s;
+
+      .admin__actions-switch-text:before {
+        display: none;
+      }
+    }
+  }
 }
 
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {

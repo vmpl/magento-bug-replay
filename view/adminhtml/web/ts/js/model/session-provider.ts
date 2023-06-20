@@ -5,7 +5,6 @@ export default Provider.extend({
     defaults: {
         fileHash: 'AdminReplay',
         fileRequestUrl: '',
-        endpointRequest: '',
     },
     _manager() {
         const endpoint = new URL(this.endpointRequest).pathname.replace(/\/+$/, '');
