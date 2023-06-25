@@ -21,20 +21,13 @@ class Worker implements SessionWorkerInterface {
     }
 
     post(event: IRecordEvent): Promise<number> {
-        return Promise.all([
-            this.database.buffer.where('type').equals(EventType.Meta).count(),
-            this.database.buffer.where('type').equals(EventType.FullSnapshot).count(),
-        ])
-            .then(([metaCount, snapshotCount]) => {
-                return metaCount === snapshotCount && snapshotCount === 0
-                    ? Promise.resolve(0)
-                    : this.flushBuffer()
+        return (event.type <= 2
+            ? this.flushBuffer()
+            : Promise.resolve(0))
+            .then(sessionId => {
+                return this.database.buffer.put(event)
+                    .then(() => sessionId);
             })
-            .then(sessionId => this.database.buffer.put(event)
-                .then(() => sessionId)
-                .catch(error => {
-                throw error;
-            }))
     }
 
     sessions(

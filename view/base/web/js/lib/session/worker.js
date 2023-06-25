@@ -17,15 +17,9 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
     };
     _proto.post = function post(event) {
       var _this = this;
-      return Promise.all([this.database.buffer.where('type').equals(_session.EventType.Meta).count(), this.database.buffer.where('type').equals(_session.EventType.FullSnapshot).count()]).then(function (_ref) {
-        var metaCount = _ref[0],
-          snapshotCount = _ref[1];
-        return metaCount === snapshotCount && snapshotCount === 0 ? Promise.resolve(0) : _this.flushBuffer();
-      }).then(function (sessionId) {
+      return (event.type <= 2 ? this.flushBuffer() : Promise.resolve(0)).then(function (sessionId) {
         return _this.database.buffer.put(event).then(function () {
           return sessionId;
-        }).catch(function (error) {
-          throw error;
         });
       });
     };
@@ -87,8 +81,8 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
         return _axios.default.post('/vmpl-bug-report/session/upload', body).then(function (response) {
           return response.data;
         });
-      }).then(function (_ref2) {
-        var fileName = _ref2.fileName;
+      }).then(function (_ref) {
+        var fileName = _ref.fileName;
         return Promise.all(sessionIds.map(function (id) {
           return _this2.database.sessions.update(id, {
             uploaded: fileName
@@ -129,10 +123,10 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
      */;
     _proto.flushBuffer = function flushBuffer() {
       var _this5 = this;
-      return Promise.all([this.database.buffer.where('type').equals(_session.EventType.Meta).first(), this.database.buffer.where('type').equals(_session.EventType.FullSnapshot).first(), this.createBufferErrorDigests()]).then(function (_ref3) {
-        var meta = _ref3[0],
-          snapshot = _ref3[1],
-          errorConsoles = _ref3[2];
+      return Promise.all([this.database.buffer.where('type').equals(_session.EventType.Meta).first(), this.database.buffer.where('type').equals(_session.EventType.FullSnapshot).first(), this.createBufferErrorDigests()]).then(function (_ref2) {
+        var meta = _ref2[0],
+          snapshot = _ref2[1],
+          errorConsoles = _ref2[2];
         var tagMetaTitle = snapshot == null ? void 0 : snapshot.data.node.childNodes.find(function (it) {
           return (it == null ? void 0 : it.tagName) === 'html';
         }).childNodes.find(function (it) {
@@ -152,9 +146,9 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
             return !it.id;
           }), {
             allKeys: true
-          })]).then(function (_ref4) {
-            var sessionId = _ref4[0],
-              errorKeys = _ref4[1];
+          })]).then(function (_ref3) {
+            var sessionId = _ref3[0],
+              errorKeys = _ref3[1];
             var errorIds = errorKeys.map(function (it) {
               return ~~it;
             });
@@ -196,9 +190,9 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database
         }));
       }).then(function (results) {
         var errorMap = new Map();
-        results.forEach(function (_ref5) {
-          var event = _ref5[0],
-            digest = _ref5[1];
+        results.forEach(function (_ref4) {
+          var event = _ref4[0],
+            digest = _ref4[1];
           errorMap.set(textDecoder.decode(digest), event);
         });
         return errorMap;

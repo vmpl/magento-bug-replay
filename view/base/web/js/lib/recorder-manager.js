@@ -57,16 +57,13 @@ define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/c
     var _proto = RecorderManager.prototype;
     _proto.startRecord = function startRecord() {
       (function (self) {
-        self.stopRecord = rrwebRecord({
+        self.stopRecord = rrweb.record({
           emit: function emit(event) {
             self.sessionWorker.post(event).then(function (sessionId) {
-              if (sessionId === 0) {
-                return;
-              }
-              window.dispatchEvent(DataEvent.NewSessionWithError(sessionId));
+              sessionId === 0 || window.dispatchEvent(DataEvent.NewSessionWithError(sessionId));
             });
           },
-          plugins: [rrwebConsoleRecord.getRecordConsolePlugin()]
+          plugins: [rrweb.getRecordConsolePlugin()]
         });
       })(this);
     };

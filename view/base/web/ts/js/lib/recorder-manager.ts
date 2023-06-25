@@ -3,9 +3,9 @@ import ItemPaginator, {PaginatorFilter} from "VMPL_BugReplay/js/lib/items-pagina
 import {IPaginatorFilter, IPaginatorLoader, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import {WorkerClient} from "VMPL_BugReplay/js/lib/worker/client";
 import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
+import {eventWithTime, recordOptions, RecordPlugin} from "rrweb/typings/types";
 
-declare const rrwebRecord: Function;
-declare const rrwebConsoleRecord: { getRecordConsolePlugin: Function };
+declare const rrweb: {record: (options: recordOptions<eventWithTime>) => Function, getRecordConsolePlugin: () => RecordPlugin };
 
 export class DataEvent extends Event {
     data: any;
@@ -42,18 +42,15 @@ export default class RecorderManager implements IPaginatorLoader<IRecordSession>
 
     startRecord() {
         ((self) => {
-            self.stopRecord = rrwebRecord({
+            self.stopRecord = rrweb.record({
                 emit(event: IRecordEvent) {
                     self.sessionWorker.post(event)
                         .then(sessionId => {
-                            if (sessionId === 0) {
-                                return;
-                            }
-
-                            window.dispatchEvent(DataEvent.NewSessionWithError(sessionId));
+                            sessionId === 0
+                                || window.dispatchEvent(DataEvent.NewSessionWithError(sessionId));
                         })
                 },
-                plugins: [rrwebConsoleRecord.getRecordConsolePlugin()]
+                plugins: [rrweb.getRecordConsolePlugin()],
             })
         })(this);
     }
