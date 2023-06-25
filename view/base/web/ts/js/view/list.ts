@@ -4,8 +4,8 @@ import registry from "uiRegistry";
 import Component from 'uiComponent';
 import ko from 'knockout';
 import ItemSession, {ItemSessionFactory} from "VMPL_BugReplay/js/model/item-session";
-import {Exception as ItemPaginatorException} from "VMPL_BugReplay/js/lib/items-paginator";
-import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
+import {Exception as ItemPaginatorException} from "VMPL_BugReplay/js/bug-replay/items-paginator";
+import RecorderManager from "VMPL_BugReplay/js/bug-replay/recorder-manager";
 
 export default Component.extend({
     listOpen: ko.observable(false),

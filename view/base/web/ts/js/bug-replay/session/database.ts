@@ -1,9 +1,9 @@
 import {Dexie} from "dexie";
 import {exportDB, importInto, ExportOptions, ImportOptions} from "dexie-export-import";
 import {IErrorConsole, IRecordEvent, IRecordSession} from "VMPL_BugReplay/js/api/session";
-import {RecordEvent} from "VMPL_BugReplay/js/lib/session/model/record-event";
-import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
-import ErrorConsole from "VMPL_BugReplay/js/lib/session/model/error-console";
+import {RecordEvent} from "VMPL_BugReplay/js/bug-replay/session/model/record-event";
+import {RecordSession} from "VMPL_BugReplay/js/bug-replay/session/model/record-session";
+import ErrorConsole from "VMPL_BugReplay/js/bug-replay/session/model/error-console";
 
 export default class Database extends Dexie {
     sessions!: Dexie.Table<IRecordSession, number>;

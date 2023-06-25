@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["VMPL_BugReplay/js/view/dialog", "VMPL_BugReplay/js/lib/recorder-manager", "knockout"], function (_dialog, _recorderManager, _knockout) {
+define(["VMPL_BugReplay/js/view/dialog", "VMPL_BugReplay/js/bug-replay/recorder-manager", "knockout"], function (_dialog, _recorderManager, _knockout) {
   var _default = _dialog.extend({
     defaults: {
       template: 'VMPL_BugReplay/dialog/catch-error',

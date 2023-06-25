@@ -2,9 +2,8 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
   <body>
-    <block class="VMPL\BugReplay\Block\Player" name="vmpl.bug-replay.player" template="VMPL_BugReplay::player.phtml">
+    <block name="vmpl.bug-replay.player" template="VMPL_BugReplay::player.phtml">
       <arguments>
-        <argument name="view_model" xsi:type="object">\VMPL\BugReplay\ViewModel\Player</argument>
         <argument name="jsLayout" xsi:type="array">
           <item name="components" xsi:type="array">
             <item name="player" xsi:type="array">

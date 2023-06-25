@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/lib/session/database", "VMPL_BugReplay/js/lib/worker/consumer", "axios", "VMPL_BugReplay/js/lib/session/model/record-session", "VMPL_BugReplay/js/lib/session/model/error-console"], function (_session, _database, _consumer, _axios, _recordSession, _errorConsole) {
+define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/bug-replay/session/database", "VMPL_BugReplay/js/lib/worker/consumer", "axios", "VMPL_BugReplay/js/bug-replay/session/model/record-session", "VMPL_BugReplay/js/bug-replay/session/model/error-console"], function (_session, _database, _consumer, _axios, _recordSession, _errorConsole) {
   "use strict";
 
   _database = _interopRequireDefault(_database);

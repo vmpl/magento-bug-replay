@@ -1,6 +1,6 @@
 import Component from 'uiComponent';
 import ko from 'knockout';
-import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
+import {RecordSession} from "VMPL_BugReplay/js/bug-replay/session/model/record-session";
 
 export default Component.extend({
     defaults: {

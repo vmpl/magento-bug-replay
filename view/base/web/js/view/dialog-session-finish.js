@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["VMPL_BugReplay/js/view/dialog", "knockout", "VMPL_BugReplay/js/lib/recorder-manager"], function (_dialog, _knockout, _recorderManager) {
+define(["VMPL_BugReplay/js/view/dialog", "knockout", "VMPL_BugReplay/js/bug-replay/recorder-manager"], function (_dialog, _knockout, _recorderManager) {
   var _default = _dialog.extend({
     defaults: {
       template: 'VMPL_BugReplay/dialog/session-finish',

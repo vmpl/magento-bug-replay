@@ -2,7 +2,7 @@
 import utils from 'mageUtils';
 import _ from 'underscore';
 import Component from 'uiComponent';
-import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
+import RecorderManager from "VMPL_BugReplay/js/bug-replay/recorder-manager";
 
 export default Component.extend({
     defaults: {
