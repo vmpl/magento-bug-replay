@@ -1,11 +1,10 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["VMPL_BugReplay/js/model/provider", "VMPL_BugReplay/js/lib/recorder-manager"], function (_provider, _recorderManager) {
+define(["VMPL_BugReplay/js/model/provider", "VMPL_BugReplay/js/bug-replay/recorder-manager"], function (_provider, _recorderManager) {
   var _default = _provider.extend({
     defaults: {
       fileHash: 'AdminReplay',
-      fileRequestUrl: '',
-      endpointRequest: ''
+      fileRequestUrl: ''
     },
     _manager: function _manager() {
       var _this = this;

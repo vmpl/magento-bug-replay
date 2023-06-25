@@ -1,15 +1,15 @@
 import {
-    EventType, IErrorConsole,
+    EventType,
     IRecordEvent, IRecordSession,
     SessionWorker as SessionWorkerInterface,
 } from 'VMPL_BugReplay/js/api/session'
-import SessionDatabase from "VMPL_BugReplay/js/lib/session/database";
+import SessionDatabase from "VMPL_BugReplay/js/bug-replay/session/database";
 import {IPaginatorFilter, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import {WorkerConsumer} from "VMPL_BugReplay/js/lib/worker/consumer";
 import axios from "axios";
-import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
+import {RecordSession} from "VMPL_BugReplay/js/bug-replay/session/model/record-session";
 import {error} from "consoleLogger";
-import ErrorConsole from "VMPL_BugReplay/js/lib/session/model/error-console";
+import ErrorConsole from "VMPL_BugReplay/js/bug-replay/session/model/error-console";
 
 @WorkerConsumer()
 class Worker implements SessionWorkerInterface {
@@ -21,20 +21,13 @@ class Worker implements SessionWorkerInterface {
     }
 
     post(event: IRecordEvent): Promise<number> {
-        return Promise.all([
-            this.database.buffer.where('type').equals(EventType.Meta).count(),
-            this.database.buffer.where('type').equals(EventType.FullSnapshot).count(),
-        ])
-            .then(([metaCount, snapshotCount]) => {
-                return metaCount === snapshotCount && snapshotCount === 0
-                    ? Promise.resolve(0)
-                    : this.flushBuffer()
+        return (event.type <= 2
+            ? this.flushBuffer()
+            : Promise.resolve(0))
+            .then(sessionId => {
+                return this.database.buffer.put(event)
+                    .then(() => sessionId);
             })
-            .then(sessionId => this.database.buffer.put(event)
-                .then(() => sessionId)
-                .catch(error => {
-                throw error;
-            }))
     }
 
     sessions(

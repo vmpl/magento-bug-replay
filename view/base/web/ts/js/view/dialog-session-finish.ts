@@ -1,6 +1,6 @@
 import Dialog from "VMPL_BugReplay/js/view/dialog";
 import ko from "knockout";
-import {DataEvent} from "VMPL_BugReplay/js/lib/recorder-manager";
+import {DataEvent} from "VMPL_BugReplay/js/bug-replay/recorder-manager";
 
 export default Dialog.extend({
     defaults: {

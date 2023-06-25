@@ -1,4 +1,4 @@
-import {PaginatorFilter} from "VMPL_BugReplay/js/lib/items-paginator";
+import {PaginatorFilter} from "VMPL_BugReplay/js/bug-replay/items-paginator";
 
 export interface IPaginatorLoader<T extends Object> {
     loadPaginatorItems: (offset: number, limit: number, filter: IPaginatorFilter<T>) => Promise<IPaginatorResponse<T>>;

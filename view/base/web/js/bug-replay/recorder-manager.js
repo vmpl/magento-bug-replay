@@ -11,7 +11,7 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 function _isNativeFunction(fn) { return Function.toString.call(fn).indexOf("[native code]") !== -1; }
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/client"], function (_itemsPaginator, _client) {
+define(["VMPL_BugReplay/js/bug-replay/items-paginator", "VMPL_BugReplay/js/lib/worker/client"], function (_itemsPaginator, _client) {
   function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
   var DataEvent = /*#__PURE__*/function (_Event) {
     "use strict";
@@ -57,16 +57,13 @@ define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/c
     var _proto = RecorderManager.prototype;
     _proto.startRecord = function startRecord() {
       (function (self) {
-        self.stopRecord = rrwebRecord({
+        self.stopRecord = rrweb.record({
           emit: function emit(event) {
             self.sessionWorker.post(event).then(function (sessionId) {
-              if (sessionId === 0) {
-                return;
-              }
-              window.dispatchEvent(DataEvent.NewSessionWithError(sessionId));
+              sessionId === 0 || window.dispatchEvent(DataEvent.NewSessionWithError(sessionId));
             });
           },
-          plugins: [rrwebConsoleRecord.getRecordConsolePlugin()]
+          plugins: [rrweb.getRecordConsolePlugin()]
         });
       })(this);
     };
@@ -75,7 +72,7 @@ define(["VMPL_BugReplay/js/lib/items-paginator", "VMPL_BugReplay/js/lib/worker/c
         instance = 'BugReplay';
       }
       var urlWorker = new URL(location.origin);
-      urlWorker.pathname = endpoint + "/VMPL_BugReplay/js/lib/session/worker";
+      urlWorker.pathname = endpoint + "/VMPL_BugReplay/js/bug-replay/session/worker";
       return (0, _client.WorkerClient)(urlWorker.toString()).then(function (sessionWorker) {
         return sessionWorker.initInstance(instance).then(function () {
           return new RecorderManager(sessionWorker);

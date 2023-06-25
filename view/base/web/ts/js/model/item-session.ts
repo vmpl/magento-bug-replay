@@ -1,5 +1,5 @@
-import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
-import Primary from "VMPL_BugReplay/js/lib/decorator/primary";
+import {RecordSession} from "VMPL_BugReplay/js/bug-replay/session/model/record-session";
+import Primary from "VMPL_BugReplay/js/bug-replay/decorator/primary";
 import ko from "knockout";
 import {IRecordSession} from "VMPL_BugReplay/js/api/session";
 

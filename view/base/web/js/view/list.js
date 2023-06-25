@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["uiLayout", "uiRegistry", "uiComponent", "knockout", "VMPL_BugReplay/js/model/item-session", "VMPL_BugReplay/js/lib/items-paginator"], function (_uiLayout, _uiRegistry, _uiComponent, _knockout, _itemSession, _itemsPaginator) {
+define(["uiLayout", "uiRegistry", "uiComponent", "knockout", "VMPL_BugReplay/js/model/item-session", "VMPL_BugReplay/js/bug-replay/items-paginator"], function (_uiLayout, _uiRegistry, _uiComponent, _knockout, _itemSession, _itemsPaginator) {
   // @ts-ignore
   var _default = _uiComponent.extend({
     listOpen: _knockout.observable(false),

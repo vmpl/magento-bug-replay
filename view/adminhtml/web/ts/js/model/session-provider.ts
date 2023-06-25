@@ -1,5 +1,5 @@
 import Provider from "VMPL_BugReplay/js/model/provider";
-import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
+import RecorderManager from "VMPL_BugReplay/js/bug-replay/recorder-manager";
 
 export default Provider.extend({
     defaults: {

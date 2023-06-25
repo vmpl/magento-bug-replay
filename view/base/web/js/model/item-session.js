@@ -2,7 +2,7 @@
 /* jscs:disable */
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; _setPrototypeOf(subClass, superClass); }
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-define(["VMPL_BugReplay/js/lib/session/model/record-session", "VMPL_BugReplay/js/lib/decorator/primary", "knockout"], function (_recordSession, _primary, _knockout) {
+define(["VMPL_BugReplay/js/bug-replay/session/model/record-session", "VMPL_BugReplay/js/bug-replay/decorator/primary", "knockout"], function (_recordSession, _primary, _knockout) {
   var _dec, _class;
   var Factory = /*#__PURE__*/function () {
     "use strict";

@@ -3,8 +3,7 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
   <head>
     <link rel="stylesheet" src="VMPL_BugReplay::rrweb-player/style.css"/>
-    <script src="VMPL_BugReplay::rrweb/record/rrweb-record.min.js"/>
-    <script src="VMPL_BugReplay::rrweb/plugins/console-record.min.js"/>
+    <script src="VMPL_BugReplay::rrweb/rrweb-all.min.js"/>
     <script src="VMPL_BugReplay::rrweb-player/index.js"/>
   </head>
   <body>

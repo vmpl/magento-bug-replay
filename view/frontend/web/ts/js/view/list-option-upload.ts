@@ -1,4 +1,3 @@
-import ko from 'knockout';
 import ListItemOption from "VMPL_BugReplay/js/view/list-item-option";
 
 export default ListItemOption.extend({

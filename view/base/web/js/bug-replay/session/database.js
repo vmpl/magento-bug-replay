@@ -2,7 +2,7 @@
 /* jscs:disable */
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; _setPrototypeOf(subClass, superClass); }
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-define(["dexie", "dexie-export-import", "VMPL_BugReplay/js/lib/session/model/record-event", "VMPL_BugReplay/js/lib/session/model/record-session", "VMPL_BugReplay/js/lib/session/model/error-console"], function (_dexie, _dexieExportImport, _recordEvent, _recordSession, _errorConsole) {
+define(["dexie", "dexie-export-import", "VMPL_BugReplay/js/bug-replay/session/model/record-event", "VMPL_BugReplay/js/bug-replay/session/model/record-session", "VMPL_BugReplay/js/bug-replay/session/model/error-console"], function (_dexie, _dexieExportImport, _recordEvent, _recordSession, _errorConsole) {
   var Database = /*#__PURE__*/function (_dexie$Dexie) {
     "use strict";
 

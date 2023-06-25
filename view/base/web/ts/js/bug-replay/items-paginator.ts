@@ -4,8 +4,6 @@ import {
 } from "VMPL_BugReplay/js/api/paginator";
 import * as module from "module";
 import {WorkerArgument} from "VMPL_BugReplay/js/lib/worker/decorator";
-import {of} from "rxjs";
-import {ArrayTypeAnnotation} from "@babel/types";
 
 enum CompareTypes {
     equal,
