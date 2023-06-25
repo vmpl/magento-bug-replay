@@ -1,7 +1,7 @@
 import Component from 'uiComponent';
 import ko from 'knockout';
-import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
-import {RecordEvent} from "VMPL_BugReplay/js/lib/session/model/record-event";
+import RecorderManager from "VMPL_BugReplay/js/bug-replay/recorder-manager";
+import {RecordEvent} from "VMPL_BugReplay/js/bug-replay/session/model/record-event";
 import {IRecordSession} from "VMPL_BugReplay/js/api/session";
 
 declare var rrwebPlayer: any;

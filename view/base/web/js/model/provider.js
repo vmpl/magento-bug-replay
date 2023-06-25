@@ -1,6 +1,6 @@
 /*eslint-disable */
 /* jscs:disable */
-define(["mageUtils", "underscore", "uiComponent", "VMPL_BugReplay/js/lib/recorder-manager"], function (_mageUtils, _underscore, _uiComponent, _recorderManager) {
+define(["mageUtils", "underscore", "uiComponent", "VMPL_BugReplay/js/bug-replay/recorder-manager"], function (_mageUtils, _underscore, _uiComponent, _recorderManager) {
   // @ts-ignore
   var _default = _uiComponent.extend({
     defaults: {

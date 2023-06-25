@@ -2,7 +2,7 @@ import Component from "uiComponent";
 import ko from 'knockout';
 import ItemSession from "VMPL_BugReplay/js/model/item-session";
 import $t from 'mage/translate';
-import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
+import RecorderManager from "VMPL_BugReplay/js/bug-replay/recorder-manager";
 
 export default Component.extend({
     visibility: ko.observable<boolean>(false),

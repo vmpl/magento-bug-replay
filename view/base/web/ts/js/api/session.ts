@@ -1,5 +1,5 @@
 import {IPaginatorFilter, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
-import {RecordSession} from "VMPL_BugReplay/js/lib/session/model/record-session";
+import {RecordSession} from "VMPL_BugReplay/js/bug-replay/session/model/record-session";
 
 export enum EventType {
     DomContentLoaded = 0,

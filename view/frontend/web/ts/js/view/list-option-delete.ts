@@ -1,5 +1,5 @@
 import ListItemOption from "VMPL_BugReplay/js/view/list-item-option";
-import RecorderManager from "VMPL_BugReplay/js/lib/recorder-manager";
+import RecorderManager from "VMPL_BugReplay/js/bug-replay/recorder-manager";
 
 export default ListItemOption.extend({
     defaults: {
