@@ -12,6 +12,7 @@
           <enable_toggle>1</enable_toggle>
           <report>1</report>
           <report_toggle>0</report_toggle>
+          <policy_page>record-policy-page</policy_page>
         </storefront>
       </vmpl_bug_replay>
     </analytics>

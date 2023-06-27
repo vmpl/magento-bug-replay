@@ -57,6 +57,7 @@
                  canRestore="1" sortOrder="70">
             <label>Privacy Policy Page</label>
             <source_model>Magento\Cms\Model\Config\Source\Page</source_model>
+            <can_be_empty>0</can_be_empty>
           </field>
         </group>
       </group>
