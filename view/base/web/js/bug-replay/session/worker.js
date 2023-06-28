@@ -78,7 +78,7 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/bug-replay/session/d
       }).then(function (blob) {
         var body = new FormData();
         body.append('database', new File([blob], 'database.json'), 'database.json');
-        return _axios.default.post('/vmpl-bug-report/session/upload', body).then(function (response) {
+        return _axios.default.post('/vmpl-bug-replay/session/upload', body).then(function (response) {
           return response.data;
         });
       }).then(function (_ref) {
