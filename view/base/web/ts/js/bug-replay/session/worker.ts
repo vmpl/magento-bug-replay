@@ -98,7 +98,7 @@ class Worker implements SessionWorkerInterface {
         }).then(blob => {
             const body = new FormData();
             body.append('database', new File([blob], 'database.json'), 'database.json');
-            return axios.post('/vmpl-bug-report/session/upload', body)
+            return axios.post('/vmpl-bug-replay/session/upload', body)
                 .then(response => response.data);
         }).then(({fileName}) => {
             return Promise.all(

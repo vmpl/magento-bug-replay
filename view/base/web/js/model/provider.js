@@ -5,13 +5,15 @@ define(["mageUtils", "underscore", "uiComponent", "VMPL_BugReplay/js/bug-replay/
   var _default = _uiComponent.extend({
     defaults: {
       fileHash: 'BugReplay',
-      endpointRequest: '/vmpl-bug-report/worker/loader',
+      endpointRequest: '/vmpl-bug-replay/worker/loader',
       ignoreTmpls: {
         data: true
       }
     },
     initialize: function initialize(options) {
       this._super(options);
+      this.get('$recordEnable') !== undefined || this.set('$recordEnable', this.get('configuration.enabled') === '1' ? '1' : '0');
+      this.get('$reportEnable') !== undefined || this.set('$reportEnable', this.get('configuration.report') === '1' ? '1' : '0');
       var manager = this._manager();
       this._set('manager', function () {
         return manager;
@@ -21,15 +23,16 @@ define(["mageUtils", "underscore", "uiComponent", "VMPL_BugReplay/js/bug-replay/
     _manager: function _manager() {
       var _this = this;
       return _recorderManager.init(this.endpointRequest, this.fileHash).then(function (manager) {
-        if (_this.get('$recordEnable') === '1') {
-          manager.startRecord();
-        }
+        !_this.shouldRecord() || manager.startRecord();
         return manager;
       });
     },
     get: function get(path) {
       if (path.startsWith('$')) {
         return this.storage().get(path.replace(/^\$/, ''));
+      }
+      if (path.startsWith('!')) {
+        return !JSON.parse(this._super(path.replace(/^!/, '')));
       }
       return this._super(path);
     },
@@ -76,6 +79,16 @@ define(["mageUtils", "underscore", "uiComponent", "VMPL_BugReplay/js/bug-replay/
       } else {
         parent[lastPathComponent] = value;
       }
+    },
+    shouldRecord: function shouldRecord() {
+      var shouldRecord = this.get('configuration.available') === '1';
+      shouldRecord && (shouldRecord = this.get('configuration.enable_toggle') === '0' && this.get('configuration.enabled') === '1' || this.get('configuration.enable_toggle') === '1' && this.get('$recordEnable') === '1');
+      return shouldRecord;
+    },
+    shouldReport: function shouldReport() {
+      var shouldReport = this.get('configuration.available') === '1';
+      shouldReport && (shouldReport = this.get('configuration.report_toggle') === '0' && this.get('configuration.report') === '1' || this.get('configuration.report_toggle') === '1' && this.get('$reportEnable') === '1');
+      return shouldReport;
     }
   });
   return _default;

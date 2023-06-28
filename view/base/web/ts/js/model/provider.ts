@@ -7,13 +7,18 @@ import RecorderManager from "VMPL_BugReplay/js/bug-replay/recorder-manager";
 export default Component.extend({
     defaults: {
         fileHash: 'BugReplay',
-        endpointRequest: '/vmpl-bug-report/worker/loader',
+        endpointRequest: '/vmpl-bug-replay/worker/loader',
         ignoreTmpls: {
             data: true
         },
     },
     initialize(options: object) {
         this._super(options);
+        this.get('$recordEnable') !== undefined
+            || this.set('$recordEnable', this.get('configuration.enabled') === '1' ? '1' : '0');
+        this.get('$reportEnable') !== undefined
+            || this.set('$reportEnable', this.get('configuration.report') === '1' ? '1' : '0');
+
         const manager = this._manager();
         this._set('manager', () => manager);
         return this;
@@ -21,9 +26,8 @@ export default Component.extend({
     _manager() {
         return RecorderManager.init(this.endpointRequest, this.fileHash)
             .then(manager => {
-                if (this.get('$recordEnable') === '1') {
-                    manager.startRecord();
-                }
+                !this.shouldRecord()
+                    || manager.startRecord();
 
                 return manager;
             })
@@ -31,6 +35,10 @@ export default Component.extend({
     get(path: string) {
         if (path.startsWith('$')) {
             return this.storage().get(path.replace(/^\$/, ''));
+        }
+
+        if (path.startsWith('!')) {
+            return !JSON.parse(this._super(path.replace(/^!/, '')));
         }
 
         return this._super(path);
@@ -87,4 +95,16 @@ export default Component.extend({
             parent[lastPathComponent] = value;
         }
     },
+    shouldRecord() {
+        let shouldRecord = this.get('configuration.available') === '1';
+        shouldRecord &&= (this.get('configuration.enable_toggle') === '0' && this.get('configuration.enabled') === '1'
+            || this.get('configuration.enable_toggle') === '1' && this.get('$recordEnable') === '1');
+        return shouldRecord;
+    },
+    shouldReport() {
+        let shouldReport = this.get('configuration.available') === '1';
+        shouldReport &&= (this.get('configuration.report_toggle') === '0' && this.get('configuration.report') === '1'
+            || this.get('configuration.report_toggle') === '1' && this.get('$reportEnable') === '1');
+        return shouldReport;
+    }
 })
