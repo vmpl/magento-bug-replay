@@ -2,15 +2,18 @@
 
 namespace VMPL\BugReplay\ViewModel;
 
+use Magento\Framework\DataObject;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use VMPL\BugReplay\Model\StoreConfigProvider;
 use VMPL\BugReplay\Types\StoreConfig;
 
-class Session implements ArgumentInterface
+class Session extends DataObject implements ArgumentInterface
 {
     public function __construct(
         protected readonly StoreConfigProvider $configProvider,
+        array $data = [],
     ) {
+        parent::__construct($data);
     }
 
     public function getStoreCoreConfig(): array

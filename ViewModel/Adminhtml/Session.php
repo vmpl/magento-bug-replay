@@ -5,17 +5,20 @@ namespace VMPL\BugReplay\ViewModel\Adminhtml;
 use Magento\Framework\DataObject;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
+use VMPL\BugReplay\Model\StoreConfigProvider;
+use VMPL\BugReplay\Types\StoreConfig;
 
 /**
  * @method self setHash(string $hash)
  */
-class Session extends DataObject implements ArgumentInterface
+class Session extends \VMPL\BugReplay\ViewModel\Session implements ArgumentInterface
 {
     public function __construct(
         protected readonly UrlInterface $urlBuilder,
+        StoreConfigProvider $configProvider,
         array $data = [],
     ) {
-        parent::__construct($data);
+        parent::__construct($configProvider, $data);
     }
 
     final public function getHash(): string
@@ -37,5 +40,13 @@ class Session extends DataObject implements ArgumentInterface
             'vmpl_bug_replay/worker/loader',
         );
         return $url;
+    }
+
+    public function getAdminhtmlConfig(): array
+    {
+        return array_map(
+            fn ($case) => $this->configProvider->getValue($case),
+            StoreConfig::getGroupCases('admin'),
+        );
     }
 }

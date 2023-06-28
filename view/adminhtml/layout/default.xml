@@ -12,6 +12,7 @@
                 <item name="fileHash" xsi:type="helper" helper="\VMPL\BugReplay\ViewModel\Adminhtml\Session::getHash"/>
                 <item name="fileRequestUrl" xsi:type="helper" helper="\VMPL\BugReplay\ViewModel\Adminhtml\Session::getFileRequestUrl"/>
                 <item name="endpointRequest" xsi:type="helper" helper="\VMPL\BugReplay\ViewModel\Adminhtml\Session::endpointRequest"/>
+                <item name="configuration" xsi:type="helper" helper="\VMPL\BugReplay\ViewModel\Adminhtml\Session::getAdminhtmlConfig"/>
               </item>
             </item>
           </item>
