@@ -14,9 +14,9 @@ export default Component.extend({
     },
     initialize(options: object) {
         this._super(options);
-        this.get('$recordEnable') !== undefined
+        (this.get('$recordEnable') !== undefined && this.get('configuration.enable_toggle') === '1')
             || this.set('$recordEnable', this.get('configuration.enabled') === '1' ? '1' : '0');
-        this.get('$reportEnable') !== undefined
+        (this.get('$reportEnable') !== undefined && this.get('configuration.report_toggle') === '1')
             || this.set('$reportEnable', this.get('configuration.report') === '1' ? '1' : '0');
 
         const manager = this._manager();
@@ -38,7 +38,7 @@ export default Component.extend({
         }
 
         if (path.startsWith('!')) {
-            return !JSON.parse(this._super(path.replace(/^!/, '')));
+            return !JSON.parse(this.get(path.replace(/^!/, '')));
         }
 
         return this._super(path);

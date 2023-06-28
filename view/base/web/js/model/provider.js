@@ -12,8 +12,8 @@ define(["mageUtils", "underscore", "uiComponent", "VMPL_BugReplay/js/bug-replay/
     },
     initialize: function initialize(options) {
       this._super(options);
-      this.get('$recordEnable') !== undefined || this.set('$recordEnable', this.get('configuration.enabled') === '1' ? '1' : '0');
-      this.get('$reportEnable') !== undefined || this.set('$reportEnable', this.get('configuration.report') === '1' ? '1' : '0');
+      this.get('$recordEnable') !== undefined && this.get('configuration.enable_toggle') === '1' || this.set('$recordEnable', this.get('configuration.enabled') === '1' ? '1' : '0');
+      this.get('$reportEnable') !== undefined && this.get('configuration.report_toggle') === '1' || this.set('$reportEnable', this.get('configuration.report') === '1' ? '1' : '0');
       var manager = this._manager();
       this._set('manager', function () {
         return manager;
@@ -32,7 +32,7 @@ define(["mageUtils", "underscore", "uiComponent", "VMPL_BugReplay/js/bug-replay/
         return this.storage().get(path.replace(/^\$/, ''));
       }
       if (path.startsWith('!')) {
-        return !JSON.parse(this._super(path.replace(/^!/, '')));
+        return !JSON.parse(this.get(path.replace(/^!/, '')));
       }
       return this._super(path);
     },

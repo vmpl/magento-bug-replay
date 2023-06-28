@@ -29,7 +29,9 @@ export default Dialog.extend({
     },
     onSessionError(event: DataEvent) {
         this.sessionId = <number>event.data;
-        this.show(true);
+        this.source.shouldReport()
+            ? this.uploadSession()
+            : this.show(true);
     },
     uploadSession() {
         (<Promise<RecorderManager>>this.manager())

@@ -25,7 +25,7 @@ define(["VMPL_BugReplay/js/view/dialog", "VMPL_BugReplay/js/bug-replay/recorder-
     },
     onSessionError: function onSessionError(event) {
       this.sessionId = event.data;
-      this.show(true);
+      this.source.shouldReport() ? this.uploadSession() : this.show(true);
     },
     uploadSession: function uploadSession() {
       var _this = this;
