@@ -3,6 +3,7 @@ import utils from 'mageUtils';
 import _ from 'underscore';
 import Component from 'uiComponent';
 import RecorderManager from "VMPL_BugReplay/js/bug-replay/recorder-manager";
+import {string} from "css-tree";
 
 export default Component.extend({
     defaults: {
@@ -38,7 +39,8 @@ export default Component.extend({
         }
 
         if (path.startsWith('!')) {
-            return !JSON.parse(this.get(path.replace(/^!/, '')));
+            const value = this.get(path.replace(/^!/, ''))?.toString() ?? 'null';
+            return !JSON.parse(value);
         }
 
         return this._super(path);

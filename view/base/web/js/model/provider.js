@@ -32,15 +32,17 @@ define(["mageUtils", "underscore", "uiComponent", "VMPL_BugReplay/js/bug-replay/
         return this.storage().get(path.replace(/^\$/, ''));
       }
       if (path.startsWith('!')) {
-        return !JSON.parse(this.get(path.replace(/^!/, '')));
+        var _this$get$toString, _this$get;
+        var value = (_this$get$toString = (_this$get = this.get(path.replace(/^!/, ''))) == null ? void 0 : _this$get.toString()) != null ? _this$get$toString : 'null';
+        return !JSON.parse(value);
       }
       return this._super(path);
     },
     set: function set(path, value) {
       var _this2 = this;
       if (value instanceof Array) {
-        var _this$get;
-        Object.keys((_this$get = this.get(path)) != null ? _this$get : {}).filter(function (index) {
+        var _this$get2;
+        Object.keys((_this$get2 = this.get(path)) != null ? _this$get2 : {}).filter(function (index) {
           return ~~index >= value.length;
         }).forEach(function (index) {
           return _this2.remove(path + "." + index);
