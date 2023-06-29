@@ -8,7 +8,7 @@
   </head>
   <body>
     <referenceContainer name="after.body.start">
-      <block name="vmpl.bug-replay.recorder" template="VMPL_BugReplay::recorder.phtml">
+      <block class="VMPL\BugReplay\Block\UiComponentWithJsLayout" name="vmpl.bug-replay.recorder" template="VMPL_BugReplay::recorder.phtml">
         <arguments>
           <argument name="jsLayout" xsi:type="array">
             <item name="components" xsi:type="array">

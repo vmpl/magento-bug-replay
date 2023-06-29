@@ -19,11 +19,21 @@
                     </item>
                   </item>
                 </item>
+                <item name="notRecordedErrorDialog" xsi:type="array">
+                  <item name="component" xsi:type="string">VMPL_BugReplay/js/view/dialog-not-recorded-error</item>
+                  <item name="config" xsi:type="array">
+                    <item name="provider" xsi:type="string">replayProvider</item>
+                    <item name="deps" xsi:type="array">
+                      <item name="0" xsi:type="string">replayProvider</item>
+                    </item>
+                  </item>
+                </item>
               </item>
             </item>
           </item>
         </argument>
       </arguments>
+      <uiComponent name="vmpl_bug_replay_record_toggle" group="ui_components"/>
     </referenceBlock>
     <referenceBlock name="footer_links">
       <block class="Magento\Framework\View\Element\Html\Link\Current" name="footer_links.bug_replay_sessions">
