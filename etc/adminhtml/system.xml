@@ -59,6 +59,10 @@
             <source_model>Magento\Cms\Model\Config\Source\Page</source_model>
             <can_be_empty>0</can_be_empty>
           </field>
+          <field id="ignore_rules" translate="label" type="textarea" showInDefault="1" showInWebsite="1" showInStore="1"
+                 canRestore="1" sortOrder="80">
+            <label>Regex error ignore rules</label>
+          </field>
         </group>
       </group>
     </section>

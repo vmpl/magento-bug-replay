@@ -11,6 +11,7 @@ enum StoreConfig : string
     case AutoReport = 'analytics/vmpl_bug_replay/storefront/report';
     case AutoReportToggle = 'analytics/vmpl_bug_replay/storefront/report_toggle';
     case CmsPolicyPage = 'analytics/vmpl_bug_replay/storefront/policy_page';
+    case IgnoreRules = 'analytics/vmpl_bug_replay/storefront/ignore_rules';
 
     /**
      * @return array<string, self>

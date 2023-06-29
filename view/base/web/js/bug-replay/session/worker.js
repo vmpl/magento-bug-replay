@@ -17,9 +17,9 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/bug-replay/session/d
     };
     _proto.post = function post(event) {
       var _this = this;
-      return (event.type <= 2 ? this.flushBuffer() : Promise.resolve(0)).then(function (sessionId) {
+      return event.type <= 2 ? this.flushBuffer() : Promise.resolve({}).then(function (info) {
         return _this.database.buffer.put(event).then(function () {
-          return sessionId;
+          return info;
         });
       });
     };
@@ -172,7 +172,10 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/bug-replay/session/d
             })]).then(function () {
               return _this5.database.buffer.clear();
             }).then(function () {
-              return !errorConsoles.length ? 0 : sessionId;
+              return {
+                errors: errorConsoles,
+                sessionId: sessionId
+              };
             });
           });
         });
@@ -202,7 +205,7 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/bug-replay/session/d
             if (!consoleErrors.some(function (it) {
               return it.digest === digest;
             })) {
-              consoleErrors.push(new _errorConsole.default(digest, event.data.payload.payload.shift()));
+              consoleErrors.push(new _errorConsole.default(digest, JSON.parse(event.data.payload.payload.shift())));
             }
           });
           return consoleErrors;
