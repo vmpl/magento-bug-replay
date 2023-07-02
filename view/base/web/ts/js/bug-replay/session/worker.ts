@@ -22,13 +22,17 @@ class Worker implements SessionWorkerInterface {
     }
 
     post(event: IRecordEvent): Promise<EventPostResult> {
-        return (event.type <= 2
-            ? this.flushBuffer()
-            : Promise.resolve(<EventPostResult>{})
+        return (() => {
+            if (event.type <= 2) {
+                return this.flushBuffer();
+            } else {
+                return Promise.resolve(<EventPostResult>{})
+            }
+        })()
             .then(info => {
                 return this.database.buffer.put(event)
                     .then(() => info)
-            }))
+            })
     }
 
     sessions(
@@ -113,7 +117,8 @@ class Worker implements SessionWorkerInterface {
 
     import(url: string): Promise<void> {
         return axios.get(url, {responseType: 'blob'})
-            .then(response => this.database.import(response.data, {acceptNameDiff: true}))
+            .then(response => this.database.import(response.data,
+                {acceptNameDiff: true, noTransaction: true, overwriteValues: true, clearTablesBeforeImport: true}))
     }
 
     delete(sessions: IRecordSession[]): Promise<void> {
