@@ -44,8 +44,6 @@ define(["uiComponent", "knockout", "mage/translate"], function (_uiComponent, _k
       }).then(function () {
         _this2.onCancel();
         return _this2.list().reload();
-      }).then(function () {
-        return alert((0, _translate)('Uploaded'));
       });
     },
     onCancel: function onCancel() {

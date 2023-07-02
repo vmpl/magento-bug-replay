@@ -117,7 +117,8 @@ class Worker implements SessionWorkerInterface {
 
     import(url: string): Promise<void> {
         return axios.get(url, {responseType: 'blob'})
-            .then(response => this.database.import(response.data, {acceptNameDiff: true}))
+            .then(response => this.database.import(response.data,
+                {acceptNameDiff: true, noTransaction: true, overwriteValues: true, clearTablesBeforeImport: true}))
     }
 
     delete(sessions: IRecordSession[]): Promise<void> {

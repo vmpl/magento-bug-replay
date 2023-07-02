@@ -102,7 +102,10 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/bug-replay/session/d
         responseType: 'blob'
       }).then(function (response) {
         return _this3.database.import(response.data, {
-          acceptNameDiff: true
+          acceptNameDiff: true,
+          noTransaction: true,
+          overwriteValues: true,
+          clearTablesBeforeImport: true
         });
       });
     };
