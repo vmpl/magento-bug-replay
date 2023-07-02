@@ -8,6 +8,7 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Store\Model\StoreManagerInterface;
 use VMPL\BugReplay\Model\UploadedSession;
 
 class Upload implements HttpPostActionInterface, CsrfAwareActionInterface
@@ -20,6 +21,8 @@ class Upload implements HttpPostActionInterface, CsrfAwareActionInterface
         protected readonly ResultFactory $resultFactory,
         protected readonly \Magento\Framework\Filesystem $filesystem,
         protected readonly \VMPL\BugReplay\Model\ResourceModel\UploadedSession\CollectionFactory $collectionFactory,
+        protected readonly StoreManagerInterface $storeManagement,
+        protected readonly \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
     ) {
     }
 
@@ -41,6 +44,8 @@ class Upload implements HttpPostActionInterface, CsrfAwareActionInterface
         $collection = $this->collectionFactory->create();
         $model = $collection->getNewEmptyItem();
         $model->setHash($fileHash);
+        $model->setStoreId($this->storeManagement->getStore()->getId());
+        $model->setUserId($this->currentCustomer->getCustomerId() ?? 0);
         $collection->getResource()->save($model);
 
         $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);

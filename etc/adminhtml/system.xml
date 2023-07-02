@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+  <system>
+    <section id="analytics" showInWebsite="1" showInStore="1">
+      <group id="vmpl_bug_replay" translate="label" type="text" sortOrder="21" showInDefault="1" showInWebsite="1"
+             showInStore="1">
+        <label>Bug Replay</label>
+        <group id="admin" translate="label" showInDefault="1" showInWebsite="0" showInStore="0">
+          <label>Admin</label>
+          <field id="available" type="select" translate="label" showInDefault="1" showInWebsite="0" showInStore="0"
+                 sortOrder="10">
+            <label>Available</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+          </field>
+        </group>
+        <group id="storefront" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Storefront</label>
+          <field id="available" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1"
+                 sortOrder="20">
+            <label>Available</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+          </field>
+          <field id="enabled" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1"
+                 sortOrder="30">
+            <label>Record by default</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <depends>
+              <field id="available">1</field>
+            </depends>
+          </field>
+          <field id="enable_toggle" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1"
+                 sortOrder="40">
+            <label>Record can be disabled</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <depends>
+              <field id="enabled">1</field>
+            </depends>
+          </field>
+          <field id="report" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1"
+                 sortOrder="50">
+            <label>Automatically report record on error</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <depends>
+              <field id="available">1</field>
+            </depends>
+          </field>
+          <field id="report_toggle" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1"
+                 sortOrder="60">
+            <label>Can disable automated record report</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <depends>
+              <field id="report">1</field>
+            </depends>
+          </field>
+          <field id="policy_page" translate="label" type="select" showInDefault="1" showInWebsite="1" showInStore="1"
+                 canRestore="1" sortOrder="70">
+            <label>Privacy Policy Page</label>
+            <source_model>Magento\Cms\Model\Config\Source\Page</source_model>
+            <can_be_empty>0</can_be_empty>
+          </field>
+          <field id="ignore_rules" translate="label" type="textarea" showInDefault="1" showInWebsite="1" showInStore="1"
+                 canRestore="1" sortOrder="80">
+            <label>Regex error ignore rules</label>
+          </field>
+        </group>
+      </group>
+    </section>
+  </system>
+</config>

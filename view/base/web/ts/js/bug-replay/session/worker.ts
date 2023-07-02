@@ -1,5 +1,6 @@
 import {
-    EventType,
+    EventPostResult,
+    EventType, IErrorConsole,
     IRecordEvent, IRecordSession,
     SessionWorker as SessionWorkerInterface,
 } from 'VMPL_BugReplay/js/api/session'
@@ -20,13 +21,17 @@ class Worker implements SessionWorkerInterface {
         return Promise.resolve();
     }
 
-    post(event: IRecordEvent): Promise<number> {
-        return (event.type <= 2
-            ? this.flushBuffer()
-            : Promise.resolve(0))
-            .then(sessionId => {
+    post(event: IRecordEvent): Promise<EventPostResult> {
+        return (() => {
+            if (event.type <= 2) {
+                return this.flushBuffer();
+            } else {
+                return Promise.resolve(<EventPostResult>{})
+            }
+        })()
+            .then(info => {
                 return this.database.buffer.put(event)
-                    .then(() => sessionId);
+                    .then(() => info)
             })
     }
 
@@ -98,7 +103,7 @@ class Worker implements SessionWorkerInterface {
         }).then(blob => {
             const body = new FormData();
             body.append('database', new File([blob], 'database.json'), 'database.json');
-            return axios.post('/vmpl-bug-report/session/upload', body)
+            return axios.post('/vmpl-bug-replay/session/upload', body)
                 .then(response => response.data);
         }).then(({fileName}) => {
             return Promise.all(
@@ -112,7 +117,8 @@ class Worker implements SessionWorkerInterface {
 
     import(url: string): Promise<void> {
         return axios.get(url, {responseType: 'blob'})
-            .then(response => this.database.import(response.data, {acceptNameDiff: true}))
+            .then(response => this.database.import(response.data,
+                {acceptNameDiff: true, noTransaction: true, overwriteValues: true, clearTablesBeforeImport: true}))
     }
 
     delete(sessions: IRecordSession[]): Promise<void> {
@@ -145,7 +151,7 @@ class Worker implements SessionWorkerInterface {
      * @private
      * @return number when buffer has event with error in the console otherwise zero
      */
-    private flushBuffer(): Promise<number> {
+    private flushBuffer(): Promise<EventPostResult> {
         return Promise.all([
             this.database.buffer.where('type').equals(EventType.Meta).first(),
             this.database.buffer.where('type').equals(EventType.FullSnapshot).first(),
@@ -187,13 +193,13 @@ class Worker implements SessionWorkerInterface {
                             .then(events => this.database.events.bulkPut(events)),
                     ])
                         .then(() => this.database.buffer.clear())
-                        .then(() => !errorConsoles.length ? 0 : sessionId);
+                        .then(() => { return {errors: errorConsoles, sessionId}});
                 })
             })
         })
     }
 
-    private createBufferErrorDigests(): Promise<ErrorConsole[]> {
+    private createBufferErrorDigests(): Promise<IErrorConsole[]> {
         const textEncoder = new TextEncoder();
         const textDecoder = new TextDecoder();
 
@@ -219,7 +225,7 @@ class Worker implements SessionWorkerInterface {
                         .then(consoleErrors => {
                             digests.forEach((event, digest) => {
                                 if (!consoleErrors.some(it => it.digest === digest)) {
-                                    consoleErrors.push(new ErrorConsole(digest, event.data.payload.payload.shift()))
+                                    consoleErrors.push(new ErrorConsole(digest, JSON.parse(event.data.payload.payload.shift())))
                                 }
                             })
                             return consoleErrors;

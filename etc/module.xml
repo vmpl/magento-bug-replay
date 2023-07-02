@@ -4,6 +4,7 @@
   <module name="VMPL_BugReplay">
     <sequence>
       <module name="Magento_Store"/>
+      <module name="Magento_Cms"/>
     </sequence>
   </module>
 </config>

@@ -14,7 +14,7 @@
     "experimentalDecorators": true,
     "lib": [
       "dom",
-      "es2019",
+      "es2022",
       "webworker"
     ],
     "types": [

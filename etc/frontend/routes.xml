@@ -2,7 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
   <router id="standard">
-    <route id="vmpl_bug_report" frontName="vmpl-bug-report">
+    <route id="vmpl_bug_replay" frontName="vmpl-bug-replay">
       <module name="VMPL_BugReplay"/>
     </route>
   </router>

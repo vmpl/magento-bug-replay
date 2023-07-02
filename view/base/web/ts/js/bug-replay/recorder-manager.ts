@@ -1,4 +1,4 @@
-import {IRecordEvent, IRecordSession, SessionWorker} from "VMPL_BugReplay/js/api/session";
+import {EventPostResult, IRecordEvent, IRecordSession, SessionWorker} from "VMPL_BugReplay/js/api/session";
 import ItemPaginator, {PaginatorFilter} from "VMPL_BugReplay/js/bug-replay/items-paginator";
 import {IPaginatorFilter, IPaginatorLoader, IPaginatorResponse} from "VMPL_BugReplay/js/api/paginator";
 import {WorkerClient} from "VMPL_BugReplay/js/lib/worker/client";
@@ -17,9 +17,9 @@ export class DataEvent extends Event {
         }
     }
 
-    static NewSessionWithError(sessionId: number): DataEvent {
+    static NewSessionWithError(result: EventPostResult): DataEvent {
         const instance = new this(DataEvent.Types.NewSessionWithError, {bubbles: false, cancelable: false});
-        instance.data = sessionId;
+        instance.data = result;
         return instance;
     }
 
@@ -45,9 +45,9 @@ export default class RecorderManager implements IPaginatorLoader<IRecordSession>
             self.stopRecord = rrweb.record({
                 emit(event: IRecordEvent) {
                     self.sessionWorker.post(event)
-                        .then(sessionId => {
-                            sessionId === 0
-                                || window.dispatchEvent(DataEvent.NewSessionWithError(sessionId));
+                        .then(result => {
+                            (result?.errors?.length ?? 0) === 0
+                                || window.dispatchEvent(DataEvent.NewSessionWithError(result));
                         })
                 },
                 plugins: [rrweb.getRecordConsolePlugin()],

@@ -8,12 +8,16 @@
   </head>
   <body>
     <referenceContainer name="after.body.start">
-      <block name="vmpl.bug-replay.recorder" template="VMPL_BugReplay::recorder.phtml">
+      <block class="VMPL\BugReplay\Block\UiComponentWithJsLayout" name="vmpl.bug-replay.recorder" template="VMPL_BugReplay::recorder.phtml">
         <arguments>
           <argument name="jsLayout" xsi:type="array">
             <item name="components" xsi:type="array">
               <item name="replayProvider" xsi:type="array">
                 <item name="component" xsi:type="string">VMPL_BugReplay/js/model/provider</item>
+                <item name="config" xsi:type="array">
+                  <item name="configuration" xsi:type="helper"
+                        helper="\VMPL\BugReplay\ViewModel\Session::getStoreCoreConfig"/>
+                </item>
               </item>
               <item name="recorder" xsi:type="array">
                 <item name="component" xsi:type="string">uiComponent</item>
@@ -28,12 +32,13 @@
                     </item>
                     <item name="children" xsi:type="array">
                       <item name="previewPlayer" xsi:type="array">
-                        <item name="component" xsi:type="string">VMPL_BugReplay/js/view/player</item><item name="config" xsi:type="array">
-                        <item name="provider" xsi:type="string">replayProvider</item>
-                        <item name="deps" xsi:type="array">
-                          <item name="0" xsi:type="string">replayProvider</item>
+                        <item name="component" xsi:type="string">VMPL_BugReplay/js/view/player</item>
+                        <item name="config" xsi:type="array">
+                          <item name="provider" xsi:type="string">replayProvider</item>
+                          <item name="deps" xsi:type="array">
+                            <item name="0" xsi:type="string">replayProvider</item>
+                          </item>
                         </item>
-                      </item>
                       </item>
                     </item>
                   </item>

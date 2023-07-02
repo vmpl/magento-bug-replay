@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+  <default>
+    <analytics>
+      <vmpl_bug_replay>
+        <admin>
+          <available>1</available>
+        </admin>
+        <storefront>
+          <available>1</available>
+          <enable_toggle>1</enable_toggle>
+          <report>1</report>
+          <report_toggle>0</report_toggle>
+          <policy_page>record-policy-page</policy_page>
+        </storefront>
+      </vmpl_bug_replay>
+    </analytics>
+  </default>
+</config>

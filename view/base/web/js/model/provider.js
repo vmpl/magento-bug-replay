@@ -5,13 +5,15 @@ define(["mageUtils", "underscore", "uiComponent", "VMPL_BugReplay/js/bug-replay/
   var _default = _uiComponent.extend({
     defaults: {
       fileHash: 'BugReplay',
-      endpointRequest: '/vmpl-bug-report/worker/loader',
+      endpointRequest: '/vmpl-bug-replay/worker/loader',
       ignoreTmpls: {
         data: true
       }
     },
     initialize: function initialize(options) {
       this._super(options);
+      this.get('$recordEnable') !== undefined && this.get('configuration.enable_toggle') === '1' || this.set('$recordEnable', this.get('configuration.enabled') === '1' ? '1' : '0');
+      this.get('$reportEnable') !== undefined && this.get('configuration.report_toggle') === '1' || this.set('$reportEnable', this.get('configuration.report') === '1' ? '1' : '0');
       var manager = this._manager();
       this._set('manager', function () {
         return manager;
@@ -21,9 +23,7 @@ define(["mageUtils", "underscore", "uiComponent", "VMPL_BugReplay/js/bug-replay/
     _manager: function _manager() {
       var _this = this;
       return _recorderManager.init(this.endpointRequest, this.fileHash).then(function (manager) {
-        if (_this.get('$recordEnable') === '1') {
-          manager.startRecord();
-        }
+        !_this.shouldRecord() || manager.startRecord();
         return manager;
       });
     },
@@ -31,13 +31,18 @@ define(["mageUtils", "underscore", "uiComponent", "VMPL_BugReplay/js/bug-replay/
       if (path.startsWith('$')) {
         return this.storage().get(path.replace(/^\$/, ''));
       }
+      if (path.startsWith('!')) {
+        var _this$get$toString, _this$get;
+        var value = (_this$get$toString = (_this$get = this.get(path.replace(/^!/, ''))) == null ? void 0 : _this$get.toString()) != null ? _this$get$toString : 'null';
+        return !JSON.parse(value);
+      }
       return this._super(path);
     },
     set: function set(path, value) {
       var _this2 = this;
       if (value instanceof Array) {
-        var _this$get;
-        Object.keys((_this$get = this.get(path)) != null ? _this$get : {}).filter(function (index) {
+        var _this$get2;
+        Object.keys((_this$get2 = this.get(path)) != null ? _this$get2 : {}).filter(function (index) {
           return ~~index >= value.length;
         }).forEach(function (index) {
           return _this2.remove(path + "." + index);
@@ -76,6 +81,16 @@ define(["mageUtils", "underscore", "uiComponent", "VMPL_BugReplay/js/bug-replay/
       } else {
         parent[lastPathComponent] = value;
       }
+    },
+    shouldRecord: function shouldRecord() {
+      var shouldRecord = this.get('configuration.available') === '1';
+      shouldRecord && (shouldRecord = this.get('configuration.enable_toggle') === '0' && this.get('configuration.enabled') === '1' || this.get('configuration.enable_toggle') === '1' && this.get('$recordEnable') === '1');
+      return shouldRecord;
+    },
+    shouldReport: function shouldReport() {
+      var shouldReport = this.get('configuration.available') === '1';
+      shouldReport && (shouldReport = this.get('configuration.report_toggle') === '0' && this.get('configuration.report') === '1' || this.get('configuration.report_toggle') === '1' && this.get('$reportEnable') === '1');
+      return shouldReport;
     }
   });
   return _default;

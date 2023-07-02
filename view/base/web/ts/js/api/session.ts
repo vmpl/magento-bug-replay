@@ -32,9 +32,11 @@ export interface IErrorConsole {
     readonly digest: string;
 }
 
+export type EventPostResult = {errors: IErrorConsole[], sessionId: number};
+
 export interface SessionWorker {
     initInstance(instance: string): Promise<void>;
-    post(event: IRecordEvent): Promise<number>;
+    post(event: IRecordEvent): Promise<EventPostResult>;
     sessions(offset: number, limit: number, filter: IPaginatorFilter<IRecordSession>): Promise<IPaginatorResponse<RecordSession>>;
     events(sessions: IRecordSession[]): Promise<IPaginatorResponse<IRecordEvent>>;
     export(sessions: IRecordSession[]): Promise<number[]>;

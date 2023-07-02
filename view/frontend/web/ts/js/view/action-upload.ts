@@ -46,7 +46,6 @@ export default Component.extend({
                 this.onCancel();
                 return this.list().reload()
             })
-            .then(() => alert($t('Uploaded')));
     },
     onCancel() {
         Object.values(this.sessions())

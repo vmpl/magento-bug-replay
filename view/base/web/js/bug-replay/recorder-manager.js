@@ -20,12 +20,12 @@ define(["VMPL_BugReplay/js/bug-replay/items-paginator", "VMPL_BugReplay/js/lib/w
     function DataEvent() {
       return _Event.apply(this, arguments) || this;
     }
-    DataEvent.NewSessionWithError = function NewSessionWithError(sessionId) {
+    DataEvent.NewSessionWithError = function NewSessionWithError(result) {
       var instance = new this(DataEvent.Types.NewSessionWithError, {
         bubbles: false,
         cancelable: false
       });
-      instance.data = sessionId;
+      instance.data = result;
       return instance;
     };
     DataEvent.UploadSessionFinished = function UploadSessionFinished(sessions) {
@@ -59,8 +59,9 @@ define(["VMPL_BugReplay/js/bug-replay/items-paginator", "VMPL_BugReplay/js/lib/w
       (function (self) {
         self.stopRecord = rrweb.record({
           emit: function emit(event) {
-            self.sessionWorker.post(event).then(function (sessionId) {
-              sessionId === 0 || window.dispatchEvent(DataEvent.NewSessionWithError(sessionId));
+            self.sessionWorker.post(event).then(function (result) {
+              var _result$errors$length, _result$errors;
+              ((_result$errors$length = result == null ? void 0 : (_result$errors = result.errors) == null ? void 0 : _result$errors.length) != null ? _result$errors$length : 0) === 0 || window.dispatchEvent(DataEvent.NewSessionWithError(result));
             });
           },
           plugins: [rrweb.getRecordConsolePlugin()]
