@@ -17,7 +17,13 @@ define(["VMPL_BugReplay/js/api/session", "VMPL_BugReplay/js/bug-replay/session/d
     };
     _proto.post = function post(event) {
       var _this = this;
-      return event.type <= 2 ? this.flushBuffer() : Promise.resolve({}).then(function (info) {
+      return function () {
+        if (event.type <= 2) {
+          return _this.flushBuffer();
+        } else {
+          return Promise.resolve({});
+        }
+      }().then(function (info) {
         return _this.database.buffer.put(event).then(function () {
           return info;
         });
