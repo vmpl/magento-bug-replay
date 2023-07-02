@@ -13,7 +13,7 @@
         }
     ],
     "dist": {
-        "url": "https://github.com/vmpl/magento-bug-replay/archive/refs/tags/1.0.1-alpha.zip",
+        "url": "https://github.com/vmpl/magento-bug-replay/archive/refs/tags/1.1.0-alpha.zip",
         "type": "zip"
     },
     "source": {
