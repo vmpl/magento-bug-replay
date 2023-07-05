@@ -1,6 +1,6 @@
 {
   "name": "@vmpl/module-bug-replay",
-  "version": "1.1.0-alpha",
+  "version": "1.1.1-alpha",
   "description": "Bug Replay module",
   "scripts": {
     "test:static": "tslint --project tsconfig.json",
