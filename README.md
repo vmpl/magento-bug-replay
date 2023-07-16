@@ -7,9 +7,9 @@
 ### Features Stack
 
 1. Record user interaction of webpage
-2. Most of work is seperated to dedicated web-worker for parallel not blocking thread
-3. Using local browser database for storing recorded events data
-4. Sending chosen session from storefront to admin site to report error issues
+2. Most of the work is separated to dedicated web-worker for parallel not blocking thread
+3. Using a local browser database for storing recorded events data
+4. Sending a chosen session from storefront to admin site to report error issues
 5. Automatically records console events and optionally send it to administration 
 6. Store configuration for automated recording and reporting of web session errors
 7. Free to use 🔥
@@ -25,7 +25,9 @@
 
 ```shell
 $ composer require vmpl/module-bug-replay
-```
-```shell
 $ bin/magento module:enable VMPL_BugReplay
 ```
+
+## Guides
+1. [Installation Guide](.docs%2Finstallation-guide.md)
+2. [Feature Guide](.docs%2Ffeature-guide.md)
