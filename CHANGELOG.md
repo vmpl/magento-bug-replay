@@ -1,2 +1,2 @@
-# 1.0.0-dev
-Initial release, keep up with new released with links to issues or tasks
+# 1.1.2-alpha
+Adding markdown guides
